@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Globals.Abstractions;
+using Globals.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Globals.Abstractions;
-using Globals.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Globals.Sevices
 {
@@ -25,7 +25,7 @@ namespace Globals.Sevices
         //}
 
         public virtual async Task<int> AddEntityGetIdAsync(T entity)
-        {
+        {            
             using (var db = (V)Activator.CreateInstance(typeof(V)))
             {
                 var res = db.Values.Add(entity);

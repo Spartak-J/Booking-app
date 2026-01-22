@@ -1,7 +1,7 @@
-﻿using System.Reflection;
-using Globals.Abstractions;
-using Globals.Models;
+﻿using Globals.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using Globals.Models;
 
 namespace Globals.Sevices
 {
@@ -30,7 +30,7 @@ namespace Globals.Sevices
             using (var db = (V)Activator.CreateInstance(typeof(V)))
             {
                 var dbSet = GetDbSet(db);
-                var res = dbSet.Add(entity);
+                var res =  dbSet.Add(entity);
                 db.SaveChanges();
                 return res.Entity.id;
             }
