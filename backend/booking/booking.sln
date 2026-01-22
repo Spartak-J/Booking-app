@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfferApiService", "OfferApi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderApiService", "OrderApiService\OrderApiService.csproj", "{78306AFF-BAA9-445A-DFDB-00AE72E7B24E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationApiService", "LocationApiService\LocationApiService.csproj", "{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{78306AFF-BAA9-445A-DFDB-00AE72E7B24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78306AFF-BAA9-445A-DFDB-00AE72E7B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78306AFF-BAA9-445A-DFDB-00AE72E7B24E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
