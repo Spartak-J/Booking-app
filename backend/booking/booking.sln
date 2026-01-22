@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderApiService", "OrderApi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationApiService", "LocationApiService\LocationApiService.csproj", "{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttractionApiService", "AttractionApiService\AttractionApiService.csproj", "{1A3DAE92-646F-E507-0905-D4460333CB36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6D1E92E-F0B1-14B1-D4E5-2F87B715C110}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A3DAE92-646F-E507-0905-D4460333CB36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A3DAE92-646F-E507-0905-D4460333CB36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A3DAE92-646F-E507-0905-D4460333CB36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A3DAE92-646F-E507-0905-D4460333CB36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
