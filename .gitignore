@@ -83,3 +83,9 @@ SCREEN_TEMPLATE.md
 # Owner
 # -------------------------
 src/screens/Owner
+
+
+# -------------------------
+# Firebase / Google
+# -------------------------
+GoogleService-Info.plist
