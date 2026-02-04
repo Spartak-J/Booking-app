@@ -1,49 +1,59 @@
-import 'dotenv/config';
-
-export default ({ config }) => ({
-  ...config,
-  name: 'mobile-app',
-  slug: 'mobile-app',
-  version: '1.0.0',
-
-  orientation: 'portrait',
-  icon: './assets/icon.png',
-  userInterfaceStyle: 'light',
-  newArchEnabled: true,
-
-  splash: {
-    image: './assets/splash-icon.png',
-    resizeMode: 'contain',
-    backgroundColor: '#ffffff',
-  },
-
-  ios: {
-    supportsTablet: true,
-    bundleIdentifier: 'com.booking.like.mobile.ios',
-    googleServicesFile: './GoogleService-Info.plist',
-  },
-
-  android: {
-    package: 'com.booking.like.mobile',
-    googleServicesFile: './google-services.json',
-    adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
+export default ({ config }) => {
+  const env = process.env.APP_ENV || 'development';
+  
+  return {
+    ...config,
+    name: 'Booking Oselya',
+    slug: 'booking-oselya',
+    version: '1.0.0',
+    orientation: 'portrait',
+    icon: './assets/icon.png',
+    userInterfaceStyle: 'light',
+    splash: {
+      image: './assets/splash.png',
+      resizeMode: 'contain',
       backgroundColor: '#ffffff',
     },
-    edgeToEdgeEnabled: true,
-    predictiveBackGestureEnabled: false,
-  },
-
-  web: {
-    favicon: './assets/favicon.png',
-  },
-
-  plugins: ['expo-secure-store', 'expo-notifications'],
-
-  extra: {
-    EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL,
-    EXPO_PUBLIC_USE_MOCKS: process.env.EXPO_PUBLIC_USE_MOCKS ?? 'true',
-    USE_MOCKS: process.env.EXPO_PUBLIC_USE_MOCKS ?? 'true',
-    EXPO_PUBLIC_SENDER_ID: process.env.EXPO_PUBLIC_SENDER_ID,
-  },
-});
+    extra: {
+      API_BASE_URL: env === 'production' 
+        ? 'https://booking-oselya.pp.ua'
+        : 'http://10.0.2.2',
+      USE_MOCKS: false,
+      LANG: 'uk',
+      eas: {
+        projectId: 'booking-oselya-project',
+      },
+    },
+    android: {
+      package: 'com.bookingoselya',
+      versionCode: 1,
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#ffffff',
+      },
+      permissions: [
+        'INTERNET',
+        'ACCESS_NETWORK_STATE',
+        'RECEIVE_BOOT_COMPLETED',
+        'VIBRATE',
+      ],
+    },
+    ios: {
+      bundleIdentifier: 'com.bookingoselya',
+      supportsTablet: true,
+    },
+    web: {
+      favicon: './assets/favicon.png',
+    },
+    plugins: [
+      'expo-secure-store',
+      [
+        'expo-notifications',
+        {
+          icon: './assets/notification-icon.png',
+          color: '#ffffff',
+        },
+      ],
+    ],
+  };
+};

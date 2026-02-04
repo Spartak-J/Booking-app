@@ -89,3 +89,12 @@ src/screens/Owner
 # Firebase / Google
 # -------------------------
 GoogleService-Info.plist
+# Environment files
+.env*
+!.env.example
+*.backup
+
+# Environment files
+.env*
+!.env.example
+*.backup
