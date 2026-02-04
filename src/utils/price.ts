@@ -1,2 +1,6 @@
-export const formatPrice = (value: number, currency = 'USD'): string =>
-  Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
+export const formatPrice = (value: number, currency = 'UAH', withCurrency = true): string => {
+  const options: Intl.NumberFormatOptions = withCurrency
+    ? { style: 'currency', currency, maximumFractionDigits: 0 }
+    : { style: 'decimal', maximumFractionDigits: 0 };
+  return Intl.NumberFormat('uk-UA', options).format(value);
+};

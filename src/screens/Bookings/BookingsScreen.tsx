@@ -1,126 +1,118 @@
+// Screen: BookingsScreen. Used in: RootNavigator.
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useMemo } from 'react';
-import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { bookingService } from '@/services/bookingService';
-import { useAuthStore } from '@/store/authStore';
-import { spacing, radius } from '@/theme';
-import { useThemeColors } from '@/hooks/useThemeColors';
-import { BookingCard } from '@/components/BookingCard';
-import { Skeleton } from '@/components/Skeleton';
-import { useCallback } from 'react';
+import BookingsScreenView, {
+  ActiveBooking,
+  PastBookingItem,
+} from '@/components/Bookings/BookingsScreenView';
+import { BookingRepository } from '@/data/bookings';
+import { HotelsRepository } from '@/data/hotels';
+import { Routes } from '@/navigation/routes';
+import type { RootStackParamList } from '@/navigation/RootNavigator';
+import { useAuth } from '@/hooks/useAuth';
+import { formatPrice } from '@/utils/price';
+import { ScreenContainer } from '@/ui';
+
+import activeTripImage from '@/assets/images/2.png';
+import pastImage1 from '@/assets/images/1.png';
+import pastImage2 from '@/assets/images/2.png';
+import pastImage3 from '@/assets/images/3.png';
+import pastImage4 from '@/assets/images/4.png';
+import pastImage5 from '@/assets/images/5.png';
+
+type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 export const BookingsScreen = () => {
-  const user = useAuthStore((state) => state.user);
-  const queryClient = useQueryClient();
-  const navigation = useNavigation<any>();
-  const { colors } = useThemeColors();
-  const styles = useMemo(() => getStyles(colors), [colors]);
+  const navigation = useNavigation<Navigation>();
+  const { user } = useAuth();
+  const [activeBooking, setActiveBooking] = useState<ActiveBooking | null>(null);
+  const [pastItems, setPastItems] = useState<PastBookingItem[]>([]);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['bookings', user?.id],
-    queryFn: () => bookingService.getUserBookings(user?.id ?? ''),
-    enabled: Boolean(user?.id),
-  });
+  useEffect(() => {
+    let active = true;
+    const imageMap: Record<string, number> = {
+      'hotel-1': pastImage1,
+      'hotel-2': pastImage2,
+      'hotel-3': pastImage3,
+      'hotel-4': pastImage4,
+      'hotel-5': pastImage5,
+    };
 
-  const cancelMutation = useMutation({
-    mutationFn: (bookingId: string) => bookingService.cancel(bookingId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bookings'] }),
-  });
+    const formatDateRange = (start: string, end: string) => {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      return `${startDate.toLocaleDateString('uk-UA')} -${endDate.toLocaleDateString('uk-UA')}`;
+    };
 
-  const confirmCancel = useCallback(
-    (id: string) =>
-      Alert.alert('Отменить бронь?', 'Вы уверены, что хотите отменить бронь?', [
-        { text: 'Нет', style: 'cancel' },
-        { text: 'Да', style: 'destructive', onPress: () => cancelMutation.mutate(id) },
-      ]),
-    [cancelMutation],
-  );
+    const loadBookings = async () => {
+      const userId = user?.id ?? 'user-1';
+      const [items, hotels] = await Promise.all([
+        BookingRepository.getByUserId(userId),
+        HotelsRepository.getAll(),
+      ]);
+      if (!active) return;
+
+      const activeItem = items.find(
+        (item) => item.status === 'active' || item.status === 'pending',
+      );
+      if (activeItem) {
+        const activeHotelId = activeItem.hotelId ?? '';
+        const hotel = hotels.find((item) => item.id === activeItem.hotelId);
+        setActiveBooking({
+          city: hotel?.city ?? 'Львів',
+          hotelName: hotel?.name ?? 'Jam Hotel Staroyevreyska',
+          dates: formatDateRange(activeItem.checkIn, activeItem.checkOut),
+          price: `UAH ${formatPrice(activeItem.totalPrice, 'UAH', false)}`,
+          image: imageMap[activeHotelId] ?? activeTripImage,
+        });
+      } else {
+        setActiveBooking(null);
+      }
+
+      const pastBookings = items.filter((item) => item.status === 'completed');
+      setPastItems(
+        pastBookings.map((item) => {
+          const pastHotelId = item.hotelId ?? '';
+          const hotel = hotels.find((entry) => entry.id === item.hotelId);
+          return {
+            id: hotel?.id ?? item.id,
+            hotelId: item.hotelId,
+            title: hotel?.name ?? 'Jam Hotel Staroyevreyska',
+            image: imageMap[pastHotelId] ?? pastImage1,
+            dates: formatDateRange(item.checkIn, item.checkOut),
+            price: `UAH ${formatPrice(item.totalPrice, 'UAH', false)}`,
+            location: hotel?.address ?? 'вул. Наукова,61',
+            rating: hotel?.rating ? hotel.rating.toFixed(1).replace('.', ',') : '8,1',
+            infoText: hotel?.description ?? '',
+            amenities: hotel?.amenities ?? [],
+          };
+        }),
+      );
+    };
+
+    loadBookings();
+    const unsubscribe = navigation?.addListener?.('focus', loadBookings);
+
+    return () => {
+      active = false;
+      if (unsubscribe) unsubscribe();
+    };
+  }, [navigation, user?.id]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Мои бронирования</Text>
-      {isLoading && (
-        <View style={styles.list}>
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} height={120} />
-          ))}
-        </View>
-      )}
-      <FlatList
-        data={data?.items ?? []}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <BookingCard
-            booking={item}
-            onPress={() =>
-              navigation.navigate(
-                'BookingDetails' as never,
-                {
-                  bookingId: item.id,
-                } as never,
-              )
-            }
-            onCancel={item.status !== 'cancelled' ? () => confirmCancel(item.id) : undefined}
-            cancelLabel={cancelMutation.isPending ? 'Отмена...' : 'Отменить'}
-          />
-        )}
-        ListEmptyComponent={
-          <Text style={styles.empty}>
-            {isLoading ? 'Загрузка...' : 'У вас пока нет бронирований'}
-          </Text>
+    <ScreenContainer edges={['top', 'left', 'right']}>
+      <BookingsScreenView
+        activeBooking={activeBooking}
+        pastItems={pastItems}
+        onBack={() => navigation.goBack()}
+        onPressPastBooking={(item) =>
+          navigation.navigate(Routes.PastBookingDetails, { booking: item })
         }
-        contentContainerStyle={styles.list}
       />
-    </View>
+    </ScreenContainer>
   );
 };
 
-const getStyles = (colors: any) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-      padding: spacing.lg,
-    },
-    heading: {
-      fontSize: 22,
-      fontWeight: '700',
-      color: colors.text,
-      marginBottom: spacing.md,
-    },
-    list: {
-      gap: spacing.md,
-    },
-    card: {
-      backgroundColor: colors.surface,
-      padding: spacing.lg,
-      borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
-      gap: spacing.sm,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: colors.text,
-    },
-    muted: {
-      color: colors.muted,
-    },
-    price: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: colors.primary,
-    },
-    status: {
-      color: colors.text,
-      fontWeight: '500',
-    },
-    empty: {
-      textAlign: 'center',
-      marginTop: spacing.xl,
-      color: colors.muted,
-    },
-  });
+export default BookingsScreen;

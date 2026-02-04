@@ -1,17 +1,20 @@
+// Screen: OwnerObjectFormScreen. Used in: (no direct imports found).
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
-import { Alert, Button, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 import { RootStackParamList } from '@/navigation/RootNavigator';
 import { offerService } from '@/services/offerService';
 import { paramService } from '@/services/paramService';
-import { spacing } from '@/theme';
-import { useThemeColors } from '@/hooks/useThemeColors';
-import { FormContainer, FormField } from '@/components/Form';
+import { spacing, radius } from '@/theme';
+import { useTheme } from '@/theme';
 import { ChipSelect } from '@/components/ChipSelect';
-import { Skeleton } from '@/components/Skeleton';
+import { useTranslation } from '@/i18n';
+import { BackButton } from '@/components/BackButton';
+import { formatDate } from '@/utils/date';
+import { Button, Card, Input, Loader, ScreenContainer, Typography } from '@/ui';
 
 type Route = RouteProp<RootStackParamList, 'OwnerObjectForm'>;
 
@@ -20,8 +23,10 @@ export const OwnerObjectFormScreen = () => {
   const queryClient = useQueryClient();
   const { params } = useRoute<Route>();
   const offerId = params?.offerId;
-  const { colors } = useThemeColors();
+// TODO: move theming to UI layer
+  const { colors } = useTheme();
   const styles = React.useMemo(() => getStyles(colors), [colors]);
+  const { t } = useTranslation();
   const { data: amenities } = useQuery({
     queryKey: ['amenities'],
     queryFn: paramService.getAmenities,
@@ -96,11 +101,12 @@ export const OwnerObjectFormScreen = () => {
       if (result?.id) {
         queryClient.setQueryData(['offer', result.id], result);
       }
-      Alert.alert('Сохранено', 'Объект сохранён (моки).');
+      // TODO: replace mock success copy with API response copy/i18n when backend is ready.
+      Alert.alert(t('owner.form.saved'), t('owner.form.savedMock'));
       navigation.goBack();
     },
     onError: (err: unknown) => {
-      Alert.alert('Ошибка', String(err));
+      Alert.alert(t('booking.error'), String(err));
     },
   });
 
@@ -117,68 +123,83 @@ export const OwnerObjectFormScreen = () => {
     }
   };
 
-  const title = useMemo(() => (offerId ? 'Редактирование объекта' : 'Новый объект'), [offerId]);
+  // TODO: replace mock replies with backend responses.
+  const respondToReview = (id: string) =>
+    Alert.alert(t('owner.reviews.reply'), `Mock reply for ${id}`);
+
+  // TODO: replace mock disputes with backend responses.
+  const disputeReview = (id: string) =>
+    Alert.alert(t('owner.reviews.dispute'), `Mock dispute for ${id}`);
+
+  const title = useMemo(
+    () => (offerId ? t('owner.form.title.edit') : t('owner.form.title.new')),
+    [offerId, t],
+  );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.heading}>{title}</Text>
-      {loadingOffer && <Skeleton height={140} />}
-      <FormContainer>
-        <Field label="Название" styles={styles}>
-          <FormField value={form.title} onChangeText={(v) => onChange('title', v)} label="" />
-        </Field>
-        <Field label="Описание" styles={styles}>
-          <FormField
+    <ScreenContainer style={styles.container} edges={['top', 'left', 'right']}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <BackButton />
+        <Typography variant="h2" tone="primary">
+          {title}
+        </Typography>
+        {loadingOffer && <Loader variant="skeleton" height={140} />}
+        <Card style={styles.formCard} padding="lg">
+          <Input
+            label={t('owner.form.name')}
+            value={form.title}
+            onChangeText={(v) => onChange('title', v)}
+          />
+          <Input
+            label={t('owner.form.description')}
             value={form.description}
             onChangeText={(v) => onChange('description', v)}
-            label=""
             multiline
-            style={styles.multiline}
+            inputStyle={styles.multiline}
           />
-        </Field>
-        <Field label="Город" styles={styles}>
-          <FormField value={form.cityName} onChangeText={(v) => onChange('cityName', v)} label="" />
-        </Field>
-        <Field label="Страна" styles={styles}>
-          <FormField
+          <Input
+            label={t('owner.form.city')}
+            value={form.cityName}
+            onChangeText={(v) => onChange('cityName', v)}
+          />
+          <Input
+            label={t('owner.form.country')}
             value={form.cityCountry}
             onChangeText={(v) => onChange('cityCountry', v)}
-            label=""
           />
-        </Field>
-        <Field label="Адрес" styles={styles}>
-          <FormField value={form.address} onChangeText={(v) => onChange('address', v)} label="" />
-        </Field>
-        <Field label="Цена за ночь" styles={styles}>
-          <FormField
+          <Input
+            label={t('owner.form.address')}
+            value={form.address}
+            onChangeText={(v) => onChange('address', v)}
+          />
+          <Input
+            label={t('owner.form.price')}
             value={form.pricePerNight}
             onChangeText={(v) => onChange('pricePerNight', v)}
-            label=""
             keyboardType="numeric"
-            helperText="Укажите стоимость за ночь"
+            helperText={t('owner.form.price.helper')}
           />
-        </Field>
-        <Field label="Гостей" styles={styles}>
-          <FormField
+          <Input
+            label={t('owner.form.guests')}
             value={form.guests}
             onChangeText={(v) => onChange('guests', v)}
-            label=""
             keyboardType="numeric"
           />
-        </Field>
-        <Field label="Спален" styles={styles}>
-          <FormField
+          <Input
+            label={t('owner.form.bedrooms')}
             value={form.bedrooms}
             onChangeText={(v) => onChange('bedrooms', v)}
-            label=""
             keyboardType="numeric"
           />
-        </Field>
-        <Field label="Фото (URL)" styles={styles}>
-          <FormField value={form.image} onChangeText={(v) => onChange('image', v)} label="" />
-          <Button title="Выбрать из галереи" onPress={pickImage} />
-        </Field>
-        <Field label="Удобства" styles={styles}>
+          <Input
+            label={t('owner.form.photo')}
+            value={form.image}
+            onChangeText={(v) => onChange('image', v)}
+          />
+          <Button title={t('owner.form.pickImage')} onPress={pickImage} variant="ghost" />
+          <Typography variant="caption" tone="secondary">
+            {t('owner.form.amenities')}
+          </Typography>
           <ChipSelect
             options={(amenities ?? []).map((a) => ({ id: a.name, label: a.name }))}
             selected={form.amenities}
@@ -191,29 +212,61 @@ export const OwnerObjectFormScreen = () => {
             multi
             horizontal={false}
           />
-        </Field>
-      </FormContainer>
-      <Button
-        title={mutation.isPending ? 'Сохраняем...' : 'Сохранить'}
-        onPress={() => mutation.mutate()}
-        disabled={mutation.isPending}
-      />
-    </ScrollView>
+        </Card>
+        <Button
+          title={mutation.isPending ? t('owner.form.saveProgress') : t('owner.form.save')}
+          onPress={() => mutation.mutate()}
+          disabled={mutation.isPending}
+        />
+        {existing && (
+          <>
+            <Typography variant="h2" tone="primary">
+              {t('owner.reviews.title')}
+            </Typography>
+            {existing.reviews && existing.reviews.length ? (
+              <View style={styles.reviews}>
+                {existing.reviews.map((r) => (
+                  <Card key={r.id} style={styles.reviewCard} padding="md">
+                    <Typography variant="body" tone="primary">
+                      {r.userName} · {r.rating}★
+                    </Typography>
+                    <Typography variant="caption" tone="primary">
+                      {r.comment}
+                    </Typography>
+                    <Typography variant="caption" tone="secondary">
+                      {formatDate(r.createdAt)}
+                    </Typography>
+                    <View style={styles.reviewActions}>
+                      <Button
+                        title={t('owner.reviews.reply')}
+                        variant="ghost"
+                        style={styles.secondary}
+                        onPress={() => respondToReview(r.id)}
+                      />
+                      <Button
+                        title={t('owner.reviews.dispute')}
+                        variant="ghost"
+                        style={styles.secondary}
+                        onPress={() => disputeReview(r.id)}
+                      />
+                    </View>
+                  </Card>
+                ))}
+              </View>
+            ) : (
+              <Typography variant="caption" tone="secondary" style={styles.muted}>
+                {t('owner.reviews.empty')}
+              </Typography>
+            )}
+          </>
+        )}
+      </ScrollView>
+    </ScreenContainer>
   );
 };
 
-const Field: React.FC<{
-  label: string;
-  children: React.ReactNode;
-  styles: ReturnType<typeof getStyles>;
-}> = ({ label, children, styles }) => (
-  <View style={styles.field}>
-    <Text style={styles.label}>{label}</Text>
-    {children}
-  </View>
-);
-
 const getStyles = (colors: any) =>
+// LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
     container: {
       flex: 1,
@@ -223,19 +276,30 @@ const getStyles = (colors: any) =>
       padding: spacing.lg,
       gap: spacing.md,
     },
-    heading: {
-      fontSize: 22,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    field: {
-      gap: spacing.xs,
-    },
-    label: {
-      color: colors.muted,
+    formCard: {
+      gap: spacing.sm,
     },
     multiline: {
       minHeight: 90,
       textAlignVertical: 'top',
+    },
+    reviews: {
+      gap: spacing.sm,
+      marginTop: spacing.md,
+    },
+    reviewCard: {
+      gap: spacing.xs,
+    },
+    reviewActions: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      flexWrap: 'wrap',
+    },
+    secondary: {
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.md,
+    },
+    muted: {
     },
   });

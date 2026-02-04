@@ -1,22 +1,38 @@
-import { useQuery } from '@tanstack/react-query';
+// Screen: OwnerBookingsScreen. Used in: (no direct imports found).
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, View, Button } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 import { bookingService } from '@/services/bookingService';
+import { adminService } from '@/services/adminService';
 import { useAuthStore } from '@/store/authStore';
-import { spacing } from '@/theme';
-import { mockOffers } from '@/utils/mockData';
-import { useThemeColors } from '@/hooks/useThemeColors';
-import { Skeleton } from '@/components/Skeleton';
-import { BookingCard } from '@/components/BookingCard';
+import { spacing, radius } from '@/theme';
+import { useTheme } from '@/theme';
+import { useTranslation } from '@/i18n';
+import { BackButton } from '@/components/BackButton';
+import { formatDateRange } from '@/utils/date';
+import { formatPrice } from '@/utils/price';
+import { useNavigation } from '@react-navigation/native';
+import { ChipSelect } from '@/components/ChipSelect';
+import { Button, Card, Loader, ScreenContainer, Typography } from '@/ui';
 
 export const OwnerBookingsScreen = () => {
   const owner = useAuthStore((state) => state.user);
-  const [filterOfferId, setFilterOfferId] = useState<string | undefined>();
-  const { colors } = useThemeColors();
+// TODO: move theming to UI layer
+  const { colors } = useTheme();
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const { t } = useTranslation();
+  const navigation = useNavigation<any>();
+  const queryClient = useQueryClient();
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'active' | 'cancelled' | 'completed' | 'pending'
+  >('pending');
 
-  const ownerOffers = useMemo(() => mockOffers.filter((o) => o.ownerId === owner?.id), [owner?.id]);
+  const { data: ownerOffers = [] } = useQuery({
+    queryKey: ['owner-offers', owner?.id],
+    queryFn: () => adminService.getUserOffers(owner?.id ?? ''),
+    enabled: Boolean(owner?.id),
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ['owner-bookings', owner?.id],
@@ -24,54 +40,119 @@ export const OwnerBookingsScreen = () => {
     enabled: Boolean(owner?.id),
   });
 
+  const confirmMutation = useMutation({
+    mutationFn: (bookingId: string) => bookingService.updateStatus(bookingId, 'active'),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['owner-bookings', owner?.id] }),
+  });
+  const cancelMutation = useMutation({
+    mutationFn: (bookingId: string) => bookingService.cancel(bookingId),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['owner-bookings', owner?.id] }),
+  });
+
   const items = useMemo(() => {
-    const bookings = data?.items ?? [];
-    if (!filterOfferId) return bookings;
-    return bookings.filter((b) => b.offerId === filterOfferId);
-  }, [data?.items, filterOfferId]);
+    const all = data?.items ?? [];
+    if (statusFilter === 'all') return all;
+    if (statusFilter === 'pending') return all.filter((b) => b.status === 'pending');
+    return all.filter((b) => b.status === statusFilter);
+  }, [data?.items, statusFilter]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Брони по моим объектам</Text>
-      {isLoading && (
+    <ScreenContainer style={styles.container} edges={['top', 'left', 'right']}>
+      <BackButton />
+      <Typography variant="h2" tone="primary" style={styles.heading}>
+        {t('owner.bookings.new')}
+      </Typography>
+      <View style={styles.filters}>
+        <ChipSelect
+          options={(['pending', 'active', 'completed', 'cancelled', 'all'] as const).map((f) => ({
+            id: f,
+            label: t(`bookings.filter.${f}`),
+          }))}
+          selected={[statusFilter]}
+          onChange={(next) => setStatusFilter((next[0] as typeof statusFilter) ?? 'pending')}
+          multi={false}
+          horizontal
+        />
+      </View>
+      {isLoading ? (
         <View style={styles.list}>
           {[1, 2].map((i) => (
-            <Skeleton key={i} height={100} />
+            <Loader key={i} variant="skeleton" height={140} />
           ))}
         </View>
-      )}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.row}>
-        <Button
-          title="Все объекты"
-          color={!filterOfferId ? colors.accent : colors.surface}
-          onPress={() => setFilterOfferId(undefined)}
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            const offer = ownerOffers.find((o) => o.id === item.offerId);
+            return (
+              <Card style={styles.card} padding="lg">
+                <Typography variant="body" tone="primary">
+                  {offer?.title ?? item.offerId}
+                </Typography>
+                <Typography variant="caption" tone="secondary">
+                  {formatDateRange(item.checkIn, item.checkOut)}
+                </Typography>
+                <Typography variant="caption" tone="secondary">
+                  {t('bookings.guests')}: {item.guests}
+                </Typography>
+                <Typography variant="body" tone="accent">
+                  {formatPrice(item.totalPrice)}
+                </Typography>
+                <View style={styles.actions}>
+                  <Button
+                    title={t('bookingDetails.status')}
+                    variant="ghost"
+                    style={styles.chip}
+                    onPress={() =>
+                      navigation.navigate('BookingDetails' as never, { bookingId: item.id } as never)
+                    }
+                  />
+                  <Button
+                    title={t('owner.contact')}
+                    variant="ghost"
+                    style={styles.chip}
+                    onPress={() => alert('Связаться с гостем')}
+                  />
+                  <Button
+                    title={t('owner.confirm')}
+                    onPress={() => confirmMutation.mutate(item.id)}
+                    disabled={item.status === 'active'}
+                    style={styles.primary}
+                  />
+                  <Button
+                    title={t('owner.objects.edit')}
+                    variant="ghost"
+                    style={styles.chip}
+                    onPress={() => alert('Редактирование скоро будет доступно')}
+                  />
+                  <Button
+                    title={t('bookings.cancel')}
+                    variant="ghost"
+                    style={styles.chip}
+                    onPress={() => cancelMutation.mutate(item.id)}
+                  />
+                </View>
+              </Card>
+            );
+          }}
+          ListEmptyComponent={
+            <Typography variant="caption" tone="secondary" style={styles.empty}>
+              {isLoading ? t('bookings.loading') : t('owner.bookings.empty')}
+            </Typography>
+          }
+          contentContainerStyle={styles.list}
         />
-        {ownerOffers.map((o) => (
-          <Button
-            key={o.id}
-            title={o.title}
-            color={filterOfferId === o.id ? colors.accent : colors.surface}
-            onPress={() => setFilterOfferId(o.id)}
-          />
-        ))}
-      </ScrollView>
-
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <BookingCard booking={item} />}
-        ListEmptyComponent={
-          <Text style={styles.empty}>
-            {isLoading ? 'Загрузка...' : 'Пока нет бронирований на ваши объекты'}
-          </Text>
-        }
-        contentContainerStyle={styles.list}
-      />
-    </View>
+      )}
+    </ScreenContainer>
   );
 };
 
 const getStyles = (colors: any) =>
+// LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
     container: {
       flex: 1,
@@ -79,14 +160,6 @@ const getStyles = (colors: any) =>
       padding: spacing.lg,
     },
     heading: {
-      fontSize: 22,
-      fontWeight: '700',
-      color: colors.text,
-      marginBottom: spacing.md,
-    },
-    row: {
-      flexDirection: 'row',
-      gap: spacing.sm,
       marginBottom: spacing.md,
     },
     muted: {
@@ -95,8 +168,25 @@ const getStyles = (colors: any) =>
     list: {
       gap: spacing.md,
     },
+    filters: {
+      marginBottom: spacing.md,
+    },
+    card: {
+      gap: spacing.xs,
+    },
+    actions: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+      marginTop: spacing.sm,
+    },
+    chip: {
+      borderRadius: radius.md,
+    },
+    primary: {
+      borderRadius: radius.md,
+    },
     empty: {
       textAlign: 'center',
-      color: colors.muted,
     },
   });

@@ -13,6 +13,9 @@ module.exports = function (api) {
           extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
         },
       ],
+
+      // ⬇️ ОБЯЗАТЕЛЬНО ПОСЛЕДНИМ
+      'react-native-reanimated/plugin',
     ],
   };
 };

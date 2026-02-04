@@ -1,11 +1,12 @@
+// Component: Form. Used in: (no direct imports found).
 import React from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View, ViewProps } from 'react-native';
 
 import { spacing, radius } from '@/theme';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTheme } from '@/theme';
 
 export const FormContainer: React.FC<ViewProps> = ({ children, style, ...rest }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useTheme();
   return (
     <View
       style={[
@@ -27,7 +28,7 @@ type FieldProps = {
 } & TextInputProps;
 
 export const FormField: React.FC<FieldProps> = ({ label, error, helperText, style, ...rest }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useTheme();
   const hasError = Boolean(error);
   return (
     <View style={styles.field}>

@@ -1,8 +1,10 @@
+// Component: GuestPicker. Used in: BookingDetailsSection.tsx.
 import React from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { spacing, radius } from '@/theme';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { spacing } from '@/theme';
+import { useTranslation } from '@/i18n';
+import { Button, Input, Typography } from '@/ui';
 
 type Props = {
   value: number | undefined;
@@ -10,8 +12,8 @@ type Props = {
 };
 
 export const GuestPicker: React.FC<Props> = ({ value, onChange }) => {
-  const { colors } = useThemeColors();
-  const styles = getStyles(colors);
+  const styles = getStyles();
+  const { t } = useTranslation();
   const [input, setInput] = React.useState(value ? String(value) : '');
 
   const apply = () => {
@@ -26,43 +28,35 @@ export const GuestPicker: React.FC<Props> = ({ value, onChange }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Гости</Text>
+      <Typography variant="caption" tone="secondary">
+        {t('bookings.guests')}
+      </Typography>
       <View style={styles.row}>
-        <TextInput
-          placeholder="Количество"
+        <Input
+          placeholder={t('guestPicker.placeholder')}
           value={input}
           onChangeText={setInput}
           keyboardType="numeric"
-          style={styles.input}
+          containerStyle={styles.inputContainer}
         />
-        <Button title="OK" onPress={apply} />
-        <Button title="Сброс" onPress={clear} color={colors.muted} />
+        <Button title={t('guestPicker.apply')} onPress={apply} />
+        <Button title={t('guestPicker.clear')} onPress={clear} variant="ghost" />
       </View>
     </View>
   );
 };
 
-const getStyles = (colors: any) =>
+const getStyles = () =>
   StyleSheet.create({
     container: {
       gap: spacing.xs,
-    },
-    label: {
-      color: colors.muted,
     },
     row: {
       flexDirection: 'row',
       gap: spacing.sm,
       alignItems: 'center',
     },
-    input: {
+    inputContainer: {
       flex: 1,
-      backgroundColor: colors.surface,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      color: colors.text,
     },
   });

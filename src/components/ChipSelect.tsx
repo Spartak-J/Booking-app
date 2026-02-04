@@ -1,7 +1,8 @@
+// Component: ChipSelect. Used in: AdminDashboardScreen.tsx, OwnerDashboardScreen.tsx, OwnerObjectFormScreen.tsx….
 import React from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTheme } from '@/theme';
 import { spacing, radius } from '@/theme';
 
 type Option = { id: string; label: string };
@@ -23,8 +24,8 @@ export const ChipSelect: React.FC<Props> = ({
   horizontal = true,
   disabledIds = [],
 }) => {
-  const { colors } = useThemeColors();
-  const styles = getStyles();
+  const { colors } = useTheme();
+  const styles = getStyles(horizontal);
 
   const toggle = (id: string) => {
     if (disabledIds.includes(id)) return;
@@ -63,11 +64,11 @@ export const ChipSelect: React.FC<Props> = ({
   return content;
 };
 
-const getStyles = () =>
+const getStyles = (horizontal: boolean) =>
   StyleSheet.create({
     row: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
+      flexWrap: horizontal ? 'nowrap' : 'wrap',
       gap: spacing.sm,
     },
     rowGap: {
@@ -127,7 +128,7 @@ const OptionChip = ({
           },
         ]}
       >
-        <Text style={[styles.chipText, { color: active ? '#fff' : colors.text }]}>
+        <Text style={[styles.chipText, { color: active ? colors.white : colors.text }]}>
           {option.label}
         </Text>
       </Pressable>

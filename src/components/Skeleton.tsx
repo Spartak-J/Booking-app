@@ -1,7 +1,8 @@
+// Component: Skeleton. Used in: (no direct imports found).
 import React, { useEffect, useMemo } from 'react';
 import { Animated, StyleSheet, ViewStyle } from 'react-native';
 
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTheme } from '@/theme';
 
 type Props = {
   width?: number | `${number}%`;
@@ -10,7 +11,7 @@ type Props = {
 };
 
 export const Skeleton: React.FC<Props> = ({ width = '100%', height = 16, style }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useTheme();
   const opacity = useMemo(() => new Animated.Value(0.4), []);
 
   useEffect(() => {

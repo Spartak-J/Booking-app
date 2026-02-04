@@ -1,20 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
 
+// Шрифты
+import CagliostroRegular from './assets/fonts/Cagliostro-Regular.ttf';
+import MontserratAlternatesRegular from './assets/fonts/MontserratAlternates-Regular.ttf';
+import MontserratAlternatesMedium from './assets/fonts/MontserratAlternates-Medium.ttf';
+import MontserratAlternatesBold from './assets/fonts/MontserratAlternates-Bold.ttf';
+
+// Провайдеры и навигация
 import { QueryProvider } from '@/api/queryClient';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { RootNavigator } from '@/navigation/RootNavigator';
+
+// Хуки и сервисы
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { notificationService } from '@/services/notificationService';
 import { useAuthStore } from '@/store/authStore';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { useLanguageStore } from '@/store/languageStore';
+import { ThemeProvider, useTheme } from '@/theme';
 
-export default function App() {
+// Экран загрузки
+import { SplashScreen } from '@/screens/SplashScreen';
+
+const AppContent = () => {
+  const { tokens } = useTheme();
+
+  // Загрузка шрифтов
+  const [fontsLoaded] = useFonts({
+    'Cagliostro-Regular': CagliostroRegular,
+    'MontserratAlternates-Regular': MontserratAlternatesRegular,
+    'MontserratAlternates-Medium': MontserratAlternatesMedium,
+    'MontserratAlternates-Bold': MontserratAlternatesBold,
+  });
+
   const [ready, setReady] = useState(false);
-  const { token: pushToken } = usePushNotifications();
-  const { colors } = useThemeColors();
+  const [splashVisible, setSplashVisible] = useState(true);
 
+  const { token: pushToken } = usePushNotifications();
+
+  // Регистрация push-уведомлений
   useEffect(() => {
     if (pushToken) {
       notificationService
@@ -23,36 +48,40 @@ export default function App() {
     }
   }, [pushToken]);
 
+  // Гидратация хранилищ (Auth, Language)
   useEffect(() => {
-    useAuthStore
-      .getState()
-      .hydrate()
-      .finally(() => setReady(true));
+    Promise.all([useAuthStore.getState().hydrate(), useLanguageStore.getState().hydrate()]).finally(
+      () => {
+        setReady(true);
+      },
+    );
   }, []);
 
-  if (!ready) {
-    return (
-      <View style={[styles.loader, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+  // Стабильная ссылка на функцию завершения (предотвращает ре-рендеры сплэша)
+  const handleFinish = useCallback(() => {
+    setSplashVisible(false);
+  }, []);
+
+  // Условие отображения: SplashScreen висит, пока не загружены ресурсы ИЛИ идет анимация
+  if (!fontsLoaded || !ready || splashVisible) {
+    return <SplashScreen onFinish={handleFinish} />;
   }
 
+  // Основное приложение после 5 секунд анимации
   return (
     <SafeAreaProvider>
       <QueryProvider>
-        <StatusBar style="light" backgroundColor={colors.primary} />
+        <StatusBar style="light" backgroundColor={tokens.accent} />
         <RootNavigator />
       </QueryProvider>
     </SafeAreaProvider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  loader: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f6fa',
-  },
-});
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}

@@ -1,15 +1,16 @@
+// Component: CachedImage. Used in: OwnerObjectsScreen.tsx, OfferOwnerInfo.tsx, OfferRoomsList.tsx….
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ImageProps, StyleSheet, View } from 'react-native';
 
 import { getCachedImageUri } from '@/utils/imageCache';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTheme } from '@/theme';
 
 type Props = Omit<ImageProps, 'source'> & {
   uri: string;
 };
 
 export const CachedImage: React.FC<Props> = ({ uri, style, ...rest }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useTheme();
   const styles = getStyles(colors);
   const [localUri, setLocalUri] = useState<string | null>(null);
 

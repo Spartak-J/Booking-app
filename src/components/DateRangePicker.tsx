@@ -1,8 +1,10 @@
+// Component: DateRangePicker. Used in: BookingDetailsSection.tsx.
 import React from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { spacing, radius } from '@/theme';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { spacing } from '@/theme';
+import { useTranslation } from '@/i18n';
+import { Button, Input, Typography } from '@/ui';
 
 type Props = {
   value: { from: string; to: string } | undefined;
@@ -10,8 +12,8 @@ type Props = {
 };
 
 export const DateRangePicker: React.FC<Props> = ({ value, onChange }) => {
-  const { colors } = useThemeColors();
-  const styles = getStyles(colors);
+  const styles = getStyles();
+  const { t } = useTranslation();
   const [from, setFrom] = React.useState(value?.from ?? '');
   const [to, setTo] = React.useState(value?.to ?? '');
 
@@ -27,41 +29,42 @@ export const DateRangePicker: React.FC<Props> = ({ value, onChange }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Даты (YYYY-MM-DD)</Text>
+      <Typography variant="caption" tone="secondary">
+        {t('dateRange.label')}
+      </Typography>
       <View style={styles.row}>
-        <TextInput placeholder="Заезд" value={from} onChangeText={setFrom} style={styles.input} />
-        <TextInput placeholder="Выезд" value={to} onChangeText={setTo} style={styles.input} />
+        <Input
+          placeholder={t('dateRange.from')}
+          value={from}
+          onChangeText={setFrom}
+          containerStyle={styles.inputContainer}
+        />
+        <Input
+          placeholder={t('dateRange.to')}
+          value={to}
+          onChangeText={setTo}
+          containerStyle={styles.inputContainer}
+        />
       </View>
       <View style={styles.actions}>
-        <Button title="Применить" onPress={apply} />
-        <Button title="Очистить" onPress={clear} color={colors.muted} />
+        <Button title={t('dateRange.apply')} onPress={apply} />
+        <Button title={t('dateRange.clear')} onPress={clear} variant="ghost" />
       </View>
     </View>
   );
 };
 
-const getStyles = (colors: any) =>
+const getStyles = () =>
   StyleSheet.create({
     container: {
       gap: spacing.sm,
-    },
-    label: {
-      color: colors.muted,
-      fontSize: 14,
     },
     row: {
       flexDirection: 'row',
       gap: spacing.sm,
     },
-    input: {
+    inputContainer: {
       flex: 1,
-      backgroundColor: colors.surface,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      color: colors.text,
     },
     actions: {
       flexDirection: 'row',

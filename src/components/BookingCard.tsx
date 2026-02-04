@@ -1,11 +1,13 @@
+// Component: BookingCard. Used in: (no direct imports found).
 import React, { useEffect, useMemo } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { spacing, radius } from '@/theme';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTheme } from '@/theme';
 import { formatDateRange } from '@/utils/date';
 import { formatPrice } from '@/utils/price';
 import { Booking } from '@/types';
+import { useTranslation } from '@/i18n';
 
 type Props = {
   booking: Booking;
@@ -15,8 +17,9 @@ type Props = {
 };
 
 export const BookingCard: React.FC<Props> = ({ booking, onPress, onCancel, cancelLabel }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useTheme();
   const styles = getStyles(colors);
+  const { t } = useTranslation();
   const anim = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
@@ -34,11 +37,8 @@ export const BookingCard: React.FC<Props> = ({ booking, onPress, onCancel, cance
         <Text style={styles.price}>{formatPrice(booking.totalPrice)}</Text>
       </Pressable>
       {onCancel && (
-        <Pressable
-          onPress={onCancel}
-          style={[styles.button, { backgroundColor: colors.error ?? '#dc2626' }]}
-        >
-          <Text style={styles.buttonText}>{cancelLabel ?? 'Отменить'}</Text>
+        <Pressable onPress={onCancel} style={[styles.button, { backgroundColor: colors.error }]}>
+          <Text style={styles.buttonText}>{cancelLabel ?? t('bookings.cancel')}</Text>
         </Pressable>
       )}
     </Animated.View>
@@ -87,7 +87,7 @@ const getStyles = (colors: any) =>
       alignItems: 'center',
     },
     buttonText: {
-      color: '#fff',
+      color: colors.white,
       fontWeight: '600',
     },
   });
