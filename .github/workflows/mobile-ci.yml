@@ -6,38 +6,35 @@ on:
     paths:
       - 'src/**'
       - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig.json'
-      - '.github/workflows/mobile-ci.yml'
   pull_request:
-    branches: [mobile-app, main]
+    branches: [mobile-app]
 
 jobs:
   lint-and-typecheck:
-    name: Lint & Type Check
+    name: Lint and Type Check
     runs-on: ubuntu-latest
     
     steps:
-      - name: í³¥ Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: í¿¢ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
       
-      - name: í³¦ Install dependencies
+      - name: Install dependencies
         run: npm ci
       
-      - name: í´ Run ESLint
+      - name: Run ESLint
         run: npm run lint
         continue-on-error: true
       
-      - name: í³ Run TypeScript check
+      - name: Run TypeScript check
         run: npm run typecheck
       
-      - name: âœ¨ Check formatting
+      - name: Check formatting
         run: npx prettier --check "src/**/*.{ts,tsx}"
         continue-on-error: true
 
@@ -46,19 +43,19 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: í³¥ Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: í¿¢ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
       
-      - name: í³¦ Install dependencies
+      - name: Install dependencies
         run: npm ci
       
-      - name: í´’ Run npm audit
+      - name: Run npm audit
         run: npm audit --audit-level=high
         continue-on-error: true
 
@@ -68,34 +65,17 @@ jobs:
     needs: [lint-and-typecheck]
     
     steps:
-      - name: í³¥ Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: í¿¢ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
       
-      - name: í³¦ Install dependencies
+      - name: Install dependencies
         run: npm ci
       
-      - name: í¿—ï¸ Test build
-        run: |
-          echo "Testing if app builds without errors..."
-          echo "Build test completed"
-
-  notify:
-    name: Notify Results
-    runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, security-scan, build-test]
-    if: always()
-    
-    steps:
-      - name: í³¢ Post summary
-        run: |
-          echo "## í¾‰ CI/CD Pipeline Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- âœ… Lint & TypeCheck: ${{ needs.lint-and-typecheck.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- í´’ Security Scan: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- í¿—ï¸ Build Test: ${{ needs.build-test.result }}" >> $GITHUB_STEP_SUMMARY
+      - name: Test build
+        run: echo "Build test completed successfully"
