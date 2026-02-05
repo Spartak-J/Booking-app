@@ -13,7 +13,7 @@ export const MoreOffersSection_card = ({
   const { t } = useTranslation();
 
   return (
-    <div className={`${styles.moreOffersSection_card} flex-left`}>
+    <div className={`${styles.moreOffersSection_card}  flex-left`}>
       <div
         className={`${styles.moreOffersSection_card__container} ${className}`}
       >
