@@ -30,15 +30,13 @@ body {
 
 .header__logo_Oselya {
   color: var(--color-text-secondary);
-  margin-left: 80px;
 }
 .logo_Oselya {
   color: var(--color-text-secondary);
 }
 .footer__logo_Oselya{
   border-radius: 10px;
-  background-color: var( --color--btn-action);
-  color: var(--color-text);
+
 }
 
 /*=================================================
