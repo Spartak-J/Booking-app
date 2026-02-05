@@ -106,17 +106,17 @@ public class UserController : ControllerBase
     [HttpPut("me/update")]
     [Authorize]
     public Task<IActionResult> Update( [FromBody] object request) =>
-        _gateway.ForwardRequestAsync("UserApiService", $"/api/user/update", HttpMethod.Put, request);
+        _gateway.ForwardRequestAsync("UserApiService", $"/api/user/me/update", HttpMethod.Post, request);
 
     [HttpPut("me/change-password")]
     [Authorize]
     public Task<IActionResult> ChangePassword( [FromBody] object request) =>
-       _gateway.ForwardRequestAsync("UserApiService", $"/api/user/me/change-password", HttpMethod.Put, request);
+       _gateway.ForwardRequestAsync("UserApiService", $"/api/user/me/change-password", HttpMethod.Post, request);
 
     [HttpPut("me/change-email")]
     [Authorize]
     public Task<IActionResult> ChangeEmail([FromBody] object request) =>
-    _gateway.ForwardRequestAsync("UserApiService", $"/api/user/me/me/change-email", HttpMethod.Put, request);
+    _gateway.ForwardRequestAsync("UserApiService", $"/api/user/me/change-email", HttpMethod.Post, request);
     
     
     //===========================================================================================
