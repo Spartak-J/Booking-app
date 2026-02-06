@@ -1,27 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 import { Logo_Oselya_128 } from "../Logo/Logo_Oselya_128.jsx";
-import { Text } from "../UI/Text/Text.jsx"
+import { Text } from "../UI/Text/Text.jsx";
 import { StateButton_Profile } from "../UI/Button/StateButton_Profile.jsx";
-import { AccountPanel } from "./AccountPanel.jsx"
-import { MyTravelsPanel } from "./MyTravelsPanel.jsx"
-import { PaymentInfoPanel } from "./PaymentInfoPanel.jsx"
-import { HelpPanel } from "./HelpPanel.jsx"
-import { PrivacyPanel } from "./PrivacyPanel.jsx"
-import {MessagePanel} from "./MessagePanel.jsx";
-import {HousingPanel} from "./HousingPanel.jsx";
+import { AccountPanel } from "./AccountPanel.jsx";
+import { MyTravelsPanel } from "./MyTravelsPanel.jsx";
+import { PaymentInfoPanel } from "./PaymentInfoPanel.jsx";
+import { HelpPanel } from "./HelpPanel.jsx";
+import { PrivacyPanel } from "./PrivacyPanel.jsx";
+import { MessagePanel } from "./MessagePanel.jsx";
+import { HousingPanel } from "./HousingPanel.jsx";
 import styles from './ProfilePage_menu.module.css';
-
-
 
 export const ProfilePageMenu = ({ user }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
 
-  
   const [account, setAccount] = useState(user ? user.roleName : null);
   const [activeKey, setActiveKey] = useState("account");
-
 
   useEffect(() => {
     if (user) {
@@ -30,7 +30,7 @@ export const ProfilePageMenu = ({ user }) => {
   }, [user]);
 
   if (!user) {
-    return null; 
+    return null;
   }
 
   const baseButtons = [
@@ -55,8 +55,8 @@ export const ProfilePageMenu = ({ user }) => {
     ...commonBottomButtons,
   ];
 
-  const renderRightPanel = (activeKey) => {
-    switch (activeKey) {
+  const renderRightPanel = (key) => {
+    switch (key) {
       case "account": return <AccountPanel user={user} />;
       case "travels": return <MyTravelsPanel />;
       case "payment": return <PaymentInfoPanel />;
@@ -65,6 +65,15 @@ export const ProfilePageMenu = ({ user }) => {
       case "privacy": return <PrivacyPanel />;
       case "message": return <MessagePanel />;
       default: return null;
+    }
+  };
+
+  const handleButtonClick = async (key) => {
+    if (key === "logout") {
+      const result = await logout();
+        navigate("/");
+    } else {
+      setActiveKey(key);
     }
   };
 
@@ -84,7 +93,7 @@ export const ProfilePageMenu = ({ user }) => {
                 icon_name={btn.icon}
                 className="btn-w-425 btn-h-60 btn-br-r-20"
                 isActive={activeKey === btn.key}
-                onClick={() => setActiveKey(btn.key)}
+                onClick={() => handleButtonClick(btn.key)}
               />
             ))}
           </div>

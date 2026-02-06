@@ -56,7 +56,7 @@ export const SearchBar = ({
         userDiscountPercent: 5,
         lang: language,
         cityId: locationId,
-        paramItemFilters: {} // пустой объект фильтров
+        paramItemFilters: {} 
       });
 
       const foundHotels = response.data;

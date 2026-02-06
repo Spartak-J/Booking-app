@@ -1,34 +1,47 @@
-import { Link, useLocation } from "react-router-dom";
-import { FiChevronRight } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import styles from "./Text.module.css";
-import { useState } from "react";
 
-export const Breadcrumbs = ({ 
-   country="Украина",
-  region="Львовская область",
-  city={city} ,  // передаём state из Header
+export const Breadcrumbs = ({
+  country = "Украина",
+  region = "Львовская область",
+  city,
+  district,
   hotelTitle,
-  last_path="Результаты поиска"
+  last_path = ""
 }) => {
-
-  
+  const { t } = useTranslation();
   const parts = [
-    country && { label: country, to: `/country/${encodeURIComponent(country)}` },
-    region && { label: region, to: `/region/${encodeURIComponent(region)}` },
-    city && { label: city, to: `/city/${encodeURIComponent(city)}` },
-    // district && { label: district, to: `/district/${encodeURIComponent(district)}` }
-  ].filter(Boolean); 
-
+    country && country.trim() && {
+      label: country,
+      to: `/country/${encodeURIComponent(country)}`
+    },
+    region && region.trim() && {
+      label: region,
+      to: `/region/${encodeURIComponent(region)}`
+    },
+    city && city.trim() && {
+      label: city,
+      to: `/city/${encodeURIComponent(city)}`
+    },
+    district && district.trim() && {
+      label: district,
+      to: `/district/${encodeURIComponent(district)}`
+    }
+  ].filter(Boolean);
 
   const items = [
-    { label: "Главная", to: "/" },
+    { label: t("menu_home"), to: "/" },
     ...parts
   ];
 
-  if (parts.length > 0) {
+  if (last_path && last_path.trim()) {
     items.push({ label: last_path, to: null });
   }
 
+  if (hotelTitle && hotelTitle.trim()) {
+    items.push({ label: hotelTitle, to: null });
+  }
 
   return (
     <div className={styles.breadcrumbs}>
@@ -43,10 +56,9 @@ export const Breadcrumbs = ({
           )}
 
           {index < items.length - 1 && (
-            // <FiChevronRight className={styles.icon} />
-             <svg className={styles.icon} width="11" height="15">
-            +    <use href="/img/sprite.svg#breadcrumbs_next_icon" />
-            +  </svg>
+            <svg className={styles.icon} width="11" height="15">
+              <use href="/img/sprite.svg#breadcrumbs_next_icon" />
+            </svg>
           )}
         </div>
       ))}

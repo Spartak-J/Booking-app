@@ -209,7 +209,7 @@ export const HomePage = () => {
 
 
   useEffect(() => {
-    paramsCategoryApi.getAll(language)
+    paramsCategoryApi.getAllCategories(language)
       .then((res) => setFiltersData(res.data))
       .catch(() => {
         console.warn("API недоступен, используется mock");

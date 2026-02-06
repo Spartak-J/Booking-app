@@ -11,6 +11,7 @@
       "name": "Your first and last name",
       "country": "Country",
       "email": "Email",
+      "birthDate": "BirthDate",
       "phone": "Phone number",
       "owner": "Property owner",
       "client": "User",

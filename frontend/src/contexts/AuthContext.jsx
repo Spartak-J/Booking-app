@@ -62,37 +62,42 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const register = async (username, email, password, phoneNumber, roleName) => {
-    try {
-      const response = await http.post("/User/register", {
-        username,
-        email,
-        password,
-        phoneNumber,
-        roleName
-      });
+const register = async ({ username, countryId, email,birthDate, password, phoneNumber, roleName }) => {
+  try {
+    // type = "Client" или "Owner"
+    const url = roleName === "Client" ? "/User/register/client" : "/User/register/owner";
 
-      const jwt = response.data.token;
+    const response = await http.post(url, {
+      username,
+      countryId,
+      email,
+      birthDate,
+      password,
+      phoneNumber,
+      roleName
+    });
 
-      const decoded = jwtDecode(jwt);
+    const jwt = response.data.token;
+    const decoded = jwtDecode(jwt);
 
-      const userData = {
-        id: decoded.sub,
-        email: decoded.email,
-        name: decoded.username,
-        role: decoded.roleName,
-      };
+    const userData = {
+      id: decoded.sub,
+      email: decoded.email,
+      name: decoded.username,
+      role: decoded.roleName,
+    };
 
-      localStorage.setItem("token", jwt);
-      setToken(jwt);
-      setUser(userData);
+    localStorage.setItem("token", jwt);
+    setToken(jwt);
+    setUser(userData);
 
-      return { success: true };
-    } catch (error) {
-      console.error("Register error:", error);
-      return { success: false, message: "Ошибка регистрации" };
-    }
-  };
+    return { success: true };
+  } catch (error) {
+    console.error("Register error:", error);
+    return { success: false, message: "Ошибка регистрации" };
+  }
+};
+
 
 
   const logout = () => {

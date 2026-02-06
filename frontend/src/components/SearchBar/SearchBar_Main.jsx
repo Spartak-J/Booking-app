@@ -24,7 +24,7 @@ export const SearchBar_Main = ({ onSearch, text }) => {
 
   const [guests, setGuests] = useState({
     rooms: 1,
-    adults: 2,
+    adults: 1,
     children: 0,
   });
 
@@ -92,7 +92,7 @@ export const SearchBar_Main = ({ onSearch, text }) => {
           <CitySelector
             value={location}
             classTitle="btn-h-70 btn-w-425"
-            input_classTitle="p-l-80"
+            input_classTitle=""
             icon_title="city_big"
             icon_size="48"
             placeholder={t("Search.city")}

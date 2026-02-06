@@ -6,13 +6,13 @@
   width: 1449px;
   height: min(1587px, 90vh);
 
-overflow: hidden; 
+  overflow: hidden;
   border-radius: 20px;
   background-color: var(--color-input-form-bg);
 }
 
 .registerPage_content {
-    position: relative;
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
@@ -32,17 +32,41 @@ overflow: hidden;
 .input {
   background-color: transparent;
   border: 3px solid var(--color-input-border);
+  width: 1165px;
 }
 
 .googleButton__wrapper {
   display: inline-flex;
   width: 100%;
+  width: 1165px;
 }
 
 
 .actionButton__wrapper {
   width: 100%;
   display: inline-flex;
+  width: 1165px;
+
+}
+
+
+.input {
+  background-color: transparent;
+  border: 3px solid var(--color-input-border);
+  font-family: 'Montserrat Alternates';
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 120px;
+  padding-left: 25px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+
+.input[name="password"] {
+  font-size: 40px;
+  letter-spacing: 2px;
+  line-height: 120px;
 }
 
 /* placeholder */
@@ -60,6 +84,29 @@ overflow: hidden;
   display: flex;
   align-items: center;
   padding: 0 10%;
+}
+
+@media (max-width: 1920px) {
+  .loginPage {
+      max-width: 1449px;
+  width: 80%;
+  }
+  .input {
+      max-width: 1165px;
+  width: 80%;
+}
+.googleButton__wrapper {
+ max-width: 1165px;
+  width: 80%;
+  
+}
+.actionButton__wrapper {
+  max-width: 1165px;
+  width: 80%;
+}
+.radioButton_wrapper {
+    width: 80%;
+}
 }
 
 /* ===================================================== */

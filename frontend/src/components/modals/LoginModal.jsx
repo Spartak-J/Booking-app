@@ -1,8 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../../contexts/AuthContext.jsx";
-
 
 import { Text } from "../UI/Text/Text.jsx";
 import { ActionButton__Primary } from "../UI/Button/ActionButton_Primary.jsx";
@@ -10,36 +9,54 @@ import { TextButton } from "../UI/Button/TextButton.jsx";
 import { GoogleButton } from '../UI/Button/GoogleButton.jsx';
 import { IconButtonClose } from "../../components/UI/Button/IconButton_close.jsx";
 
-
 import "../../styles/globals.css";
 import styles from "./LoginModal.module.css";
 
-
-
-const handleSearchResults = (results) => {
-    console.log('Search results:', results);
-};
-
-export const LoginModal = ({
-    setIsModalOpen,
-    setIsRegisterModalOpen
-}) => {
+export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
     const { t } = useTranslation();
 
+    const [formData, setFormData] = useState({ username: "", password: "" });
+    const [displayPassword, setDisplayPassword] = useState("");
 
-    const [formData, setFormData] = useState({
-        username: "",
-        password: ""
-    });
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+        const { name, value } = e.target;
+        console.log({
+
+            password: formData.password, 
         });
+
+        if (name === "password") {
+            const newDisplay = value;
+            const oldDisplay = displayPassword;
+            const oldPassword = formData.password;
+            let newPassword = oldPassword;
+
+            if (newDisplay.length > oldDisplay.length) {
+                const addedChar = newDisplay[newDisplay.length - 1];
+                newPassword += addedChar;
+            }
+            else if (newDisplay.length < oldDisplay.length) {
+                newPassword = oldPassword.slice(0, newDisplay.length);
+            }
+
+            setFormData(prev => ({ ...prev, password: newPassword }));
+            if (newPassword.length === 0) {
+                setDisplayPassword("");
+                return;
+            }
+            setDisplayPassword("●".repeat(newPassword.length - 1) + newPassword.slice(-1));
+
+            setTimeout(() => {
+                setDisplayPassword("●".repeat(newPassword.length));
+            }, 400);
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -47,7 +64,7 @@ export const LoginModal = ({
         const result = await login(formData.username, formData.password);
 
         if (result.success) {
-           setIsModalOpen(false); 
+            setIsModalOpen(false);
         } else {
             alert(result.message);
         }
@@ -57,14 +74,13 @@ export const LoginModal = ({
     return (
         <div className={styles.loginPage}>
             <IconButtonClose onClick={() => setIsModalOpen(false)} />
-            <div className={`${styles.loginPage__content} p-25 `}>
-                <span className={`${styles.loginPage__title_wrapper} mb-30  `}>
-                    <Text text={t("Auth.login.title")} type="m_700" />
+            <div className={`${styles.loginPage__content} p-25`}>
+                <span className={`${styles.loginPage__title_wrapper} mb-30`}>
+                    <Text text={t("Auth.login.title")} type="m_700_s_48" />
                 </span>
-                <span className={`${styles.loginPage__subtitle_wrapper} mb-50`}  >
+                <span className={`${styles.loginPage__subtitle_wrapper} mb-50`}>
                     <Text text={t("Auth.login.welcome_back")} type="m_500" />
                 </span>
-
 
                 <form className={`${styles.loginPage__form} gap-30 mt-10`} onSubmit={handleSubmit}>
                     {/* Username */}
@@ -74,35 +90,45 @@ export const LoginModal = ({
                         value={formData.username}
                         onChange={handleChange}
                         placeholder={t("Auth.login.signUp")}
-                        className={`${styles.input} btn-h-120 btn-w-1165 btn-br-r-20 p-10`}
+                        className={`${styles.input} btn-h-120 btn-br-r-20 p-10`}
                         required
                     />
 
-                    {/* Password */}
                     <input
-                        type="password"
+                        type="text"
                         name="password"
-                        value={formData.password}
+                        value={displayPassword}  
                         onChange={handleChange}
                         placeholder={t("Auth.login.password")}
-                        className={`${styles.input} btn-h-120 btn-w-1165 btn-br-r-20 p-10`}
+                        className={`${styles.input} btn-h-120  btn-br-r-20 p-10`}
+                        autoComplete="new-password"
                         required
                     />
-                    {/* google */}
+                    <div className={`${styles.line_wrapper} gap-12`}>
+                        <div className={`${styles.line} ${styles.left} `}>
+                            <div className={styles.circle}></div>
+                        </div>
+                        <Text text={t("Auth.register.or")} type="text_m_500_s_40" />
+                        <div className={`${styles.line} ${styles.right}`}>
+                            <div className={styles.circle}></div>
+                        </div>
+                    </div>
+
                     <span className={`${styles.googleButton__wrapper} flex-center mt-10 mb-50`}>
-                        < GoogleButton text={t("Auth.login.google")} className="btn-w-1165 btn-h-100 btn-br-r-15" />
+                        <GoogleButton text={t("Auth.login.google")} className=" btn-h-100 btn-w-full btn-br-r-15" />
                     </span>
+
                     <span className={`${styles.actionButton__wrapper} flex-center mb-30`}>
-                        <ActionButton__Primary type="submit" text={t("Auth.login.loginButton")} className="btn-w-1165 btn-h-100 btn-br-r-20" />
+                        <ActionButton__Primary  type="m_600_s_36" text={t("Auth.login.loginButton")} className="btn-w-full btn-h-100 btn-br-r-20" />
                     </span>
+
                     <TextButton text={t("Auth.login.noAccount")}
-                        className="btn-w-1165 btn-h-100"
+                        className="btn-w-960 btn-h-100"
                         onClick={() => {
                             setIsRegisterModalOpen(true);
                             setIsModalOpen(false);
-                        }
-                        } />
-
+                        }}
+                    />
                 </form>
             </div>
         </div>

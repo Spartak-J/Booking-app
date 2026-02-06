@@ -11,6 +11,7 @@
       "name": "Ваше призвіще та ім’я",
       "country": "Країна",
       "email": "E-mail",
+      "birthDate": "День народження",
       "phone": "Номер телефону",
       "owner": "Власник житла",
       "client": "Користувач",
@@ -292,8 +293,8 @@
       "email": "Електронна пошта",
       "phone": "Номер телефону",
       "country": "Країна/Територія",
-     "select_country": "Виберіть країну/територію",
-       "btn_continue": "Продовжити",
+      "select_country": "Виберіть країну/територію",
+      "btn_continue": "Продовжити",
       "myself_info": "Особисті данні",
       "Security_settings": "Налаштування безпеки"
     },
@@ -380,41 +381,46 @@
   },
   "Host": {
     "propertyForm": {
-      "title": "Введіть свої данні",
-      "owner": {
-        "label": "Власник",
-        "name": "Ім’я",
-        "photo": "Фото",
-        "description": "Опис власника(ці)",
-        "btn": "Редагувати"
-      }
+      "title": "Введіть свої данні"
     },
     "aboutHousing": {
       "title": "Інформація про житло",
       "housing": {
         "name": "Назва",
         "address": "Адреса",
+        "street": "Вулиця",
+        "number": "номер",
         "description": "Опис",
         "photo": "Фото житла*"
       }
     },
+    "dataHousing": {
+      "title": "Данні житла",
+      "guestCount": "Кількість гостей",
+      "roomCount": "Кількість кімнат",
+      "singleBedsCount": "Односпальне ліжко",
+      "doubleBedsCount": "Двоспальне ліжко",
+      "pricePerDay": "Ціна/ніч",
+      "pricePerWeek": "Ціна/від 3ночей"
+    },
     "amenities": {
       "title": "Зручності",
       "wifi": "WI-FI",
-      "bath": "Ванна",
-      "kitchen": "Кухня/міні-кухня",
       "ac": "Кондиціонер",
+      "workDesk": "Робочий стіл",
       "tv": "Телевізор",
+      "windowView": "Вид з вікна",
+      "bath": "Власна ванна",
+      "": "Туалетний папір",
+      "kitchen": "Кухня/міні-кухня",
       "washingMachine": "Пральна машина",
       "iron": "Праска",
       "electricKettle": "Електричний чайник",
-      "windowView": "Вид з вікна",
       "coffeeTea": "Кава/чай",
-      "workDesk": "Робочий стіл",
       "petsAllowed": "Можна з тваринами",
       "addYourOwn": "Додати своє"
     },
-    "btn_add":"Додати кімнату/номер",
-    "btn_save":"Зберегти"
+    "btn_add": "Додати кімнату/номер",
+    "btn_save": "Зберегти"
   }
 }

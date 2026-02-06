@@ -4,8 +4,17 @@ export const authApi = {
   login: (username, password) =>
     http.post("/User/login", { username, password }),
     
-    register: (username, email, password, phoneNumber, roleName) =>
-    http.post("/User/register", {
+    registerClient: (username, email, password, phoneNumber, roleName) =>
+    http.post("/User/register/client", {
+      username,
+      email,
+      password,
+      phoneNumber,
+      roleName
+    }),
+
+     registerOwner: (username, email, password, phoneNumber, roleName) =>
+    http.post("/User/register/owner", {
       username,
       email,
       password,

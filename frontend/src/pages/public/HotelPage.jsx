@@ -157,6 +157,7 @@ export const HotelPage = () => {
               <HotelMap
                 lat={hotel.latitude} lng={hotel.longitude}
                 hotelName={offer.title}
+                hotel_address={`${offer.countryTitle}, ${offer.cityTitle}, ${hotel.street}  ${hotel.houseNumber}`}
                 minHeight="252"
                 showAddress={true}
               />

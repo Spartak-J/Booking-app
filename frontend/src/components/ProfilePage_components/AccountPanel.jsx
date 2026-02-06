@@ -30,13 +30,13 @@ export const AccountPanel = ({ user }) => {
 
 
     const [formData, setFormData] = useState({
-        id: 0,              // обязательно
+        id: 0,             
         username: "",
         password: "",
         email: "",
         phoneNumber: "",
         birthDate: null,
-        countryId: 0,        // обязательно
+        countryId: 0,       
         discount: 0,
         roleName: "",
         token: ""
@@ -63,7 +63,7 @@ export const AccountPanel = ({ user }) => {
         setFormData({
             id: user.id,
             username: user.username || "",
-            password: "",               // если не меняем пароль
+            password: "",             
             email: user.email || "",
             phoneNumber: user.phoneNumber || "",
             birthDate: user.birthDate ? new Date(user.birthDate).toISOString() : null,

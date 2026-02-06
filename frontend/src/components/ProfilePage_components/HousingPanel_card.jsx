@@ -7,6 +7,7 @@ export const HousingPanel_card = ({
   id,
   imgSrc,
   title,
+  onClick,
   tripId,
   setShowForm,
   setShowHostelList,
@@ -19,11 +20,7 @@ export const HousingPanel_card = ({
   return (
     <div
       className={styles.hotelCard}
-      onClick={() => {
-        setShowForm(true)
-        setShowHostelList(false)
-        setShowHostelId(id)
-      }}
+      onClick={onClick}
       role="button"
       tabIndex={0}
     >

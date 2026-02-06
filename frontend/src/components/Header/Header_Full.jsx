@@ -121,6 +121,18 @@ export const Header_Full = ({
                 />
               </div>
             )}
+             {isLoginModalOpen && (
+                <div className="modalOverlay">
+                  <LoginModal
+                    setIsModalOpen={setIsLoginModalOpen}
+                    setIsRegisterModalOpen={setIsRegisterModalOpen} />
+                </div>
+              )}
+              {isRegisterModalOpen && (
+                <div className="modalOverlay">
+                  <RegisterModal setIsModalOpen={setIsRegisterModalOpen} />
+                </div>
+              )}
           </div>
         </div>
         <div className={`${styles.headerMain_breadcrumbs__container} flex-left`} >
@@ -143,20 +155,7 @@ export const Header_Full = ({
                   <SortMenuModal />
                 </div>
               )}
-              {isLoginModalOpen && (
-                <div className="modalOverlay">
-                  <LoginModal
-                    setIsModalOpen={setIsLoginModalOpen}
-                    setIsRegisterModalOpen={setIsRegisterModalOpen} />
-                </div>
-              )}
-              {isRegisterModalOpen && (
-                <div className="modalOverlay">
-                  <RegisterModal setIsModalOpen={setIsRegisterModalOpen} />
-                </div>
-              )}
-
-
+             
               <ActionButton__Primary
                 text={titleBtn || t('sort.sort_btn')}
                 className="btn-w-148 btn-h-35 btn-br-r-10"
