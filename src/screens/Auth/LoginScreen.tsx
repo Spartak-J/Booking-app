@@ -2,7 +2,12 @@
 import React from 'react';
 
 import LoginScreenView from '@/components/Auth/LoginScreenView';
+import { AppLayout } from '@/layout/AppLayout';
 
-export const LoginScreen = () => <LoginScreenView />;
+export const LoginScreen = () => (
+  <AppLayout variant="stack">
+    <LoginScreenView />
+  </AppLayout>
+);
 
 export default LoginScreen;

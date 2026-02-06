@@ -56,7 +56,7 @@ export const sizes = {
 export const spacingTokens = spacing;
 export const typographyTokens = typography;
 
-// full theme object (опционально, но ок)
+// full theme object
 export const theme = {
   palette,
   spacing,
@@ -72,62 +72,3 @@ export const theme = {
 };
 
 export type Theme = typeof theme;
-
-// export { layout };
-//
-// export const sizes = {
-//   decorativeBubble: {
-//     sm: 80,
-//     md: 100,
-//     lg: 120,
-//   },
-//   decorativeBubbleImage: {
-//     width: 113,
-//     height: 141,
-//     offsetTop: -11,
-//   },
-//   carouselCity: {
-//     item: 110,
-//     itemActive: 164,
-//     height: 144,
-//     heightActive: 192,
-//     labelPad: 6,
-//     labelPadActive: 10,
-//     offsetX: 7,
-//     offsetY: 14,
-//     shadowOffsetX: 13,
-//     shadowOffsetY: 11,
-//     shadowBlur: 4.5,
-//   },
-// };
-//
-//
-// export const spacingTokens = spacing;
-// export const typographyTokens = typography;
-//
-// export const motion = {
-//   carousel: {
-//     scale: { min: 0.92, max: 1 },
-//     opacity: { min: 0.8, max: 1 },
-//   },
-// };
-//
-// export const theme = {
-//   palette,
-//   spacing,
-//   spacingTokens: spacing,
-//   radius,
-//   sizes,
-//   fonts,
-//   fontSizes,
-//   typography,
-//   typographyTokens: typography,
-//   motion,
-//   withOpacity,
-//   getColorTokens,
-//   getThemeColors,
-// };
-//
-// export type Theme = typeof theme;
-//
-// export { withOpacity, getColorTokens, getThemeColors, ThemeProvider, useTheme };

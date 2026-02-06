@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme';
 import { Button, IconButton, Input, ScreenContainer, Typography } from '@/ui';
-import { s, SCREEN_HEIGHT } from '@/utils/scale';
+import { s } from '@/utils/scale';
 import { Routes } from '@/navigation/routes';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import googleIcon from '@/assets/images/google.png';
@@ -49,81 +49,86 @@ export const RegisterScreenView = () => {
     defaultValues: { name: '', email: '', password: '' },
   });
 
-  const offsetTop = (SCREEN_HEIGHT - s(688)) / 2;
-
   return (
-    <ScreenContainer style={styles.screen} edges={['left', 'right']}>
-      <View style={[styles.formWrapper, { top: offsetTop }]}>
-        <Typography variant="h1" tone="primary" style={[styles.title, { top: s(24) }]}>
-          {t('auth.register.title')}
-        </Typography>
+    <ScreenContainer
+      style={styles.screen}
+      contentContainerStyle={styles.screenContent}
+      scroll
+      withKeyboardAvoiding
+    >
+      <View style={styles.formWrapper}>
+        <View style={styles.headerBlock}>
+          <Typography variant="h1" tone="primary" style={styles.title}>
+            {t('auth.register.title')}
+          </Typography>
 
-        <Typography variant="body" tone="primary" style={[styles.subtitle, { top: s(70) }]}>
-          {t('auth.register.subtitle')}
-        </Typography>
-
-        <Controller
-          control={control}
-          name="name"
-          render={({ field: { value, onChange } }) => (
-            <Input
-              value={value}
-              onChangeText={onChange}
-              placeholder={t('auth.placeholder.name')}
-              containerStyle={[styles.inputContainer, { top: s(130) }]}
-              inputStyle={styles.input}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { value, onChange } }) => (
-            <Input
-              value={value}
-              onChangeText={onChange}
-              placeholder={t('auth.placeholder.email')}
-              containerStyle={[styles.inputContainer, { top: s(196) }]}
-              inputStyle={styles.input}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { value, onChange } }) => (
-            <Input
-              value={value}
-              onChangeText={onChange}
-              placeholder={t('auth.placeholder.password')}
-              secureTextEntry
-              containerStyle={[styles.inputContainer, { top: s(262) }]}
-              inputStyle={styles.input}
-            />
-          )}
-        />
-
-        <View style={[styles.termsRow, { top: s(330) }]}>
-          <IconButton
-            onPress={() => setAgreed((p) => !p)}
-            variant={agreed ? 'filled' : 'outlined'}
-            size="sm"
-            icon={
-              agreed ? (
-                <Typography variant="caption" tone="onAccent">
-                  ✓
-                </Typography>
-              ) : null
-            }
-          />
-          <Typography variant="caption" tone="primary" style={styles.termsText}>
-            {t('auth.register.terms')}
+          <Typography variant="body" tone="primary" style={styles.subtitle}>
+            {t('auth.register.subtitle')}
           </Typography>
         </View>
 
-        <View style={[styles.cta, { top: s(380) }]}>
+        <View style={styles.fieldsBlock}>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                value={value}
+                onChangeText={onChange}
+                placeholder={t('auth.placeholder.name')}
+                containerStyle={styles.inputContainer}
+                inputStyle={styles.input}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                value={value}
+                onChangeText={onChange}
+                placeholder={t('auth.placeholder.email')}
+                containerStyle={styles.inputContainer}
+                inputStyle={styles.input}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                value={value}
+                onChangeText={onChange}
+                placeholder={t('auth.placeholder.password')}
+                secureTextEntry
+                containerStyle={styles.inputContainer}
+                inputStyle={styles.input}
+              />
+            )}
+          />
+
+          <View style={styles.termsRow}>
+            <IconButton
+              onPress={() => setAgreed((p) => !p)}
+              variant={agreed ? 'filled' : 'outlined'}
+              size="sm"
+              icon={
+                agreed ? (
+                  <Typography variant="caption" tone="onAccent">
+                    ✓
+                  </Typography>
+                ) : null
+              }
+            />
+            <Typography variant="caption" tone="primary" style={styles.termsText}>
+              {t('auth.register.terms')}
+            </Typography>
+          </View>
+
           <Button
             title={t('auth.register.continue')}
             onPress={handleSubmit(register)}
@@ -131,26 +136,24 @@ export const RegisterScreenView = () => {
           />
         </View>
 
-        <View style={[styles.dividerRow, { top: s(450) }]}>
+        <View style={styles.dividerRow}>
           <View style={styles.dividerDot} />
           <View style={styles.dividerLine} />
           <View style={styles.dividerDot} />
         </View>
 
-        <Typography variant="caption" tone="primary" style={[styles.socialTitle, { top: s(470) }]}>
-          {t('auth.login.social')}
-        </Typography>
+        <View style={styles.socialBlock}>
+          <Typography variant="caption" tone="primary" style={styles.socialTitle}>
+            {t('auth.login.social')}
+          </Typography>
 
-        <View style={[styles.socialButton, { top: s(510) }]}>
           <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
             <View style={styles.socialContent}>
               <Image source={googleIcon} style={styles.socialIcon} />
               <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>
             </View>
           </Button>
-        </View>
 
-        <View style={[styles.socialButton, { top: s(566) }]}>
           <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
             <View style={styles.socialContent}>
               <Image source={facebookIcon} style={styles.socialIcon} />
@@ -162,7 +165,7 @@ export const RegisterScreenView = () => {
         <Button
           variant="ghost"
           size="small"
-          style={[styles.footerRow, { top: s(630) }]}
+          style={styles.footerRow}
           textStyle={styles.footerLink}
           title={t('auth.register.haveAccount')}
           onPress={() => navigation.navigate(Routes.Login)}
@@ -175,90 +178,86 @@ export const RegisterScreenView = () => {
 const getStyles = (tokens: Record<string, string>) =>
   StyleSheet.create({
     screen: {
+      flex: 1,
       backgroundColor: tokens.bgScreen,
     },
+    screenContent: {
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.xl,
+    },
     formWrapper: {
-      position: 'absolute',
-      width: s(408),
-      height: s(688),
-      left: '50%',
-      transform: [{ translateX: -s(204) }],
-      borderRadius: 20,
+      flex: 1,
+      width: '100%',
+      maxWidth: s(420),
+      alignSelf: 'center',
+      gap: spacing.lg,
     },
     title: {
-      position: 'absolute',
-      alignSelf: 'center',
+      textAlign: 'center',
     },
     subtitle: {
-      position: 'absolute',
-      alignSelf: 'center',
+      textAlign: 'center',
+    },
+    headerBlock: {
+      gap: spacing.xs,
+      alignItems: 'center',
+    },
+    fieldsBlock: {
+      gap: spacing.md,
     },
     inputContainer: {
-      position: 'absolute',
-      alignSelf: 'center',
-      width: s(378),
+      width: '100%',
     },
     input: {
-      width: s(378),
+      width: '100%',
       height: s(46),
-      borderRadius: 20,
+      borderRadius: radius.md,
       borderWidth: 1,
       borderColor: tokens.borderStrong,
       paddingHorizontal: spacing.lg,
       color: tokens.textPrimary,
     },
     termsRow: {
-      position: 'absolute',
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: spacing.md,
       gap: spacing.sm,
-      left: s(15),
     },
     termsText: {
       color: tokens.textPrimary,
     },
-    cta: {
-      position: 'absolute',
-      alignSelf: 'center',
-      width: s(222),
-    },
     dividerRow: {
-      position: 'absolute',
       alignSelf: 'center',
-      width: s(356),
+      width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
+      gap: spacing.sm,
     },
     dividerLine: {
       flex: 1,
-      height: s(3),
+      height: s(2),
       backgroundColor: tokens.borderStrong,
     },
     dividerDot: {
-      width: s(10),
-      height: s(10),
+      width: s(8),
+      height: s(8),
       borderRadius: radius.sm,
       backgroundColor: tokens.borderStrong,
     },
     socialTitle: {
-      position: 'absolute',
-      alignSelf: 'center',
+      textAlign: 'center',
     },
     socialButton: {
-      position: 'absolute',
-      alignSelf: 'center',
-      width: s(378),
+      width: '100%',
       height: s(46),
-      borderRadius: 20,
+      borderRadius: radius.md,
       justifyContent: 'center',
     },
     socialOutline: {
-      width: '100%',
-      height: '100%',
+      alignSelf: 'stretch',
       borderWidth: 1,
       borderColor: tokens.borderStrong,
-      borderRadius: 20,
+      borderRadius: radius.md,
       justifyContent: 'center',
       paddingVertical: 0,
       paddingHorizontal: 0,
@@ -279,8 +278,11 @@ const getStyles = (tokens: Record<string, string>) =>
       color: tokens.textPrimary,
       marginRight: s(26),
     },
+    socialBlock: {
+      gap: spacing.md,
+      marginTop: spacing.md,
+    },
     footerRow: {
-      position: 'absolute',
       alignSelf: 'center',
       width: s(300),
       justifyContent: 'center',

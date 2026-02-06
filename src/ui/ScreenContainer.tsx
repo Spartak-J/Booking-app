@@ -31,7 +31,7 @@ export const ScreenContainer: React.FC<Props> = ({
 }) => {
   const { tokens } = useTheme();
   const { edges, ...safeAreaProps } = rest;
-  const resolvedEdges = edges ?? (['top', 'left', 'right'] as SafeAreaViewProps['edges']);
+  const resolvedEdges = edges ?? (['top', 'left', 'right', 'bottom'] as SafeAreaViewProps['edges']);
 
   const wrapWithKeyboardAvoiding = (node: React.ReactNode) =>
     withKeyboardAvoiding ? (

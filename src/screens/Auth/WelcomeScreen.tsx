@@ -2,7 +2,12 @@
 import React from 'react';
 
 import WelcomeScreenView from '@/components/Auth/WelcomeScreenView';
+import { AppLayout } from '@/layout/AppLayout';
 
-export const WelcomeScreen = () => <WelcomeScreenView />;
+export const WelcomeScreen = () => (
+  <AppLayout variant="stack">
+    <WelcomeScreenView />
+  </AppLayout>
+);
 
 export default WelcomeScreen;

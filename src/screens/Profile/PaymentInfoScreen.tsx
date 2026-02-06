@@ -9,7 +9,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PaymentRepository } from '@/data/payment';
 import type { PaymentCard } from '@/data/payment/types';
 import { Routes } from '@/navigation/routes';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 
 export const PaymentInfoScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -27,13 +27,13 @@ export const PaymentInfoScreen = () => {
   );
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="stack">
       <PaymentInfoScreenView
         cards={cards}
         onBack={() => navigation.goBack()}
         onAddCard={() => navigation.navigate(Routes.AddCard)}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

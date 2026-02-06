@@ -15,7 +15,7 @@ type KeysBackgroundProps = {
 const KEY_IMAGE_HEIGHT = s(220);
 
 export const KeysBackground: React.FC<KeysBackgroundProps> = ({
-  bottomOffset = 30,
+  bottomOffset = 0,
   variant = 'auto',
 }) => {
   const { colors, mode } = useTheme();

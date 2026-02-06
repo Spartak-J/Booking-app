@@ -70,7 +70,7 @@ export const BookingsScreenView: React.FC<BookingsScreenViewProps> = ({
     [tokens, isDark, colors],
   );
   const styles = useMemo(() => getStyles(palette), [palette]);
-  const [tab, setTab] = useState<TabKey>('cancelled');
+  const [tab, setTab] = useState<TabKey>('active');
   const { t } = useTranslation();
 
   const emptyImage = isDark ? noBookingWhiteImage : noBookingBlackImage;

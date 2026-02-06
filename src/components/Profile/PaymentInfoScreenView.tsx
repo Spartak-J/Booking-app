@@ -8,7 +8,6 @@ import { spacing, typography } from '@/theme';
 import { useTranslation } from '@/i18n';
 import type { PaymentCard } from '@/data/payment/types';
 import KeysBackground from '@/components/layout/KeysBackground';
-import FooterNavOverlay from '@/components/layout/FooterNavOverlay';
 import { s } from '@/utils/scale';
 
 type PaymentInfoScreenViewProps = {
@@ -25,12 +24,13 @@ export const PaymentInfoScreenView: React.FC<PaymentInfoScreenViewProps> = ({
   const { tokens } = useTheme();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
   const { t } = useTranslation();
+  const contentStyle = useMemo(() => [styles.content], [styles.content]);
 
   return (
     <View style={styles.root}>
       <HeaderBar title={t('profile.payment.title')} onBack={onBack} />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={contentStyle} showsVerticalScrollIndicator={false}>
         <Typography variant="subtitle" tone="primary" style={styles.sectionTitle}>
           {t('profile.payment.yourCard')}
         </Typography>
@@ -61,7 +61,6 @@ export const PaymentInfoScreenView: React.FC<PaymentInfoScreenViewProps> = ({
       </ScrollView>
 
       <KeysBackground variant="yellow" />
-      <FooterNavOverlay activeId="profile" />
     </View>
   );
 };
@@ -76,7 +75,6 @@ const getStyles = (tokens: Record<string, string>) =>
     content: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
-      paddingBottom: s(140),
       gap: spacing.lg,
     },
     sectionTitle: {

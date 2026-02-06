@@ -10,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FiltersModal } from '@/components/FiltersModal';
 import { OfferCard } from '@/components/OfferCard';
@@ -56,7 +55,6 @@ export const SearchResultsScreenView: React.FC<SearchResultsScreenViewProps> = (
   const isDark = mode === 'dark';
   const palette = useMemo(() => getPalette(colors, isDark), [colors, isDark]);
   const styles = useMemo(() => getStyles(palette), [palette]);
-  const insets = useSafeAreaInsets();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -233,7 +231,7 @@ export const SearchResultsScreenView: React.FC<SearchResultsScreenViewProps> = (
             <OfferCard offer={item} onPress={() => onPressOffer(item)} />
           </View>
         )}
-        contentContainerStyle={[styles.list, { paddingBottom: s(48) + insets.bottom }]}
+        contentContainerStyle={styles.list}
         ListFooterComponent={
           <View style={styles.pagination}>
             <Pressable

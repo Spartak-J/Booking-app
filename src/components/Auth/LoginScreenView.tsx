@@ -19,7 +19,7 @@ import facebookIcon from '@/assets/images/facebook.png';
 
 const DESIGN_WIDTH = 412;
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const scale = SCREEN_WIDTH / DESIGN_WIDTH;
 const s = (v: number) => v * scale;
 
@@ -51,98 +51,104 @@ export const LoginScreenView = () => {
     defaultValues: { email: '', password: '' },
   });
 
-  const offsetTop = (SCREEN_HEIGHT - s(688)) / 2;
-
   return (
-    <ScreenContainer style={styles.screen} edges={['left', 'right']}>
-      <View style={[styles.formWrapper, { top: offsetTop }]}>
-        <Typography variant="h1" tone="primary" style={[styles.title, { top: s(24) }]}>
-          {t('auth.login.title')}
-        </Typography>
+    <ScreenContainer
+      style={styles.screen}
+      contentContainerStyle={styles.screenContent}
+      scroll
+      withKeyboardAvoiding
+    >
+      <View style={styles.root}>
+        <View style={styles.topSection}>
+          <View style={styles.headerBlock}>
+            <Typography variant="h1" tone="primary" style={styles.title}>
+              {t('auth.login.title')}
+            </Typography>
+            <Typography variant="body" tone="primary" style={styles.subtitle}>
+              {t('auth.login.subtitle')}
+            </Typography>
+          </View>
 
-        <Typography variant="body" tone="primary" style={[styles.subtitle, { top: s(70) }]}>
-          {t('auth.login.subtitle')}
-        </Typography>
-
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { value, onChange } }) => (
-            <Input
-              value={value}
-              onChangeText={onChange}
-              placeholder={t('auth.placeholder.email')}
-              containerStyle={[styles.inputContainer, { top: s(150) }]}
-              inputStyle={styles.input}
+          <View style={styles.fieldsBlock}>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder={t('auth.placeholder.email')}
+                  containerStyle={styles.inputContainer}
+                  inputStyle={styles.input}
+                />
+              )}
             />
-          )}
-        />
 
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { value, onChange } }) => (
-            <Input
-              value={value}
-              onChangeText={onChange}
-              placeholder={t('auth.placeholder.password')}
-              secureTextEntry
-              containerStyle={[styles.inputContainer, { top: s(216) }]}
-              inputStyle={styles.input}
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder={t('auth.placeholder.password')}
+                  secureTextEntry
+                  containerStyle={styles.inputContainer}
+                  inputStyle={styles.input}
+                />
+              )}
             />
-          )}
-        />
+          </View>
+        </View>
 
-        <View style={[styles.cta, { top: s(286) }]}>
+        <View style={styles.bottomSection}>
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerDot} />
+            <View style={styles.dividerLine} />
+            <View style={styles.dividerDot} />
+          </View>
+
           <Button title={t('auth.login.continue')} onPress={handleSubmit(login)} />
-        </View>
 
-        <View style={[styles.dividerRow, { top: s(356) }]}>
-          <View style={styles.dividerDot} />
-          <View style={styles.dividerLine} />
-          <View style={styles.dividerDot} />
-        </View>
+          <View style={styles.socialBlock}>
+            <Typography variant="caption" tone="primary" style={styles.socialTitle}>
+              {t('auth.login.social')}
+            </Typography>
 
-        <Typography variant="caption" tone="primary" style={[styles.socialTitle, { top: s(376) }]}>
-          {t('auth.login.social')}
-        </Typography>
+            <Button
+              variant="ghost"
+              size="large"
+              style={styles.socialOutline}
+              onPress={() => console.log('Google login')}
+            >
+              <View style={styles.socialContent}>
+                <Image source={googleIcon} style={styles.socialIcon} />
+                <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>
+              </View>
+            </Button>
 
-        <View style={[styles.socialButton, { top: s(416) }]}>
+            <Button
+              variant="ghost"
+              size="large"
+              style={styles.socialOutline}
+              onPress={() => console.log('Facebook login')}
+            >
+              <View style={styles.socialContent}>
+                <Image source={facebookIcon} style={styles.socialIcon} />
+                <Typography style={styles.socialText}>{t('auth.login.facebook')}</Typography>
+              </View>
+            </Button>
+          </View>
+
           <Button
             variant="ghost"
-            size="large"
-            style={styles.socialOutline}
-            onPress={() => console.log('Google login')}
-          >
-            <View style={styles.socialContent}>
-              <Image source={googleIcon} style={styles.socialIcon} />
-              <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>
-            </View>
-          </Button>
+            size="small"
+            style={styles.footerRow}
+            textStyle={styles.footerText}
+            title={t('auth.login.noAccount')}
+            onPress={() => navigation.navigate(Routes.Register)}
+          />
         </View>
-
-        <View style={[styles.socialButton, { top: s(472) }]}>
-          <Button
-            variant="ghost"
-            size="large"
-            style={styles.socialOutline}
-            onPress={() => console.log('Facebook login')}
-          >
-            <View style={styles.socialContent}>
-              <Image source={facebookIcon} style={styles.socialIcon} />
-              <Typography style={styles.socialText}>{t('auth.login.facebook')}</Typography>
-            </View>
-          </Button>
-        </View>
-
-        <Button
-          variant="ghost"
-          size="small"
-          style={[styles.footerRow, { top: s(573) }]}
-          textStyle={styles.footerText}
-          title={t('auth.login.noAccount')}
-          onPress={() => navigation.navigate(Routes.Register)}
-        />
       </View>
     </ScreenContainer>
   );
@@ -151,83 +157,87 @@ export const LoginScreenView = () => {
 const getStyles = (tokens: Record<string, string>) =>
   StyleSheet.create({
     screen: {
+      flex: 1,
       backgroundColor: tokens.bgScreen,
     },
-    formWrapper: {
-      position: 'absolute',
-      width: s(408),
-      height: s(642),
-      left: '50%',
-      transform: [{ translateX: -s(204) }],
-      borderRadius: 20,
+    screenContent: {
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.xl,
+    },
+    root: {
+      flex: 1,
+      width: '100%',
+      maxWidth: s(420),
+      alignSelf: 'center',
+      gap: spacing.lg,
+    },
+    topSection: {
+      gap: spacing.xl,
     },
     title: {
-      position: 'absolute',
-      alignSelf: 'center',
+      textAlign: 'center',
     },
     subtitle: {
-      position: 'absolute',
-      alignSelf: 'center',
+      textAlign: 'center',
+    },
+    headerBlock: {
+      gap: spacing.xs,
+      alignItems: 'center',
+    },
+    fieldsBlock: {
+      gap: spacing.md,
     },
     inputContainer: {
-      position: 'absolute',
-      alignSelf: 'center',
-      width: s(378),
+      width: '100%',
     },
     input: {
-      width: s(378),
+      width: '100%',
       height: s(46),
-      borderRadius: 20,
+      borderRadius: radius.md,
       borderWidth: 1,
       borderColor: tokens.borderStrong,
       paddingHorizontal: spacing.lg,
       color: tokens.textPrimary,
     },
-    cta: {
-      position: 'absolute',
-      alignSelf: 'center',
-      width: s(222),
-      height: s(46),
-      borderRadius: 20,
-      justifyContent: 'center',
-      alignItems: 'center',
+    bottomSection: {
+      gap: spacing.lg,
     },
     dividerRow: {
-      position: 'absolute',
       alignSelf: 'center',
-      width: s(356),
+      width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
+      gap: spacing.sm,
     },
     dividerLine: {
       flex: 1,
-      height: s(3),
+      height: s(2),
       backgroundColor: tokens.borderStrong,
     },
     dividerDot: {
-      width: s(10),
-      height: s(10),
+      width: s(8),
+      height: s(8),
       borderRadius: radius.sm,
       backgroundColor: tokens.borderStrong,
     },
+    socialBlock: {
+      gap: spacing.md,
+      marginTop: spacing.md,
+    },
     socialTitle: {
-      position: 'absolute',
-      alignSelf: 'center',
+      textAlign: 'center',
     },
     socialButton: {
-      position: 'absolute',
-      alignSelf: 'center',
-      width: s(378),
+      width: '100%',
       height: s(46),
-      borderRadius: 20,
+      borderRadius: radius.md,
       justifyContent: 'center',
     },
     socialOutline: {
-      width: '100%',
-      height: '100%',
+      alignSelf: 'stretch',
       borderWidth: 1,
       borderColor: tokens.borderStrong,
-      borderRadius: 20,
+      borderRadius: radius.md,
       justifyContent: 'center',
       paddingVertical: 0,
       paddingHorizontal: 0,
@@ -250,7 +260,6 @@ const getStyles = (tokens: Record<string, string>) =>
       color: tokens.textPrimary,
     },
     footerRow: {
-      position: 'absolute',
       alignSelf: 'center',
       flexDirection: 'row',
       alignItems: 'center',

@@ -8,7 +8,7 @@ import BookingScreenView from '@/components/Bookings/BookingScreenView';
 import { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
 import { offerService } from '@/services/offerService';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 
 type Route = RouteProp<RootStackParamList, Routes.Booking>;
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
@@ -23,7 +23,7 @@ export const BookingScreen = () => {
   });
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right', 'bottom']}>
+    <AppLayout variant="stack">
       <BookingScreenView
         offerId={params.offerId}
         offer={offer}
@@ -38,7 +38,7 @@ export const BookingScreen = () => {
           })
         }
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

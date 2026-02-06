@@ -1,25 +1,18 @@
-// Screen: MessagesScreen. Used in: RootNavigator.
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import { AppLayout } from '@/layout/AppLayout';
 import MessagesScreenView from '@/components/Messages/MessagesScreenView';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
-import { Routes } from '@/navigation/routes';
-import { ScreenContainer } from '@/ui';
-
-type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 export const MessagesScreen = () => {
-  const navigation = useNavigation<Navigation>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
-      <MessagesScreenView
-        onBack={() => navigation.navigate(Routes.Main, { screen: Routes.Home })}
-        onSearch={() => navigation.navigate(Routes.Main, { screen: Routes.Home })}
-      />
-    </ScreenContainer>
+    <AppLayout variant="tab" header={false}>
+      <MessagesScreenView onBack={() => navigation.goBack()} />
+    </AppLayout>
   );
 };
 

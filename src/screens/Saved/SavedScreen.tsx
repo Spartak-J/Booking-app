@@ -10,7 +10,7 @@ import { offerService } from '@/services/offerService';
 import type { Offer } from '@/types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
@@ -28,11 +28,11 @@ export const SavedScreen = () => {
   );
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="tab" header={false}>
       <SavedScreenView
         offers={offers}
         onOpenOffer={(offerId) => navigation.navigate(Routes.OfferDetails, { offerId })}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };

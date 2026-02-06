@@ -1,14 +1,14 @@
 // Component: BookingSuccessScreenView. Used in: BookingSuccessScreen.
 import React, { useMemo, useState } from 'react';
-import { Dimensions, Image, StyleSheet, View, Pressable } from 'react-native';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ArrowLeft } from 'lucide-react-native';
 
 import successBackground from '@/assets/images/background_success.png';
 import successIcon from '@/assets/images/success.png';
 import { useTranslation } from '@/i18n';
-import { BottomLoader, LineWithDots, Typography } from '@/ui';
-import { useTheme } from '@/theme';
+import { BottomLoader, IconButton, LineWithDots, Typography } from '@/ui';
+import { palette } from '@/theme';
 
 const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -18,16 +18,20 @@ const s = (value: number) => value * scale;
 const LOAD_WIDTH = s(340);
 const LOAD_HEIGHT = s(40);
 const LOAD_KNOB = s(75);
+const SUCCESS_COLOR = palette.white;
 
 type BookingSuccessScreenViewProps = {
   onBack: () => void;
+  onHome: () => void;
 };
 
-export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> = ({ onBack }) => {
+export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> = ({
+  onBack,
+  onHome,
+}) => {
   const { t } = useTranslation();
   const [loadingFinished, setLoadingFinished] = useState(false);
-  const { colors, tokens } = useTheme();
-  const styles = useMemo(() => getStyles(colors, tokens), [colors, tokens]);
+  const styles = useMemo(() => getStyles(), []);
 
   return (
     <View style={styles.container}>
@@ -35,9 +39,14 @@ export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> =
 
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <Pressable style={styles.backButton} onPress={onBack}>
-            <ArrowLeft size={s(18)} color={tokens.textPrimary} />
-          </Pressable>
+          <IconButton
+            onPress={onBack}
+            size="md"
+            variant="ghost"
+            iconColorOverride={SUCCESS_COLOR}
+            preserveIconColor
+            icon={<ArrowLeft size={s(18)} color={SUCCESS_COLOR} />}
+          />
           <Typography
             variant="h2"
             style={styles.headerTitle}
@@ -50,16 +59,13 @@ export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> =
           </Typography>
         </View>
       </View>
-      <LineWithDots width={s(304)} color={tokens.textPrimary} style={styles.headerUnderline} />
+      <LineWithDots width={s(304)} color={SUCCESS_COLOR} style={styles.headerUnderline} />
 
-      {loadingFinished && (
+      {loadingFinished ? (
         <View style={styles.successGroup}>
-          <Typography variant="h1" style={styles.successText} allowFontScaling={false}>
-            {t('bookingSuccess.success')}
-          </Typography>
           <Image source={successIcon} style={styles.successIcon} />
         </View>
-      )}
+      ) : null}
 
       {!loadingFinished && (
         <View style={styles.bottomLoaderWrapper}>
@@ -68,9 +74,9 @@ export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> =
             height={LOAD_HEIGHT}
             knobSize={LOAD_KNOB}
             showKnob={false}
-            borderColor={tokens.textPrimary}
-            fillColor={tokens.accent}
-            knobColor={tokens.textPrimary}
+            borderColor={SUCCESS_COLOR}
+            fillColor={SUCCESS_COLOR}
+            knobColor={SUCCESS_COLOR}
             minFillWidth={s(38)}
             duration={3000}
             onFinish={() => setLoadingFinished(true)}
@@ -78,23 +84,28 @@ export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> =
         </View>
       )}
 
-      {!loadingFinished && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeCircle}>
-            <MaterialCommunityIcons name="home" size={s(18)} color={tokens.textPrimary} />
-          </View>
-        </View>
-      )}
+      <View style={styles.homeIndicator}>
+        <IconButton
+          onPress={onHome}
+          variant="ghost"
+          circular
+          bordered
+          dimension={s(42)}
+          iconColorOverride={SUCCESS_COLOR}
+          preserveIconColor
+          icon={<MaterialCommunityIcons name="home" size={s(18)} color={SUCCESS_COLOR} />}
+        />
+      </View>
     </View>
   );
 };
 
-const getStyles = (colors: any, tokens: Record<string, string>) =>
+const getStyles = () =>
   // LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.bgDark,
+      backgroundColor: undefined,
     },
     backgroundImage: {
       position: 'absolute',
@@ -109,7 +120,7 @@ const getStyles = (colors: any, tokens: Record<string, string>) =>
       width: s(412),
       height: s(36),
       left: 0,
-      top: s(41),
+      top: 0,
       alignItems: 'flex-start',
       justifyContent: 'center',
     },
@@ -126,37 +137,27 @@ const getStyles = (colors: any, tokens: Record<string, string>) =>
       alignItems: 'center',
     },
     headerTitle: {
-      color: tokens.textPrimary,
+      color: SUCCESS_COLOR,
       fontSize: s(15),
       fontWeight: '700',
     },
     headerUnderline: {
       position: 'absolute',
       left: s(50),
-      top: s(87),
+      top: s(52),
     },
     successGroup: {
       position: 'absolute',
-      width: s(299),
-      height: s(136),
-      left: s(50),
-      top: s(377),
-    },
-    successText: {
-      position: 'absolute',
-      left: s(0),
-      top: s(5),
-      color: tokens.textPrimary,
-      fontSize: s(96),
-      lineHeight: s(117),
-      fontWeight: '700',
-    },
-    successIcon: {
-      position: 'absolute',
       width: s(116.5),
       height: s(114.5),
-      left: s(183),
-      top: s(0),
+      left: s(148),
+      top: s(370),
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    successIcon: {
+      width: s(116.5),
+      height: s(114.5),
       resizeMode: 'contain',
     },
     bottomLoaderWrapper: {
@@ -172,15 +173,6 @@ const getStyles = (colors: any, tokens: Record<string, string>) =>
       left: (SCREEN_WIDTH - s(42)) / 2,
       top: s(791),
       zIndex: 5,
-    },
-    homeCircle: {
-      width: s(42),
-      height: s(42),
-      borderRadius: s(24),
-      borderWidth: s(2),
-      borderColor: tokens.textPrimary,
-      alignItems: 'center',
-      justifyContent: 'center',
     },
   });
 

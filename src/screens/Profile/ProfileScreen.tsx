@@ -4,17 +4,17 @@ import { useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '@/hooks/useAuth';
 import ProfileScreenView from '@/components/Profile/ProfileScreenView';
+import { AppLayout } from '@/layout/AppLayout';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Routes } from '@/navigation/routes';
-import { ScreenContainer } from '@/ui';
 
 export const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="tab" header={false}>
       <ProfileScreenView
         userName={user?.name}
         userInitial={user?.name ? user.name.charAt(0).toUpperCase() : ''}
@@ -24,7 +24,7 @@ export const ProfileScreen = () => {
         onOpenTrips={() => navigation.navigate(Routes.Main, { screen: Routes.Bookings })}
         onLogout={logout}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

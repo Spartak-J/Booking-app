@@ -9,16 +9,13 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import HomeMenuSheet from '@/components/Home/HomeMenuSheet';
 import { MENU_ITEMS } from '@/components/Home/homeNavigationData';
 import { useTheme } from '@/theme';
-import { HeaderBar, Typography } from '@/ui';
+import { HeaderBar } from '@/ui';
 import { radius } from '@/theme';
 import { s, SCREEN_WIDTH } from '@/utils/scale';
-import { useTranslation } from '@/i18n';
 
 import img1 from '@/assets/images/1.png';
 import img2 from '@/assets/images/2.png';
@@ -41,8 +38,6 @@ export const OfferGalleryScreenView: React.FC<OfferGalleryScreenViewProps> = ({
   onSearch,
 }) => {
   const { colors, mode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
   const isDark = mode === 'dark';
   const palette = useMemo(
     () => ({
@@ -90,10 +85,7 @@ export const OfferGalleryScreenView: React.FC<OfferGalleryScreenViewProps> = ({
         menuStyle={styles.headerMenu}
       />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingBottom: s(120) + insets.bottom }]}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <Image source={getImage(0)} style={styles.imageLarge} />
         <View style={styles.row}>
           <Image source={getImage(1)} style={styles.imageSmall} />
@@ -110,67 +102,6 @@ export const OfferGalleryScreenView: React.FC<OfferGalleryScreenViewProps> = ({
           <Image source={getImage(8)} style={styles.imageSmall} />
         </View>
       </ScrollView>
-
-      <View style={[styles.footer, { paddingBottom: s(4) + insets.bottom }]}>
-        <View style={styles.footerRow}>
-          <View style={styles.footerItem}>
-            <MaterialCommunityIcons name="home-outline" size={s(22)} color={palette.headerIcon} />
-            <Typography
-              variant="caption"
-              tone="primary"
-              style={styles.footerLabel}
-              numberOfLines={1}
-            >
-              {t('offer.footer.home')}
-            </Typography>
-          </View>
-          <View style={styles.footerItem}>
-            <MaterialCommunityIcons
-              name="message-outline"
-              size={s(22)}
-              color={palette.headerIcon}
-            />
-            <Typography
-              variant="caption"
-              tone="primary"
-              style={styles.footerLabel}
-              numberOfLines={1}
-            >
-              {t('offer.footer.messages')}
-            </Typography>
-          </View>
-          <View style={styles.footerItem}>
-            <MaterialCommunityIcons
-              name="bookmark-outline"
-              size={s(22)}
-              color={palette.headerIcon}
-            />
-            <Typography
-              variant="caption"
-              tone="primary"
-              style={styles.footerLabel}
-              numberOfLines={1}
-            >
-              {t('offer.footer.bookings')}
-            </Typography>
-          </View>
-          <View style={styles.footerItem}>
-            <MaterialCommunityIcons
-              name="account-outline"
-              size={s(22)}
-              color={palette.headerIcon}
-            />
-            <Typography
-              variant="caption"
-              tone="primary"
-              style={styles.footerLabel}
-              numberOfLines={1}
-            >
-              {t('offer.footer.profile')}
-            </Typography>
-          </View>
-        </View>
-      </View>
 
       <HomeMenuSheet
         visible={menuOpen}
@@ -254,30 +185,6 @@ const getStyles = (palette: { screenBg: string; headerBg: string; headerIcon: st
       width: s(176),
       height: s(110),
       borderRadius: radius.md,
-    },
-    footer: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      height: s(50),
-      backgroundColor: palette.headerBg,
-      paddingHorizontal: s(20),
-      paddingTop: s(4),
-    },
-    footerRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    footerItem: {
-      alignItems: 'center',
-      gap: s(2),
-      width: s(76),
-    },
-    footerLabel: {
-      fontSize: s(10),
-      flexWrap: 'nowrap',
     },
   });
 

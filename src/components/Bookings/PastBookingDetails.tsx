@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { HeaderBar, Typography } from '@/ui';
+import { HeaderBar, IconButton, Typography } from '@/ui';
 import { useTheme, withOpacity } from '@/theme';
 import { getColorTokens } from '@/theme';
 import { s } from '@/utils/scale';
@@ -30,10 +30,12 @@ type PastBookingDetailsProps = {
   hotel?: Hotel;
   owner?: Owner;
   reviews?: Review[];
+  onLeaveReview?: () => void;
 };
 
 export const PastBookingDetails: React.FC<PastBookingDetailsProps> = ({
   onBack,
+  onLeaveReview,
   booking,
   hotel,
   owner,
@@ -76,6 +78,19 @@ export const PastBookingDetails: React.FC<PastBookingDetailsProps> = ({
         titleStyle={styles.headerTitle}
         backStyle={styles.backButton}
       />
+      {onLeaveReview ? (
+        <IconButton
+          onPress={onLeaveReview}
+          icon={
+            <MaterialCommunityIcons name="message-text-outline" size={s(18)} color={palette.icon} />
+          }
+          circular
+          bordered
+          dimension={s(32)}
+          style={styles.reviewButton}
+          preserveIconColor
+        />
+      ) : null}
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Typography style={styles.statusText} numberOfLines={1} ellipsizeMode="tail">
           {t('bookings.status.completed')}
@@ -264,9 +279,14 @@ const getStyles = (palette: {
       fontSize: s(16),
       fontWeight: '700',
     },
+    reviewButton: {
+      position: 'absolute',
+      right: s(16),
+      top: s(6),
+    },
     content: {
       paddingHorizontal: s(22),
-      paddingBottom: s(80),
+      paddingBottom: s(32),
     },
     statusText: {
       marginTop: s(8),

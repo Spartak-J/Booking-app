@@ -41,6 +41,7 @@ type CreateBookingPayload = {
   checkOut: string;
   guests: number;
   paymentType?: PaymentType;
+  userId?: string;
 };
 
 export const bookingService = {
@@ -59,7 +60,7 @@ export const bookingService = {
         id: `mock-booking-${Date.now()}`,
         offerId: payload.offerId,
         hotelId: hotel?.id,
-        userId: 'user-1',
+        userId: payload.userId ?? 'user-1',
         checkIn: payload.checkIn,
         checkOut: payload.checkOut,
         guests: payload.guests,

@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PastBookingDetailsScreenView from '@/components/Bookings/PastBookingDetailsScreenView';
 import { HotelsRepository } from '@/data/hotels';
 import { Hotel, Owner, Review } from '@/data/types';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 import { Routes } from '@/navigation/routes';
 import { RootStackParamList } from '@/navigation/RootNavigator';
 
@@ -51,15 +51,18 @@ export const PastBookingDetailsScreen = () => {
   }, [booking?.hotelId, booking?.id, booking?.title]);
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']} withKeyboardAvoiding={false}>
+    <AppLayout variant="stack">
       <PastBookingDetailsScreenView
         onBack={() => navigation.goBack()}
+        onLeaveReview={() => {
+          /* TODO: navigate to review flow */
+        }}
         booking={booking}
         hotel={hotel}
         owner={owner}
         reviews={reviews}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

@@ -33,13 +33,14 @@ export const OfferDetailsScreenView: React.FC<OfferDetailsScreenViewProps> = ({
   const { colors, mode } = useTheme();
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
   const styles = useMemo(() => getStyles(tokens), [tokens]);
+  const contentStyle = useMemo(() => [styles.content], [styles.content]);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuAnimation = useMemo(() => new Animated.Value(0), []);
 
   if (isLoading || !offer) {
     return (
       <View style={styles.screen}>
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView contentContainerStyle={contentStyle}>
           <Loader variant="skeleton" height={200} />
           <Loader variant="skeleton" height={24} style={styles.loadingTitle} />
           <Loader variant="skeleton" height={18} style={styles.loadingSubtitle} />
@@ -71,7 +72,7 @@ export const OfferDetailsScreenView: React.FC<OfferDetailsScreenViewProps> = ({
 
   return (
     <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={contentStyle}>
         <OfferDetailsHeader
           offer={offer}
           onBack={onBack}
@@ -124,7 +125,6 @@ const getStyles = (tokens: ReturnType<typeof getColorTokens>) =>
     },
     content: {
       paddingHorizontal: s(20),
-      paddingBottom: s(40),
     },
     loadingTitle: {
       marginTop: s(16),

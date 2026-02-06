@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useMemo } from 'react';
-import { StatusBar } from 'react-native';
 
 // Import your screens here
 import { AuthTabsScreen } from '@/screens/Auth/AuthTabsScreen';
@@ -140,9 +139,7 @@ const MainTabs = () => {
 export const RootNavigator = () => {
   const token = useAuthStore((state) => state.token);
   const guestMode = useAuthStore((state) => state.guestMode);
-  const { colors, mode } = useTheme();
-  const { t } = useTranslation();
-  const isDark = mode === 'dark' || colors.background === colors.bgDark;
+  const { colors } = useTheme();
 
   const navTheme = useMemo(
     () => ({
@@ -160,110 +157,37 @@ export const RootNavigator = () => {
   );
 
   return (
-    <>
-      <StatusBar
-        barStyle={isDark ? 'light-content' : 'dark-content'}
-        backgroundColor={colors.background}
-      />
-      <NavigationContainer theme={navTheme} ref={navigationRef}>
-        <Stack.Navigator
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: colors.bgDark,
-            },
-            headerTitleStyle: {
-              fontFamily: 'Cagliostro-Regular',
-              color: colors.surface,
-            },
-            headerTintColor: colors.primary,
-          }}
-        >
-          {!token && !guestMode ? (
-            <>
-              <Stack.Screen
-                name="Welcome"
-                component={WelcomeScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-              <Stack.Screen
-                name="Register"
-                component={RegisterScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="Auth"
-                component={AuthTabsScreen}
-                options={{ headerShown: false }}
-              />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-              <Stack.Screen
-                name="SearchResults"
-                component={SearchResultsScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="Landmarks"
-                component={LandmarksScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="LandmarksSearchResults"
-                component={LandmarksSearchResultsScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="OfferDetails"
-                component={OfferDetailsScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="OfferGallery"
-                component={OfferGalleryScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="Booking"
-                component={BookingScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="BookingDetails"
-                component={BookingDetailsScreen}
-                options={{ title: t('nav.bookingDetails') }}
-              />
-              <Stack.Screen
-                name="BookingSuccess"
-                component={BookingSuccessScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="PastBookingDetails"
-                component={PastBookingDetailsScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="EditProfile"
-                component={EditProfileScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="PaymentInfo"
-                component={PaymentInfoScreen}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="AddCard"
-                component={AddCardScreen}
-                options={{ headerShown: false }}
-              />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </>
+    <NavigationContainer theme={navTheme} ref={navigationRef}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        {!token && !guestMode ? (
+          <>
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Auth" component={AuthTabsScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
+            <Stack.Screen name="Landmarks" component={LandmarksScreen} />
+            <Stack.Screen name="LandmarksSearchResults" component={LandmarksSearchResultsScreen} />
+            <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} />
+            <Stack.Screen name="OfferGallery" component={OfferGalleryScreen} />
+            <Stack.Screen name="Booking" component={BookingScreen} />
+            <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
+            <Stack.Screen name="BookingSuccess" component={BookingSuccessScreen} />
+            <Stack.Screen name="PastBookingDetails" component={PastBookingDetailsScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />
+            <Stack.Screen name="AddCard" component={AddCardScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };

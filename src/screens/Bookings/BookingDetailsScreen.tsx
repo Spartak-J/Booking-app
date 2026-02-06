@@ -8,7 +8,7 @@ import BookingDetailsScreenView from '@/components/Bookings/BookingDetailsScreen
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
 import { bookingService } from '@/services/bookingService';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 
 type Route = RouteProp<RootStackParamList, Routes.BookingDetails>;
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
@@ -23,13 +23,13 @@ export const BookingDetailsScreen = () => {
   });
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="stack">
       <BookingDetailsScreenView
         booking={data}
         bookingId={params.bookingId}
         onBack={() => navigation.goBack()}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

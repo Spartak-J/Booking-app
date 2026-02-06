@@ -92,6 +92,7 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         checkOut: dates.to,
         guests: guests ?? 1,
         paymentType,
+        userId: userId ?? 'user-1',
       }),
     onSuccess: (booking) => {
       queryClient.invalidateQueries({ queryKey: ['bookings', userId ?? ''] });
@@ -194,7 +195,6 @@ const getStyles = (colors: any, isDark: boolean, headerTextColor: string) =>
     },
     content: {
       paddingHorizontal: s(14),
-      paddingBottom: s(40),
       gap: s(12),
     },
     header: {

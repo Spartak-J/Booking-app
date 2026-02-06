@@ -6,7 +6,7 @@ import AddCardScreenView from '@/components/Profile/AddCardScreenView';
 import { PaymentRepository } from '@/data/payment';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 
 export const AddCardScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -27,9 +27,9 @@ export const AddCardScreen = () => {
   };
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="stack">
       <AddCardScreenView onBack={() => navigation.goBack()} onSave={handleSave} />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

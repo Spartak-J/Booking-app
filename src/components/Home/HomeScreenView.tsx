@@ -2,7 +2,6 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
 import { Animated, Easing, ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FiltersModal } from '@/components/FiltersModal';
 import { PopularCities } from '@/components/Home/PopularCities';
 import HomeCountries from '@/components/Home/HomeCountries';
@@ -81,7 +80,6 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
   const [menuOpen, setMenuOpen] = useState(false);
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const guestMode = useAuthStore((s) => s.guestMode);
   const leaveGuestMode = useAuthStore((s) => s.leaveGuestMode);
   const dateAnimation = useMemo(() => new Animated.Value(0), []);
@@ -132,10 +130,7 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
   const isDark = colors.background === colors.bgDark;
   const palette = useMemo(() => getPalette(colors, isDark), [colors, isDark]);
   const styles = useMemo(() => getStyles(palette), [palette]);
-  const contentStyle = useMemo(
-    () => [styles.content, { paddingBottom: s(50) + insets.bottom }],
-    [styles.content, insets.bottom],
-  );
+  const contentStyle = useMemo(() => [styles.content], [styles.content]);
   const { data: cities } = useQuery({ queryKey: ['cities'], queryFn: cityService.getAll });
 
   const formatDayLabel = (value: number) => String(value).padStart(2, '0');

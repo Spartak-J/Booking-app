@@ -12,6 +12,7 @@ import { Button, DecorativeBubble, Typography } from '@/ui';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
 import { s, vs } from '@/utils/scale';
+import { spacing, radius } from '@/theme';
 
 import img1 from '@/assets/images/1.png';
 import img2 from '@/assets/images/2.png';
@@ -49,6 +50,12 @@ export const WelcomeScreenView = () => {
   const [role, setRole] = useState<RoleOption | null>(null);
   const switchRole = useAuthStore((state) => state.switchRole);
   const { t } = useTranslation();
+  const fallbackTitle = t('welcome.title') || 'Ласкаво просимо';
+  const [fallback1 = 'Ласкаво', fallback2 = 'просимо'] = fallbackTitle.split(' ');
+  const rawLine1 = t('welcome.titleLine1') || fallback1;
+  const rawLine2 = t('welcome.titleLine2') || fallback2;
+  const titleLine1 = rawLine1.includes('.') || rawLine1.includes('welcome.') ? 'Ласкаво' : rawLine1;
+  const titleLine2 = rawLine2.includes('.') || rawLine2.includes('welcome.') ? 'просимо' : rawLine2;
 
   const handleContinue = () => {
     if (!role) return;
@@ -64,16 +71,38 @@ export const WelcomeScreenView = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Image source={backgroundImageSource} style={styles.backgroundImage} />
+    <View style={styles.screen}>
+      <View pointerEvents="none" style={styles.backgroundLayer}>
+        <Image source={backgroundImageSource} style={styles.backgroundImage} resizeMode="cover" />
+      </View>
 
       <LinearGradient
-        colors={[withOpacity(colors.surfaceLight, 0), colors.surfaceLight]}
-        locations={[0.04, 0.75]}
+        pointerEvents="none"
+        colors={[
+          withOpacity(colors.surfaceLight, 0),
+          withOpacity(colors.surfaceLight, 0.7),
+          withOpacity(colors.surfaceLight, 0.08),
+        ]}
+        locations={[0, 0.65, 1]}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={styles.titleOverlay}
+      />
+
+      <LinearGradient
+        pointerEvents="none"
+        colors={[
+          withOpacity(colors.surfaceLight, 0),
+          withOpacity(colors.surfaceLight, 0.35),
+          withOpacity(colors.surfaceLight, 0.85),
+        ]}
+        locations={[0, 0.55, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
         style={styles.bottomGradient}
       />
 
-      <View style={StyleSheet.absoluteFill}>
+      <View style={styles.decorLayer} pointerEvents="none">
         {propertyImages.map((item) => (
           <View
             key={item.id}
@@ -84,15 +113,22 @@ export const WelcomeScreenView = () => {
             </DecorativeBubble>
           </View>
         ))}
+      </View>
 
-        <Typography variant="h1" tone="primary" style={styles.title}>
-          {t('welcome.title')}
-        </Typography>
+      <View style={styles.content}>
+        <View style={styles.topSection}>
+          <View style={styles.titleWrapper}>
+            <Typography variant="h1" tone="primary" style={styles.title}>
+              {`${titleLine1}\n${titleLine2}`}
+            </Typography>
+          </View>
+        </View>
 
-        <View style={styles.selector}>
-          {renderRoleOption('user', t('welcome.role.user'))}
-          {renderRoleOption('owner', t('welcome.role.owner'))}
-
+        <View style={styles.bottomSection}>
+          <View style={styles.selector}>
+            {renderRoleOption('user', t('welcome.role.user'))}
+            {renderRoleOption('owner', t('welcome.role.owner'))}
+          </View>
           <Button
             title={t('welcome.cta')}
             onPress={handleContinue}
@@ -108,49 +144,71 @@ export const WelcomeScreenView = () => {
 
 const getStyles = (colors: Record<string, string>, tokens: Record<string, string>) =>
   StyleSheet.create({
-    container: {
+    screen: {
       flex: 1,
-      backgroundColor: tokens.bgPanel,
+      backgroundColor: colors.transparent,
+    },
+    backgroundLayer: {
+      ...StyleSheet.absoluteFillObject,
+      top: -spacing.xl * 2,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 0,
     },
     backgroundImage: {
-      position: 'absolute',
-      width: s(740),
-      height: vs(982),
-      left: s(-200),
-      top: vs(-21),
-    },
-    bottomGradient: {
-      position: 'absolute',
       width: '100%',
-      height: vs(350),
-      bottom: 0,
+      height: '100%',
+    },
+    decorLayer: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: 2,
     },
     fullImage: {
       width: '100%',
       height: '100%',
     },
+    content: {
+      flex: 1,
+      paddingHorizontal: spacing.xl,
+      paddingTop: spacing.xl * 9.3,
+      paddingBottom: spacing.xl,
+      justifyContent: 'flex-start',
+      gap: spacing.lg * 1.2,
+      zIndex: 3,
+    },
+    topSection: {
+      gap: spacing.lg,
+      alignItems: 'flex-start',
+      width: '80%',
+    },
+    titleWrapper: {
+      position: 'relative',
+      paddingLeft: spacing.lg,
+      paddingTop: spacing.xl * 3.3,
+    },
     title: {
-      position: 'absolute',
-      top: vs(278),
-      left: s(16),
+      textAlign: 'left',
+      paddingHorizontal: spacing.sm,
+      maxWidth: '80%',
     },
     selector: {
-      position: 'absolute',
-      left: s(22),
-      top: vs(640),
-      width: s(368),
-      gap: vs(20),
+      width: '100%',
+      gap: spacing.md * 1.2,
+      paddingHorizontal: spacing.sm,
+      alignItems: 'flex-start',
+      zIndex: 3,
     },
     roleButton: {
-      width: s(368),
-      height: vs(44),
-      borderRadius: s(20),
+      width: '100%',
+      minHeight: vs(44),
+      borderRadius: radius.lg,
       justifyContent: 'flex-start',
       alignItems: 'center',
       flexDirection: 'row',
-      gap: s(12),
-      paddingVertical: 0,
-      paddingHorizontal: 0,
+      gap: spacing.md,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
       borderWidth: 0,
     },
     radioCircle: {
@@ -171,14 +229,44 @@ const getStyles = (colors: Record<string, string>, tokens: Record<string, string
     },
     radioLabel: {
       color: tokens.textPrimary,
+      fontWeight: '700',
+    },
+    bottomSection: {
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingHorizontal: spacing.lg,
+      justifyContent: 'flex-end',
+      marginTop: 'auto',
+      width: '100%',
+      gap: spacing.lg * 1.5,
+      zIndex: 3,
+      alignItems: 'center',
+    },
+    titleOverlay: {
+      position: 'absolute',
+      left: -spacing.xl * 2,
+      top: spacing.xl * 1.2,
+      width: '95%',
+      height: vs(320),
+      borderTopRightRadius: radius.xl * 2,
+      borderBottomRightRadius: radius.xl * 2.4,
+      opacity: 0.9,
+      zIndex: 1,
+    },
+    bottomGradient: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: vs(360),
+      zIndex: 1,
     },
     cta: {
-      width: s(224),
-      height: vs(44),
+      width: '72%',
+      minHeight: vs(44),
       backgroundColor: tokens.accent,
-      borderRadius: 20,
+      borderRadius: radius.lg,
       alignSelf: 'center',
-      marginTop: vs(5),
       justifyContent: 'center',
     },
     ctaText: {

@@ -9,7 +9,7 @@ import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
 import { cityService } from '@/services/cityService';
 import { offerService, OfferFilters } from '@/services/offerService';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 
 type Route = RouteProp<RootStackParamList, Routes.SearchResults>;
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
@@ -27,7 +27,7 @@ export const SearchResultsScreen = () => {
   const { data: cities } = useQuery({ queryKey: ['cities'], queryFn: cityService.getAll });
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="stack">
       <SearchResultsScreenView
         filters={filters}
         setFilters={setFilters}
@@ -39,7 +39,7 @@ export const SearchResultsScreen = () => {
         onBack={() => navigation.goBack()}
         onPressOffer={(offer) => navigation.navigate(Routes.OfferDetails, { offerId: offer.id })}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

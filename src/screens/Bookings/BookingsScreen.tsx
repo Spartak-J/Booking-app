@@ -7,13 +7,13 @@ import BookingsScreenView, {
   ActiveBooking,
   PastBookingItem,
 } from '@/components/Bookings/BookingsScreenView';
-import { BookingRepository } from '@/data/bookings';
 import { HotelsRepository } from '@/data/hotels';
 import { Routes } from '@/navigation/routes';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { useAuth } from '@/hooks/useAuth';
 import { formatPrice } from '@/utils/price';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
+import { bookingService } from '@/services/bookingService';
 
 import activeTripImage from '@/assets/images/2.png';
 import pastImage1 from '@/assets/images/1.png';
@@ -23,6 +23,8 @@ import pastImage4 from '@/assets/images/4.png';
 import pastImage5 from '@/assets/images/5.png';
 
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
+
+const toTime = (value: string) => new Date(value).getTime();
 
 export const BookingsScreen = () => {
   const navigation = useNavigation<Navigation>();
@@ -48,15 +50,15 @@ export const BookingsScreen = () => {
 
     const loadBookings = async () => {
       const userId = user?.id ?? 'user-1';
-      const [items, hotels] = await Promise.all([
-        BookingRepository.getByUserId(userId),
+      const [{ items }, hotels] = await Promise.all([
+        bookingService.getUserBookings(userId),
         HotelsRepository.getAll(),
       ]);
       if (!active) return;
 
-      const activeItem = items.find(
-        (item) => item.status === 'active' || item.status === 'pending',
-      );
+      const activeItem = [...items]
+        .filter((item) => item.status === 'active' || item.status === 'pending')
+        .sort((a, b) => toTime(b.checkIn) - toTime(a.checkIn))[0];
       if (activeItem) {
         const activeHotelId = activeItem.hotelId ?? '';
         const hotel = hotels.find((item) => item.id === activeItem.hotelId);
@@ -71,7 +73,9 @@ export const BookingsScreen = () => {
         setActiveBooking(null);
       }
 
-      const pastBookings = items.filter((item) => item.status === 'completed');
+      const pastBookings = items
+        .filter((item) => item.status === 'completed')
+        .sort((a, b) => toTime(b.checkOut) - toTime(a.checkOut));
       setPastItems(
         pastBookings.map((item) => {
           const pastHotelId = item.hotelId ?? '';
@@ -102,7 +106,7 @@ export const BookingsScreen = () => {
   }, [navigation, user?.id]);
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="tab" header={false}>
       <BookingsScreenView
         activeBooking={activeBooking}
         pastItems={pastItems}
@@ -111,7 +115,7 @@ export const BookingsScreen = () => {
           navigation.navigate(Routes.PastBookingDetails, { booking: item })
         }
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

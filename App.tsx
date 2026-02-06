@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Шрифты
 import CagliostroRegular from './assets/fonts/Cagliostro-Regular.ttf';
@@ -69,19 +69,19 @@ const AppContent = () => {
 
   // Основное приложение после 5 секунд анимации
   return (
-    <SafeAreaProvider>
-      <QueryProvider>
-        <StatusBar style="light" backgroundColor={tokens.accent} />
-        <RootNavigator />
-      </QueryProvider>
-    </SafeAreaProvider>
+    <QueryProvider>
+      <StatusBar style="light" backgroundColor={tokens.accent} translucent={false} />
+      <RootNavigator />
+    </QueryProvider>
   );
 };
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

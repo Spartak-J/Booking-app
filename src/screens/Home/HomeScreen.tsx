@@ -1,10 +1,10 @@
-// Screen: HomeScreen. Used in: RootNavigator.
+// Screen: HomeScreen
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 
 import HomeScreenView from '@/components/Home/HomeScreenView';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
 import { OfferFilters } from '@/services/offerService';
@@ -19,12 +19,12 @@ export const HomeScreen = () => {
   };
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="tab" header={false}>
       <HomeScreenView
         onSearch={handleSearch}
         onOpenLandmarks={() => navigation.navigate(Routes.Landmarks)}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 

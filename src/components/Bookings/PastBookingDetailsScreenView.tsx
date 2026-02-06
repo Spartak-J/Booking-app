@@ -29,6 +29,7 @@ type PastBookingDetailsScreenViewProps = {
   owner?: Owner;
   reviews: Review[];
   onBack: () => void;
+  onLeaveReview?: () => void;
 };
 
 export const PastBookingDetailsScreenView: React.FC<PastBookingDetailsScreenViewProps> = ({
@@ -37,6 +38,7 @@ export const PastBookingDetailsScreenView: React.FC<PastBookingDetailsScreenView
   owner,
   reviews,
   onBack,
+  onLeaveReview,
 }) => {
   const { t } = useTranslation();
   const { colors, mode } = useTheme();
@@ -50,6 +52,7 @@ export const PastBookingDetailsScreenView: React.FC<PastBookingDetailsScreenView
   return (
     <PastBookingDetails
       onBack={onBack}
+      onLeaveReview={onLeaveReview}
       booking={booking}
       hotel={hotel}
       owner={owner}

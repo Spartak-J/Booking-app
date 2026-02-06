@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '@/hooks/useAuth';
 import EditProfileScreenView from '@/components/Profile/EditProfileScreenView';
-import { ScreenContainer } from '@/ui';
+import { AppLayout } from '@/layout/AppLayout';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -13,7 +13,7 @@ export const EditProfileScreen = () => {
   const { user } = useAuth();
 
   return (
-    <ScreenContainer edges={['top', 'left', 'right']}>
+    <AppLayout variant="stack">
       <EditProfileScreenView
         initialValues={{
           name: user?.name ?? '',
@@ -25,7 +25,7 @@ export const EditProfileScreen = () => {
         onBack={() => navigation.goBack()}
         onSubmit={() => undefined}
       />
-    </ScreenContainer>
+    </AppLayout>
   );
 };
 
