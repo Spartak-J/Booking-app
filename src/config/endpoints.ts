@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const ENDPOINTS = {
   auth: {
     login: '/api/User/login',
@@ -31,8 +32,7 @@ export const ENDPOINTS = {
     byId: (id: string | number) => `/api/Order/get/${id}`,
   },
   reviews: {
-    byOffer: (offerId: string | number, lang: string) =>
-      `/api/Review/by-offer/${offerId}`,
+    byOffer: (offerId: string | number, lang: string) => `/api/Review/by-offer/${offerId}`,
     byUser: (lang: string) => `/api/Review/by-user`,
     create: (orderId: string | number) => `/api/Review/create`,
     update: (orderId: string | number, reviewId: string | number, lang: string) =>
@@ -43,5 +43,8 @@ export const ENDPOINTS = {
   notifications: {
     register: '/api/Notification/register',
   },
+  payment: {
+    create: '/api/Payment/create',
+    confirmHold: '/api/Payment/confirm-hold',
+  },
 };
-
