@@ -16,6 +16,10 @@ namespace LocationApiService.Models
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
 
+        public string PostCode { get; set; }
+
+        public bool? IsTop { get; set; }
+
         public string? ImageUrl { get; set; }
         public ICollection<District> Districts { get; set; } = new List<District>();
 

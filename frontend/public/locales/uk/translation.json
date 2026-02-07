@@ -344,6 +344,7 @@
     "booking_title": "Введіть свої данні для бронювання",
     "guest_data_title": "Данні гостя",
     "name_label": "Ім'я",
+    "surname_label": "Прізвище",
     "email_label": "Електронна пошта",
     "phone_label": "Телефон",
     "country_city_label": "Країна/Місто",
@@ -387,6 +388,10 @@
       "title": "Інформація про житло",
       "housing": {
         "name": "Назва",
+        "country": "Країна",
+        "region":"Область/регіон",
+        "city":"Місто",
+        "Postcode":"Поштовий код",
         "address": "Адреса",
         "street": "Вулиця",
         "number": "номер",

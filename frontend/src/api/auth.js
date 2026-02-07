@@ -21,7 +21,7 @@ export const authApi = {
       phoneNumber,
       roleName
     }),
-
+  
   updateUser: (id, data) => http.put(`/User/updateUser/${id}`, data),
   deleteUser: (id) => http.delete(`/User/deleteUser/${id}`),
   getAllUsers: () => http.get("/User/get-all"),

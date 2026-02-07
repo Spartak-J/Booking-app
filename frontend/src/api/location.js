@@ -4,6 +4,13 @@ export const locationApi = {
   getAllCities: (lang ) => http.get(`/Translation/city/get-all-translations/${lang}`),
   getAllCountries: (lang ) => http.get(`/Translation/country/get-all-translations/${lang}`),
 
+   getFullCountries: (lang ) => http.get(`/Bff/get/allCountries/${lang}`),
+
+
+  getAllRegions: (lang ) => http.get(`/Translation/region/get-all-translations/${lang}`),
+  getAllDistricts: (lang ) => http.get(`/Translation/district/get-all-translations/${lang}`),
+
+
 
   getCountryTitle: (id) => http.get(`/Location/get-country-title/${id}`),
   getRegionTitle: (id) => http.get(`/Location/get-region-title/${id}`),

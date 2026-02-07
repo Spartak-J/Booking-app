@@ -2,6 +2,16 @@ import http from "./http";
 
 export const offerApi = {
 
+  createOffer: ({ formData, lang }) =>
+    http.put(`/Bff/create/booking-offer`, {
+      formData, lang
+    }),
+
+  updateOffer: ({ formData, lang }) =>
+    http.put(`/Bff/update/booking-offer`, {
+      formData, lang
+    }),
+
   searchOffers: ({ startDate, endDate, guests, userDiscountPercent, lang, cityId, paramItemFilters }) => {
     // Форматируем даты в ISO
     const startIso = new Date(startDate).toISOString();

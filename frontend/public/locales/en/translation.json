@@ -344,6 +344,7 @@
     "booking_title": "Введіть свої данні для бронювання",
     "guest_data_title": "Данні гостя",
     "name_label": "Ім'я",
+    "surname_label": "Прізвище",
     "email_label": "Електронна пошта",
     "phone_label": "Телефон",
     "country_city_label": "Країна/Місто",

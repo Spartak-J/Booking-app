@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../contexts/LanguageContext.jsx";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
+import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { Text } from "../UI/Text/Text.jsx";
 import { ImageSvg } from "../UI/Image/ImageSvg.jsx";
 import { RadioButton } from "../UI/Button/RadioButton.jsx";
@@ -13,6 +16,9 @@ export const BookingForm = ({
 }) => {
   const { user } = useContext(AuthContext);
   const { t } = useTranslation();
+  const { locationApi } = useContext(ApiContext);
+  const navigate = useNavigate();
+  const { language } = useLanguage();
 
   const paymentMethods = [
     { key: "visa", label: t("Booking.payment_visa_mastercard") },
@@ -32,7 +38,8 @@ export const BookingForm = ({
   const [showCardInfo, setShowCardInfo] = useState(false);
   const [isOpenCardNum, setIsOpenCardNum] = React.useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
-
+  const [countries, setCountries] = useState([]);
+  const [phonePrefix, setPhonePrefix] = useState([]);
 
 
   const [formData, setFormData] = useState({
@@ -41,16 +48,50 @@ export const BookingForm = ({
     adults: 1,
     children: 0,
     email: "",
-    country: "Украина",
-    phonePrefix: "UA +380",
+    countryId: 0,
+    phonePrefix: "",
     phoneNumber: "",
-    sendConfirmation: false,
-    saveData: false,
-    mainGuest: "me",
+    arrivalDate: "",
+    departureDate: "",
     cardNum: "",
-    businessTravel: "no",
-    wishes: ""
+    businessTravel: false,
+    wishes: "",
+    saveData: false
   });
+
+
+  useEffect(() => {
+    if (!user || !Array.isArray(countries) || !countries.length) return;
+
+    const country = countries.find(c => c.id === user.countryId);
+
+    setFormData(prev => ({
+      ...prev,
+      id: user.id,
+      firstName: user.username || "",
+      lastName: user.lastName || "",
+      email: user.email || "",
+      countryId: user.countryId || 0,
+      phonePrefix: country?.phonePrefix || "",
+      phoneNumber: user.phoneNumber || "",
+      birthDate: user.birthDate
+        ? new Date(user.birthDate).toISOString()
+        : null
+    }));
+  }, [user, countries]);
+
+
+
+  useEffect(() => {
+    console.log(language)
+    locationApi.getAllCountries(language)
+      .then(res => {
+        setCountries(res.data)
+        console.log(res.data)
+      })
+      .catch(err => console.error("Error loading countries:", err));
+  }, [language]);
+
 
 
   useEffect(() => {
@@ -72,9 +113,24 @@ export const BookingForm = ({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-     setBookingStep("loading");
+    setBookingStep("loading");
+
+    const payload = {
+      ...formData,
+      phone: `${formData.phonePrefix}${formData.phoneNumber}`
+    };
+
+    //     console.log("Sending to server:", formData);
+    //     const result = await updateMe(payload);
+    //     if (result.success) {
+    //         alert("Данные обновлены");
+    //     } else {
+    //         alert(result.message);
+    //     }
+    // };
+
     console.log("Отправка формы:", formData);
   };
 
@@ -141,7 +197,7 @@ export const BookingForm = ({
 
             <label className={styles.bookingForm_label} >
               <legend className={styles.form__legend} >
-                <Text text={t("Booking.name_label")} type="m_400_s_20" />
+                <Text text={t("Booking.surname_label")} type="m_400_s_20" />
               </legend>
               <input
                 type="text"
@@ -154,7 +210,7 @@ export const BookingForm = ({
               />
             </label>
 
-
+            {/* 
             <label className={styles.bookingForm_label} >
               <legend className={styles.form__legend} >
                 <Text text={t("Booking.country_city_label")} type="m_400_s_20" />
@@ -171,28 +227,42 @@ export const BookingForm = ({
                 <option value="США">США</option>
                 <option value="Германия">Германия</option>
               </select>
-            </label>
+            </label> */}
 
 
-
-            <label className={styles.bookingForm_label} >
-              <legend className={styles.form__legend} >
-                <Text text={t("Booking.country_city_label")} type="m_400_s_20" />
-              </legend>
-              <select
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className={`${styles.input} btn-h-59  btn-br-r-20 p-10`}
-                required
-              >
-                <option value="Украина">Украина</option>
-                <option value="Россия">Россия</option>
-                <option value="США">США</option>
-                <option value="Германия">Германия</option>
-              </select>
-            </label>
           </div>
+          <label className={styles.bookingForm_label} >
+            <legend className={styles.form__legend} >
+              <Text text={t("Booking.country_city_label")} type="m_400_s_20" />
+            </legend>
+            <select
+              name="countryId"
+              value={formData.countryId || ""}
+              onChange={e => {
+                const selectedId = Number(e.target.value);
+                const selectedCountry = countries.find(c => c.id === selectedId);
+
+                setFormData(prev => ({
+                  ...prev,
+                  countryId: selectedId,
+                  phonePrefix: selectedCountry?.phonePrefix || ""
+                }));
+              }}
+              className={`${styles.input} btn-h-59 btn-br-r-20 p-10`}
+              required
+            >
+              <option value="" disabled>
+                {t("Prrofile.AccountPanel.select_country")}
+              </option>
+              {countries.map(country => (
+                <option key={country.id} value={country.id}>
+                  {country.title}
+                </option>
+              ))}
+            </select>
+
+          </label>
+
 
 
 
@@ -224,15 +294,12 @@ export const BookingForm = ({
                 <select
                   name="phonePrefix"
                   value={formData.phonePrefix}
-                  onChange={handleChange}
                   className={styles.phonePrefix}
-                  required
+                  disabled
                 >
-                  {phonePrefixes.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
+                  <option value={formData.phonePrefix}>
+                    {formData.phonePrefix}
+                  </option>
                 </select>
                 <span className={styles.selectArrow}>▼</span>
               </div>
@@ -281,9 +348,9 @@ export const BookingForm = ({
               <Text text={t("Booking.arrival_date_label")} type="m_400_s_16" />
             </legend>
             <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
+              type="date"
+              name="arrivalDate"
+              value={formData.arrivalDate || ""}
               onChange={handleChange}
               placeholder=""
               className={`${styles.input} btn-h-59  btn-br-r-20 p-10`}
@@ -296,9 +363,9 @@ export const BookingForm = ({
               <Text text={t("Booking.departure_date_label")} type="m_400_s_16" />
             </legend>
             <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
+              type="date"
+              name="departureDate"
+              value={formData.departure_date || ""}
               onChange={handleChange}
               required
               placeholder=""
@@ -389,17 +456,25 @@ export const BookingForm = ({
 
           <RadioButton
             text={t("Booking.trip_purpose_vacation")}
-            active={activeTripPurposeButton === "travel"}
-            onClick={() => setActiveTripPurposeButton("travel")}
+            active={formData.businessTravel === false}
+            onClick={() =>
+              setFormData(prev => ({
+                ...prev,
+                businessTravel: false
+              }))
+            }
           />
+
           <RadioButton
             text={t("Booking.trip_purpose_business")}
-            active={activeTripPurposeButton === "business"}
-            onClick={() => setActiveTripPurposeButton("business")}
+            active={formData.businessTravel === true}
+            onClick={() =>
+              setFormData(prev => ({
+                ...prev,
+                businessTravel: true
+              }))
+            }
           />
-
-
-
 
         </div>
         <label className={styles.bookingForm_label} >
@@ -445,17 +520,6 @@ export const BookingForm = ({
                 <legend className={styles.form__legend} >
                   <Text text={t("Booking.choise_card")} type="m_400_s_20" />
                 </legend>
-                {/* <input
-                  type="text"
-                  name="cardNum"
-                  value={formData.cardNum}
-                  onChange={handleChange}
-                  onFocus={() => setIsOpenCardNum(true)}
-                  placeholder=""
-                  className={`${styles.input} ${styles.input_card} btn-h-59 btn-br-r-20 p-10`}
-                  required
-                /> */}
-
                 <div className={styles.input_with_icon}>
                   <input
                     type="text"

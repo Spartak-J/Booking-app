@@ -85,8 +85,6 @@ export const HousingPanel = () => {
         </div>
 
         {showHostelList && (
-
-
           <div className={styles.cardList__container}>
             {activeKey === "1" &&
               myOffers.map(ht => (
@@ -101,12 +99,16 @@ export const HousingPanel = () => {
                     setShowHostelList(false)
                     console.log({ selectedOffer: ht.id })
                   }}
-
-
                 />
               ))
             }
-            <HousingPanel_card_empty />
+            <HousingPanel_card_empty 
+            onClick={() => {
+                    setShowForm(true)
+                    setShowHostelList(false)
+                    console.log("HousingPanel_card_empty")
+                  }}
+                  />
           </div>
         )}
         {showForm && selectedOffer && (

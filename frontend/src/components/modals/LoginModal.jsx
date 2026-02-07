@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../../contexts/AuthContext.jsx";
@@ -16,16 +16,32 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const contentRef = useRef(null);
+        const [hasScroll, setHasScroll] = useState(false);
 
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [displayPassword, setDisplayPassword] = useState("");
+
+    useEffect(() => {
+        const el = contentRef.current;
+        if (!el) return;
+
+        const checkScroll = () => {
+            setHasScroll(el.scrollHeight > el.clientHeight);
+        };
+
+        checkScroll();
+        window.addEventListener("resize", checkScroll);
+
+        return () => window.removeEventListener("resize", checkScroll);
+    }, []);
 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         console.log({
 
-            password: formData.password, 
+            password: formData.password,
         });
 
         if (name === "password") {
@@ -73,8 +89,14 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
 
     return (
         <div className={styles.loginPage}>
-            <IconButtonClose onClick={() => setIsModalOpen(false)} />
-            <div className={`${styles.loginPage__content} p-25`}>
+            <IconButtonClose
+                className={`closeBtn ${hasScroll ? "withScroll" : ""
+                    }`}
+                onClick={() => setIsModalOpen(false)}
+            />
+              <div
+                ref={contentRef}
+                className={`${styles.loginPage__content} p-25`}>
                 <span className={`${styles.loginPage__title_wrapper} mb-30`}>
                     <Text text={t("Auth.login.title")} type="m_700_s_48" />
                 </span>
@@ -97,7 +119,7 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
                     <input
                         type="text"
                         name="password"
-                        value={displayPassword}  
+                        value={displayPassword}
                         onChange={handleChange}
                         placeholder={t("Auth.login.password")}
                         className={`${styles.input} btn-h-120  btn-br-r-20 p-10`}
@@ -119,7 +141,7 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
                     </span>
 
                     <span className={`${styles.actionButton__wrapper} flex-center mb-30`}>
-                        <ActionButton__Primary  type="m_600_s_36" text={t("Auth.login.loginButton")} className="btn-w-full btn-h-100 btn-br-r-20" />
+                        <ActionButton__Primary type="m_600_s_36" text={t("Auth.login.loginButton")} className="btn-w-full btn-h-100 btn-br-r-20" />
                     </span>
 
                     <TextButton text={t("Auth.login.noAccount")}

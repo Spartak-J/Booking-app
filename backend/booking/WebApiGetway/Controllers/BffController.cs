@@ -1423,6 +1423,212 @@ namespace WebApiGetway.Controllers
         }
 
 
+        //===============================================================================================================
+        //                      all   country  with regions, city, translation
+        //===============================================================================================================
+
+        [HttpGet("get/allCountries/{lang}")]
+        public async Task<IActionResult> GetAllCountries(
+            string lang)
+        {
+
+            var countriesObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "LocationApiService",
+                  $"/api/Country/get-all",
+                  HttpMethod.Get,
+                  null);
+            if (countriesObjResult is not OkObjectResult okCountries)
+                return countriesObjResult;
+
+            var CountryDictList = BffHelper.ConvertActionResultToDict(okCountries);
+
+
+            var translateListResult =
+                await _gateway.ForwardRequestAsync<object>(
+                    "TranslationApiService",
+                    $"/api/Country/get-all-translations/{lang}",
+                    HttpMethod.Get,
+                    null);
+
+            if (translateListResult is not OkObjectResult okTranslate)
+                return translateListResult;
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+            BffHelper.UpdateListWithTranslations(CountryDictList, translations);
+
+
+            foreach (var country in CountryDictList)
+            {
+
+                var RegionsDictList = country["regions"] as List<Dictionary<string, object>>;
+
+                var translateRegionListResult =
+               await _gateway.ForwardRequestAsync<object>(
+                   "TranslationApiService",
+                   $"/api/Region/get-all-translations/{lang}",
+                   HttpMethod.Get,
+                   null);
+
+                if (translateRegionListResult is not OkObjectResult okTranslateRegion)
+                    return translateRegionListResult;
+                var translationsRegion = BffHelper.ConvertActionResultToDict(okTranslateRegion);
+
+
+                BffHelper.UpdateListWithTranslations(RegionsDictList, translationsRegion);
+
+
+                foreach (var region in RegionsDictList)
+                {
+
+                    var CitiesDictList = region["cities"] as List<Dictionary<string, object>>;
+
+                    var translateCityListResult =
+                    await _gateway.ForwardRequestAsync<object>(
+                       "TranslationApiService",
+                       $"/api/City/get-all-translations/{lang}",
+                       HttpMethod.Get,
+                       null);
+
+                    if (translateCityListResult is not OkObjectResult okTranslateCity)
+                        return translateCityListResult;
+                    var translationsCity = BffHelper.ConvertActionResultToDict(okTranslateCity);
+
+
+                    BffHelper.UpdateListWithTranslations(CitiesDictList, translationsCity);
+
+                    foreach (var city in CitiesDictList)
+                    {
+
+                        var DistrictsDictList = city["districts"] as List<Dictionary<string, object>>;
+
+                        var translateDistrictsListResult =
+                        await _gateway.ForwardRequestAsync<object>(
+                           "TranslationApiService",
+                           $"/api/District/get-all-translations/{lang}",
+                           HttpMethod.Get,
+                           null);
+
+                        if (translateDistrictsListResult is not OkObjectResult okTranslateDistrict)
+                            return translateDistrictsListResult;
+                        var translationsDistrict = BffHelper.ConvertActionResultToDict(okTranslateDistrict);
+
+
+                        BffHelper.UpdateListWithTranslations(DistrictsDictList, translationsDistrict);
+
+                    }
+                }
+            }
+
+
+            return Ok(CountryDictList);
+        }
+
+        //===============================================================================================================
+        //                      all   regions 
+        //===============================================================================================================
+
+        [HttpGet("/get/regions/{lang}")]
+        public async Task<IActionResult> GetAllRegions(
+            string lang)
+        {
+
+            var regionsObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "LocationApiService",
+                  $"/api/Region/get-all",
+                  HttpMethod.Get,
+                  null);
+            if (regionsObjResult is not OkObjectResult okRegions)
+                return regionsObjResult;
+
+            var RegionsDictList = BffHelper.ConvertActionResultToDict(okRegions);
+
+
+            var translateListResult =
+                await _gateway.ForwardRequestAsync<object>(
+                    "TranslationApiService",
+                    $"/api/Region/get-all-translations/{lang}",
+                    HttpMethod.Get,
+                    null);
+
+            if (translateListResult is not OkObjectResult okTranslate)
+                return translateListResult;
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+
+
+            BffHelper.UpdateListWithTranslations(RegionsDictList, translations);
+            return Ok(RegionsDictList);
+        }
+
+        //===============================================================================================================
+        //                      all   city 
+        //===============================================================================================================
+
+        [HttpGet("/get/cities/{lang}")]
+        public async Task<IActionResult> GetAllCities(
+            string lang)
+        {
+
+            var citiesObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "LocationApiService",
+                  $"/api/City/get-all",
+                  HttpMethod.Get,
+                  null);
+            if (citiesObjResult is not OkObjectResult okCities)
+                return citiesObjResult;
+
+            var CityDictList = BffHelper.ConvertActionResultToDict(okCities);
+
+
+        var translateListResult =
+            await _gateway.ForwardRequestAsync<object>(
+                "TranslationApiService",
+                $"/api/City/get-all-translations/{lang}",
+                HttpMethod.Get,
+                null);
+
+            if (translateListResult is not OkObjectResult okTranslate)
+                return translateListResult;
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+
+
+        BffHelper.UpdateListWithTranslations(CityDictList, translations);
+            return Ok(CityDictList);
+        }
+
+       //===============================================================================================================
+        //                      all   districts 
+        //===============================================================================================================
+
+        [HttpGet("/get/districts/{lang}")]
+        public async Task<IActionResult> GetAllDistricts(
+            string lang)
+        {
+
+            var districtsObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "LocationApiService",
+                  $"/api/District/get-all",
+                  HttpMethod.Get,
+                  null);
+            if (districtsObjResult is not OkObjectResult okDistricts)
+                return districtsObjResult;
+
+            var DistrictsDictList = BffHelper.ConvertActionResultToDict(okDistricts);
+
+
+            var translateListResult =
+                await _gateway.ForwardRequestAsync<object>(
+                    "TranslationApiService",
+                    $"/api/District/get-all-translations/{lang}",
+                    HttpMethod.Get,
+                    null);
+
+            if (translateListResult is not OkObjectResult okTranslate)
+                return translateListResult;
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+
+
+            BffHelper.UpdateListWithTranslations(DistrictsDictList, translations);
+            return Ok(DistrictsDictList);
+        }
 
 
         //===============================================================================================================
@@ -1464,7 +1670,7 @@ namespace WebApiGetway.Controllers
             var idList = new List<int>();
             foreach (var statsOffer in statisticObjDictList)
             {
-                var id = int.Parse(statsOffer["EntityId"].ToString());
+                var id = int.Parse(statsOffer["id"].ToString());
                 idList.Add(id);
             }
           

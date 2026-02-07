@@ -132,6 +132,16 @@
   border-radius: 12px;
   display: block;
 }
+.emptyImages {
+  width: 300px;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 3px solid var(--color-text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .btn_container {
   display: flex;
@@ -250,7 +260,8 @@
 }
 
 .input_price{
-  width: 428px;
+   max-width: 428px;
+   width: 60%;
   height: 60px;
   border-radius: 20px;
   text-align: center;
@@ -259,4 +270,7 @@ font-style: normal;
 font-weight: 500;
 font-size: 24px;
 line-height: 29px;
+}
+.block_price_title > *{
+  text-align: left;
 }

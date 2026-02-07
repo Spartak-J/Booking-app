@@ -29,6 +29,8 @@ export const RegisterModal = ({ setIsModalOpen }) => {
     const [hasScroll, setHasScroll] = useState(false);
     const [displayPassword, setDisplayPassword] = useState("");
     const [countries, setCountries] = useState([]);
+  
+  const [activeButton, setActiveButton] = useState("owner");
 
     const [formData, setFormData] = useState({
         username: "",
@@ -37,7 +39,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
         email: "",
         birthDate: null,
         phoneNumber: "",
-        roleName: "Client"
+        roleName: ""
     });
 
 
@@ -109,6 +111,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log({ data: formData });
+          console.log({ roleName: activeButton });
         try {
             const result = await register({
                 username: formData.username,
@@ -117,7 +120,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
                 birthDate: new Date(formData.birthDate).toISOString(),
                 password: formData.password,
                 phoneNumber: formData.phoneNumber,
-                roleName: formData.roleName
+                roleName: activeButton
             }
             );
             console.log("Registration success:", result);
@@ -240,7 +243,10 @@ export const RegisterModal = ({ setIsModalOpen }) => {
                         required
                     />
                     <div className={styles.radioButton_wrapper}>
-                        <RadioGroup />
+                        <RadioGroup 
+                        activeButton ={activeButton}
+                        setActiveButton={setActiveButton}
+                        />
                         {/* <RadioButton text={t("Auth.register.owner")} />
                         <RadioButton text={t("Auth.register.client")} /> */}
                     </div>

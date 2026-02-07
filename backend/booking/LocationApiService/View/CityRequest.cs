@@ -11,6 +11,8 @@ namespace LocationApiService.View
 
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
+        public string? PostCode { get; set; }
+        public bool? IsTop { get; set; }
         public string? ImageUrl { get; set; }
         public List<DistrictRequest> Districts { get; set; } = new();
 
@@ -23,6 +25,8 @@ namespace LocationApiService.View
 
                 Latitude = request.Latitude,
                 Longitude = request.Longitude,
+                PostCode = request.PostCode,
+                IsTop = request.IsTop,
 
                 ImageUrl = request.ImageUrl,
                 Districts = request.Districts?
