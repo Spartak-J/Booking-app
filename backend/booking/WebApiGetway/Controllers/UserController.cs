@@ -170,7 +170,7 @@ public class UserController : ControllerBase
 
         var offerObjResult = await _gateway.ForwardRequestAsync<object>(
                "OfferApiService",
-               $"/api/offer/get/offers/{userId}",
+               $"/api/Offer/get/offers/{userId}",
                HttpMethod.Get,
                null
            );
@@ -188,13 +188,13 @@ public class UserController : ControllerBase
         var idList = new List<int>();
         foreach (var statsOffer in updateOfferDictList)
         {
-            var id = int.Parse(statsOffer["EntityId"].ToString());
+            var id = int.Parse(statsOffer["id"].ToString());
             idList.Add(id);
         }
         //получаем рейтинг
         var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Post, idList);
         if (ratingObjResult is not OkObjectResult okRating)
-            return ratingObjResult;
+            return Ok(updateOfferDictList);
         var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
 
         BffHelper.UpdateOfferListWithRating(updateOfferDictList, ratingDictList);

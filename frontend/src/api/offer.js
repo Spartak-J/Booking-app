@@ -1,10 +1,22 @@
 import http from "./http";
 
-export const offerApi = {
 
-  createOffer: ({ formData, lang }) =>
-    http.put(`/Bff/create/booking-offer`, {
-      formData, lang
+ export const offerApi = {
+  createOffer: ({ formData, lang }) => {
+    console.log("lang:", lang);
+    console.log("formData:", formData);
+    return http.post(`/Bff/create/booking-offer?lang=${encodeURIComponent(lang ?? '')}`, formData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  },
+
+
+
+  createOfferImg: ({ formData, offerId }) =>
+    http.post(`/Bff/img/booking-offer/${offerId}/add`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     }),
 
   updateOffer: ({ formData, lang }) =>

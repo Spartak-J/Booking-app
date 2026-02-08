@@ -436,8 +436,14 @@ namespace WebApiGetway.Controllers
         [Authorize]
         public async Task<IActionResult> CreateOffer(
              [FromBody] CreateOfferFullRequest createOfferFullRequest,
-             string lang)
+             [FromQuery] string lang)
+        
         {
+            foreach (var param in createOfferFullRequest.RentObj.ParamValues)
+            {
+                param.ValueString ??= ""; 
+            }
+
 
             var ownerValidation = await ValidateOwnerAsync();
             if (!ownerValidation.IsOwner)
@@ -476,30 +482,53 @@ namespace WebApiGetway.Controllers
 
             var offerIdList = BffHelper.ConvertActionResultToDict(okOfferId);
             var offerIdObj = offerIdList[0];
-            var offerId = int.Parse(offerIdObj["id"].ToString());
+            var offerId = int.Parse(offerIdObj["idOffer"].ToString());
 
 
-            var translateOfferRequest = new TranslationDto
+            var sourceLang = lang; // "uk" или "en"
+            var targetLang = sourceLang == "uk" ? "en" : "uk";
+
+            var sourceTranslation = new TranslationDto
             {
                 EntityId = offerId,
-                Lang = lang,
+                Lang = sourceLang,
                 Title = createOfferFullRequest.Offer.Title,
                 TitleInfo = createOfferFullRequest.Offer.TitleInfo,
                 Description = createOfferFullRequest.Offer.Description
             };
 
-            var translateResult = await _gateway.ForwardRequestAsync<object>(
+            var translatedTranslation = new TranslationDto
+            {
+                EntityId = offerId,
+                Lang = targetLang,
+                Title = await TranslateAsync(
+                    sourceTranslation.Title, sourceLang, targetLang),
+                TitleInfo = await TranslateAsync(
+                    sourceTranslation.TitleInfo, sourceLang, targetLang),
+                Description = await TranslateAsync(
+                    sourceTranslation.Description, sourceLang, targetLang)
+            };
+
+
+            var sourceTranslationResult = await _gateway.ForwardRequestAsync<object>(
                 "TranslationApiService",
                 $"/api/Offer/create-translations/{lang}",
                 HttpMethod.Post,
-                translateOfferRequest
+                sourceTranslation
             );
+
+            var translatedTranslationResult = await _gateway.ForwardRequestAsync<object>(
+              "TranslationApiService",
+              $"/api/Offer/create-translations/{lang}",
+              HttpMethod.Post,
+              translatedTranslation
+          );
 
             var addToOwnerLink = await _gateway.ForwardRequestAsync<object>(
               "UserApiService",
               $"/api/User/owner/offers/add/{offerId}",
               HttpMethod.Post,
-              translateOfferRequest
+              null
           );
 
             return Ok(offerId);
@@ -700,12 +729,12 @@ namespace WebApiGetway.Controllers
             var RentObjIdList = BffHelper.ConvertActionResultToDict(okRentObjId);
             var RentObjIdObj = RentObjIdList[0];
 
-            var rentObjId = int.Parse(RentObjIdObj["rentObjId"].ToString());
+            var rentObjId = int.Parse(RentObjIdObj["number"].ToString());
 
             return await _gateway.ForwardFileAsync(
                 "OfferApiService",
-                $"/api/rentobjimage/upload/{rentObjId}",
-                HttpMethod.Put,
+                $"/api/RentObjImage/upload/{rentObjId}",
+                HttpMethod.Post,
                 file
             );
         }
@@ -1800,6 +1829,72 @@ namespace WebApiGetway.Controllers
         //                            Вспомогательные методы
 
         //==============================================================================================================
+
+
+        //--------------------------перевод текста-------------------------------------
+
+
+        private async Task<string> TranslateAsync(string text, string fromLang, string toLang)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            try
+            {
+                using var httpClient = new HttpClient();
+
+                // Укажи свой ключ DeepL API
+                var apiKey = "YOUR_DEEPL_API_KEY";
+
+                // Формируем POST запрос в формате x-www-form-urlencoded
+                var content = new FormUrlEncodedContent(new[]
+                {
+            new KeyValuePair<string, string>("text", text),
+            new KeyValuePair<string, string>("source_lang", fromLang.ToUpper()), // EN, UK
+            new KeyValuePair<string, string>("target_lang", toLang.ToUpper())    // EN, UK
+        });
+
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api-free.deepl.com/v2/translate");
+                request.Headers.Add("Authorization", $"DeepL-Auth-Key {apiKey}");
+                request.Content = content;
+
+                var response = await httpClient.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Ошибка DeepL: {response.StatusCode}");
+                    Console.WriteLine($"Тело ответа: {errorBody}");
+                    return text; // fallback на исходный текст
+                }
+
+                // DeepL возвращает JSON вида { "translations":[{"detected_source_language":"EN","text":"..."}] }
+                var resultJson = await response.Content.ReadFromJsonAsync<DeepLTranslateResponse>();
+
+                return resultJson?.Translations?.FirstOrDefault()?.Text ?? text;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Исключение при переводе: {ex.Message}");
+                return text; 
+            }
+        }
+
+    
+        public class DeepLTranslateResponse
+        {
+            public List<DeepLTranslationItem> Translations { get; set; }
+        }
+
+        public class DeepLTranslationItem
+        {
+            public string Detected_source_language { get; set; }
+            public string Text { get; set; }
+        }
+
+
+
+
 
         //-----парсим строку с фильтрами параметров в список словарей-----
         private static List<Dictionary<string, object>> ParseParamFiltersToDict(string filter)

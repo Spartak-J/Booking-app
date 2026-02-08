@@ -24,130 +24,84 @@ export const HostPropertyForm = ({ hotel }) => {
     const [offset, setOffset] = useState(0);
     const [categoriesParams, setCategoriesParams] = useState([]);
 
-    // Стиль стрелок в зависимости от темы
+   
     const classNameArrowLeft = darkMode ? "btn_arrow_left_dark" : "btn_arrow_left_light";
     const classNameArrowRight = darkMode ? "btn_arrow_right_dark" : "btn_arrow_right_light";
     const [countries, setCountries] = useState([]);
     const [allRegions, setAllRegions] = useState([]);
     const [allCities, setAllCities] = useState([]);
     const [allDistricts, setAllDistricts] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
+    const [uploadedImages, setUploadedImages] = useState([]);
 
 
 
-        useEffect(() => {
+    useEffect(() => {
         console.log(language)
         locationApi.getFullCountries(language)
             .then(res => {
                 setCountries(res.data)
-                console.log({Countries:res.data})
+                console.log({ Countries: res.data })
             })
             .catch(err => console.error("Error loading countries:", err));
     }, [language]);
 
-    // useEffect(() => {
-    //     console.log(language)
-    //     locationApi.getAllRegions(language)
-    //         .then(res => {
-    //             setAllRegions(res.data)
-    //             console.log({AllRegions:res.data})
-    //         })
-    //         .catch(err => console.error("Error loading countries:", err));
-    // }, [language]);
-    
-    //     useEffect(() => {
-    //     console.log(language)
-    //     locationApi.getAllCities(language)
-    //         .then(res => {
-    //             setAllCities(res.data)
-    //             console.log({AllCities:res.data})
-    //         })
-    //         .catch(err => console.error("Error loading countries:", err));
-    // }, [language]);
 
-    //      useEffect(() => {
-    //     console.log(language)
-    //     locationApi.getAllDistricts(language)
-    //         .then(res => {
-    //             setAllDistricts(res.data)
-    //             console.log({Districts:res.data})
-    //         })
-    //         .catch(err => console.error("Error loading countries:", err));
-    // }, [language]);
+    const handleCountryChange = (e) => {
+        const countryId = Number(e.target.value);
 
-    // useEffect(() => {
-    //     Promise.all([
-    //         locationApi.getAllCountries(language),
-    //         locationApi.getAllRegions(language),
-    //         locationApi.getAllCities(language),
-    //         locationApi.getAllDistricts(language)
-    //     ])
-    //         .then(([countriesRes, regionsRes, citiesRes, districtsRes]) => {
-    //             setCountries(countriesRes.data);
-    //             setAllRegions(regionsRes.data);
-    //             setAllCities(citiesRes.data);
-    //             setAllDistricts(districtsRes.data);
-    //         })
-    //         .catch(console.error);
-    // }, [language]);
+        setForm(prev => ({
+            ...prev,
+            rentObj: {
+                ...prev.rentObj,
+                countryId,
+                regionId: null,
+                cityId: null,
+                districtId: null
+            }
+        }));
+    };
 
+    const handleRegionChange = (e) => {
+        const regionId = Number(e.target.value);
 
+        setForm(prev => ({
+            ...prev,
+            rentObj: {
+                ...prev.rentObj,
+                regionId,
+                cityId: null,
+                districtId: null
+            }
+        }));
+    };
 
-const handleCountryChange = (e) => {
-    const countryId = Number(e.target.value);
+    const handleCityChange = (e) => {
+        const cityId = Number(e.target.value);
 
-    setForm(prev => ({
-        ...prev,
-        rentObj: {
-            ...prev.rentObj,
-            countryId,
-            regionId: null,
-            cityId: null,
-            districtId: null
-        }
-    }));
-};
+        setForm(prev => ({
+            ...prev,
+            rentObj: {
+                ...prev.rentObj,
+                cityId,
+                districtId: null
+            }
+        }));
+    };
 
-const handleRegionChange = (e) => {
-    const regionId = Number(e.target.value);
+    const handleDistrictChange = (e) => {
+        const districtId = Number(e.target.value);
 
-    setForm(prev => ({
-        ...prev,
-        rentObj: {
-            ...prev.rentObj,
-            regionId,
-            cityId: null,
-            districtId: null
-        }
-    }));
-};
-
-const handleCityChange = (e) => {
-    const cityId = Number(e.target.value);
-
-    setForm(prev => ({
-        ...prev,
-        rentObj: {
-            ...prev.rentObj,
-            cityId,
-            districtId: null
-        }
-    }));
-};
-
-const handleDistrictChange = (e) => {
-    const districtId = Number(e.target.value);
-
-    setForm(prev => ({
-        ...prev,
-        rentObj: {
-            ...prev.rentObj,
-            districtId
-        }
-    }));
-};
+        setForm(prev => ({
+            ...prev,
+            rentObj: {
+                ...prev.rentObj,
+                districtId
+            }
+        }));
+    };
 
 
-    // Инициализация формы
     const [form, setForm] = useState({
         offer: {
             id: -1,
@@ -191,42 +145,44 @@ const handleDistrictChange = (e) => {
             doubleBedsCount: 0,
             hasBabyCrib: false,
             paramValues: [],
-            images: [],
-            newImages: []
+            images: []
         }
     });
-const selectedCountry = countries.find(c => c.id === form.rentObj.countryId);
-const regions = selectedCountry ? selectedCountry.regions : [];
 
 
-const selectedRegion = regions.find(r => r.id === form.rentObj.regionId);
-const cities = selectedRegion ? selectedRegion.cities : [];
-
-const selectedCity = cities.find(c => c.id === form.rentObj.cityId);
-const districts = selectedCity ? selectedCity.districts : [];
-
-    
-    // const regions = allRegions.filter(
-    //     r => r.countryId === form.rentObj.countryId
-    // );
-
-    // const cities = allCities.filter(
-    //     c => c.regionId === form.rentObj.regionId
-    // );
-
-    // const districts = allDistricts.filter(
-    //     d => d.cityId === form.rentObj.cityId
-    // );
+    const selectedCountry = countries.find(c => c.id === form.rentObj.countryId);
+    const regions = selectedCountry ? selectedCountry.regions : [];
 
 
-    // Загрузка категорий параметров
+    const selectedRegion = regions.find(r => r.id === form.rentObj.regionId);
+    const cities = selectedRegion ? selectedRegion.cities : [];
+
+    const selectedCity = cities.find(c => c.id === form.rentObj.cityId);
+    const districts = selectedCity ? selectedCity.districts : [];
+
+    useEffect(() => {
+        const selectedCity = cities.find(
+            c => c.id === form.rentObj.cityId
+        );
+
+        if (selectedCity) {
+            setForm(prev => ({
+                ...prev,
+                rentObj: {
+                    ...prev.rentObj,
+                    postCode: selectedCity.postCode
+                }
+            }));
+        }
+    }, [form.rentObj.cityId, cities]);
+
+
     useEffect(() => {
         paramsCategoryApi.getAllCategories(language)
             .then(res => setCategoriesParams(res.data))
             .catch(err => console.error("Error loading categories:", err));
     }, [language]);
 
-    // Если есть hotel — заполняем форму
     useEffect(() => {
         if (!hotel) return;
 
@@ -268,13 +224,11 @@ const districts = selectedCity ? selectedCity.districts : [];
                 doubleBedsCount: ro.doubleBedsCount || 0,
                 hasBabyCrib: ro.hasBabyCrib || false,
                 paramValues: ro.paramValues || [],
-                images: ro.images || [],
-                newImages: []
+                images: ro.images || []
             }
         }));
     }, [hotel]);
 
-    // Обработчики изменения полей
     const handleOfferChange = (e) => {
         const { name, value, type, checked } = e.target;
         setForm(prev => ({
@@ -291,7 +245,6 @@ const districts = selectedCity ? selectedCity.districts : [];
         }));
     };
 
-    // Переключение boolean полей
     const toggleOfferField = (field) => setForm(prev => ({
         ...prev,
         offer: { ...prev.offer, [field]: !prev.offer[field] }
@@ -302,7 +255,6 @@ const districts = selectedCity ? selectedCity.districts : [];
         rentObj: { ...prev.rentObj, [field]: !prev.rentObj[field] }
     }));
 
-    // Проверка выбранных параметров
     const isChecked = (paramItemId) => form.rentObj.paramValues.some(p => p.paramItemId === paramItemId && p.valueBool === true);
 
     const toggleParamValue = (paramItemId) => {
@@ -325,11 +277,44 @@ const districts = selectedCity ? selectedCity.districts : [];
     // Работа с изображениями
     const handleAddImages = (e) => {
         const files = Array.from(e.target.files);
+
         setForm(prev => ({
             ...prev,
-            rentObj: { ...prev.rentObj, newImages: [...prev.rentObj.newImages, ...files] }
+            rentObj: {
+                ...prev.rentObj,
+                images: [...prev.rentObj.images, ...files]
+            }
         }));
+
+        const newPreviews = files.map(file => URL.createObjectURL(file));
+        setImagePreviews(prev => [...prev, ...newPreviews]);
+
+        e.target.value = "";
     };
+
+    const removeImage = (index) => {
+        setForm(prev => ({
+            ...prev,
+            rentObj: {
+                ...prev.rentObj,
+                images: prev.rentObj.images.filter((_, i) => i !== index)
+            }
+        }));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
+
+
+    useEffect(() => {
+        const urls = form.rentObj.images.map(file =>
+            typeof file === "string" ? file : URL.createObjectURL(file)
+        );
+
+        setImagePreviews(urls);
+        return () => urls.forEach(url => URL.revokeObjectURL(url));
+    }, [form.rentObj.images]);
+
+
 
     const removeExistingImage = (id) => {
         setForm(prev => ({
@@ -338,52 +323,116 @@ const districts = selectedCity ? selectedCity.districts : [];
         }));
     };
 
-    // Формирование FormData для API
-    const buildFormData = () => {
-        const fd = new FormData();
 
-        // Offer
-        Object.entries(form.offer).forEach(([key, value]) => {
-            if (value !== null && value !== undefined) fd.append(`offer.${key}`, value);
+
+    const buildOfferPayload = () => {
+        form.rentObj.paramValues.forEach(p => {
+            if (p.valueString === undefined || p.valueString === null) {
+                p.valueString = "";
+            }
         });
 
-        // RentObj
-        Object.entries(form.rentObj).forEach(([key, value]) => {
-            if (key === "images" || key === "newImages" || key === "paramValues") return;
-            if (value !== null && value !== undefined) fd.append(`rentObj.${key}`, value);
-        });
-
-        // Images
-        form.rentObj.images.forEach(img => fd.append("rentObj.imagesIds", img.id));
-        form.rentObj.newImages.forEach(file => fd.append("rentObj.images", file));
-
-        // ParamValues
-        form.rentObj.paramValues.forEach((p, i) => {
-            fd.append(`rentObj.paramValues[${i}].id`, p.id);
-            fd.append(`rentObj.paramValues[${i}].rentObjId`, p.rentObjId);
-            fd.append(`rentObj.paramValues[${i}].paramItemId`, p.paramItemId);
-            fd.append(`rentObj.paramValues[${i}].valueBool`, p.valueBool);
-            if (p.valueInt !== undefined) fd.append(`rentObj.paramValues[${i}].valueInt`, p.valueInt);
-            if (p.valueString !== undefined) fd.append(`rentObj.paramValues[${i}].valueString`, p.valueString);
-        });
-
-        return fd;
+        return {
+            offer: {
+                ...form.offer,
+                id: form.offer.id > 0 ? form.offer.id : 0,
+                pricePerDay: Number(form.offer.pricePerDay) || 0,
+                pricePerWeek: Number(form.offer.pricePerWeek) || 0,
+                pricePerMonth: Number(form.offer.pricePerMonth) || 0,
+                tax: form.offer.tax ?? 0,
+                minRentDays: Number(form.offer.minRentDays) || 1,
+                maxGuests: Number(form.offer.maxGuests) || 1,
+                ownerId: form.offer.ownerId ?? 1,
+                rentObjId: form.offer.rentObjId ?? 0
+            },
+            rentObj: {
+                ...form.rentObj,
+                id: form.rentObj.id > 0 ? form.rentObj.id : 0,
+                countryId: Number(form.rentObj.countryId) || 0,
+                regionId: Number(form.rentObj.regionId) || 0,
+                cityId: Number(form.rentObj.cityId) || 0,
+                districtId: Number(form.rentObj.districtId) || 0,
+                latitude: Number(form.rentObj.latitude) || 0,
+                longitude: Number(form.rentObj.longitude) || 0,
+                roomCount: Number(form.rentObj.roomCount) || 0,
+                livingRoomCount: Number(form.rentObj.livingRoomCount) || 0,
+                bathroomCount: Number(form.rentObj.bathroomCount) || 0,
+                area: Number(form.rentObj.area) || 0,
+                totalBedsCount: Number(form.rentObj.totalBedsCount) || 0,
+                singleBedsCount: Number(form.rentObj.singleBedsCount) || 0,
+                doubleBedsCount: Number(form.rentObj.doubleBedsCount) || 0,
+                hasBabyCrib: Boolean(form.rentObj.hasBabyCrib),
+                images: [],
+                paramValues: form.rentObj.paramValues.map(p => ({
+                    paramItemId: p.paramItemId ?? 0,
+                    valueBool: Boolean(p.valueBool),
+                    valueInt: Number(p.valueInt) || 0,
+                    valueString: (p.valueString ?? "").toString()
+                }))
+            }
+        };
     };
 
-    // Сохранение
+
+
+    const [uploading, setUploading] = useState(false);
+
+
     const handleSave = async () => {
-        const fd = buildFormData();
-        if (form.offer.id && form.offer.id !== -1) {
-            await offerApi.updateOffer(form.offer.id, fd);
-        } else {
-            await offerApi.createOffer(fd);
+        try {
+            setUploading(true);
+
+            const payload = buildOfferPayload();
+            console.log("Попытка отправки данных на бек:", JSON.stringify(payload, null, 2));
+
+            let offerId = form.offer.id;
+            if (!offerId || offerId === -1) {
+                const response = await offerApi.createOffer({ formData: buildOfferPayload(), lang: language });
+                offerId = response.data; 
+            } else {
+                await offerApi.updateOffer(payload);
+            }
+
+            const files = form.rentObj.images.filter(img => img instanceof File);
+
+            console.log("FILES:", files);
+
+
+
+            console.log("Файлы для отправки:", files);
+            console.log("offerId  отправки:", offerId);
+
+            if (files.length > 0) {
+                const imgFd = new FormData();
+
+                files.forEach(file => {
+                    imgFd.append("File", file);
+                });
+
+                console.log("FormData:");
+                console.log([...imgFd.entries()]);
+
+                await offerApi.createOfferImg({
+                    formData: imgFd,
+                    offerId
+                });
+            }
+
+            alert("Объявление и фото успешно сохранены!");
+            navigate("/host");
+            navigate("/host/offers");
+        } catch (error) {
+            console.error(error);
+            alert("Ошибка при сохранении");
+        } finally {
+            setUploading(false);
+            navigate("/host");
         }
-        navigate("/host/offers"); // после сохранения можно редиректить
     };
 
     return (
         <section className={styles.container}>
-            {/* Заголовок */}
+
             <div className={`${styles.title} flex-center btn-w-full`}>
                 <Text text={t("Host.propertyForm.title")} type="m_600_s_36" />
             </div>
@@ -393,7 +442,6 @@ const districts = selectedCity ? selectedCity.districts : [];
                 <Text text={t("Booking.required_fields_note")} type="m_400_s_14" />
             </div>
 
-            {/* Основная информация */}
             <div className={styles.block}>
                 <div className={styles.block_title}>
                     <Text text={t("Host.aboutHousing.title")} type="m_600_s_32" />
@@ -466,19 +514,11 @@ const districts = selectedCity ? selectedCity.districts : [];
                             ))}
                         </select>
 
-                        <select
+                        <input
                             className={styles.input_house}
-                            value={form.rentObj.districtId ?? ""}
-                            onChange={handleDistrictChange}
-                            disabled={!form.rentObj.cityId}
-                        >
-                            <option value="">
-                                {t("Host.aboutHousing.housing.district")}
-                            </option>
-                            {districts.map(d => (
-                                <option key={d.id} value={d.id}>{d.title}</option>
-                            ))}
-                        </select>
+                            value={form.rentObj.postCode || ''}
+                            readOnly
+                        />
                     </div>
                 </fieldset>
 
@@ -534,19 +574,23 @@ const districts = selectedCity ? selectedCity.districts : [];
                 </div>
                 <div className={styles.photosWrapper}>
                     <div className={styles.photosViewport}>
-                        <div
-                            className={styles.photos__container}
-                            style={{ transform: `translateX(${offset}px)` }}
-                        >
+                        <div className={styles.photos__container} style={{ transform: `translateX(${offset}px)` }}>
                             {form.rentObj.images.length > 0 ? (
-                                form.rentObj.images.map(img => (
-                                    <img key={img.id} src={img.url} alt="" className={styles.previewImage} />
-                                ))
+                                form.rentObj.images.map((img, index) => {
+                                    const src = typeof img === 'string' ? img : imagePreviews[index];
+                                    return (
+                                        <div key={index} className={styles.previewWrapper}>
+                                            <img src={src} alt={`Preview ${index}`} className={styles.previewImage} />
+                                            <button type="button" onClick={() => removeImage(index)}>Удалить</button>
+                                        </div>
+                                    );
+                                })
                             ) : (
                                 <div className={styles.emptyImages}>Нет изображений</div>
                             )}
                         </div>
                     </div>
+
                 </div>
 
                 <div className={styles.btn_container}>
@@ -586,7 +630,8 @@ const districts = selectedCity ? selectedCity.districts : [];
                 </div>
                 <div className={styles.fieldset}>
                     {categoriesParams.map(category => {
-                        if (category.id === 5) return null; // пропускаем категорию 5
+                        if (category.id === 2) return null;
+                        if (category.id === 5) return null;
                         const visibleItems = category.items.filter(item => item.title && item.title.trim() !== "");
                         if (!visibleItems.length) return null;
 
@@ -679,6 +724,7 @@ const districts = selectedCity ? selectedCity.districts : [];
                     className="btn-br-r-20 btn-w-340 btn-h-60"
                     text={t("Host.btn_save")}
                     type="m_500"
+                    onClick={handleSave}
                 />
             </div>
         </section>

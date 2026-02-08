@@ -57,6 +57,16 @@ namespace WebApiGetway.Controllers
                 var obj = JsonSerializer.Deserialize<Dictionary<string, object>>(element.GetRawText());
                 if (obj != null) dictList.Add(obj);
             }
+            else if(element.ValueKind == JsonValueKind.Number)
+            {
+                if (Double.TryParse(element.GetRawText(), out var num))
+                {
+                    var d = new Dictionary<string, object>();
+                    d["number"] = num;
+                    dictList.Add(d);
+                    return dictList;
+                }
+            }
             else
                 return new List<Dictionary<string, object>>();
 

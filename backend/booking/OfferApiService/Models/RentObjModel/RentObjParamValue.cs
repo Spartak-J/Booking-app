@@ -12,7 +12,9 @@ namespace OfferApiService.Models.RentObjModel
 
         public bool? ValueBool { get; set; }
         public int? ValueInt { get; set; }
-        public string ValueString { get; set; }
+   
+        public string ValueString { get; set; } = "";
+
     }
 
 }

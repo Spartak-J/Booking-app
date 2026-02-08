@@ -278,7 +278,7 @@ namespace OfferApiService.Controllers
 
             var rentObjModel = RentObjRequest.MapToModel(rentObjRequest);
 
-            var idRentObj = await _rentObjService.AddEntityGetIdAsync(rentObjModel);
+            var idRentObj = await _rentObjService.AddRentObjWithParamValuesAsync(rentObjModel);
 
             if (idRentObj == -1)
                 return StatusCode(500, new { message = "Error creating item" });
