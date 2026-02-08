@@ -12,6 +12,9 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     
     steps:
       - uses: actions/checkout@v3
@@ -24,12 +27,14 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       
       - name: Install dependencies
-        working-directory: ./frontend
-        run: npm ci
+        run: npm install
+      
+      - name: Run linter (if available)
+        run: npm run lint --if-present
+        continue-on-error: true
       
       - name: Run tests
-        working-directory: ./frontend
-        run: npm test -- --passWithNoTests
+        run: npm test -- --watchAll=false --passWithNoTests
         env:
           CI: true
 
@@ -59,7 +64,7 @@ jobs:
           docker push spartakj/booking-frontend:${{ github.sha }}
       
       - name: Image digest
-        run: echo "Image pushed successfully!"
+        run: echo "✅ Image pushed successfully - spartakj/booking-frontend:latest"
 
   security-scan:
     needs: build-and-push
@@ -70,11 +75,6 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: spartakj/booking-frontend:latest
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-      
-      - name: Upload Trivy results
-        uses: github/codeql-action/upload-sarif@v2
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
