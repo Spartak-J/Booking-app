@@ -26,43 +26,38 @@ jobs:
       - name: Build Docker Image
         working-directory: ./frontend
         run: |
-          echo "í´¨ Building frontend Docker image..."
+          echo "Building frontend Docker image..."
           docker build \
             --build-arg REACT_APP_API_BASE_URL=https://booking-oselya.pp.ua \
             -t spartakj/booking-frontend:latest \
             -t spartakj/booking-frontend:${{ github.sha }} \
             .
-          echo "âœ… Build completed!"
+          echo "Build completed!"
       
       - name: Push to DockerHub
         run: |
-          echo "í³¤ Pushing images to DockerHub..."
+          echo "Pushing images to DockerHub..."
           docker push spartakj/booking-frontend:latest
           docker push spartakj/booking-frontend:${{ github.sha }}
-          echo "âœ… Images pushed successfully!"
+          echo "Images pushed successfully!"
       
       - name: Test container
         run: |
-          echo "í·ª Testing container..."
+          echo "Testing container..."
           docker run -d -p 3001:80 --name test-container spartakj/booking-frontend:latest
           sleep 5
           curl -f http://localhost:3001 || exit 1
           docker stop test-container
-          echo "âœ… Container test passed!"
+          echo "Container test passed!"
       
       - name: Build Summary
         run: |
-          echo "### í¾‰ Frontend Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "### Frontend Deployment Successful!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** spartakj/booking-frontend:latest" >> $GITHUB_STEP_SUMMARY
           echo "**Tag:** spartakj/booking-frontend:${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**API URL:** https://booking-oselya.pp.ua" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** âœ… Ready for production deployment" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Next steps:**" >> $GITHUB_STEP_SUMMARY
-          echo "1. SSH to AWS server" >> $GITHUB_STEP_SUMMARY
-          echo "2. Pull image: \`docker pull spartakj/booking-frontend:latest\`" >> $GITHUB_STEP_SUMMARY
-          echo "3. Deploy: \`docker-compose -f docker-compose.frontend.yml up -d\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Ready for production deployment" >> $GITHUB_STEP_SUMMARY
 
   security-scan:
     needs: build-and-push
@@ -76,9 +71,9 @@ jobs:
           format: 'table'
           exit-code: '0'
           severity: 'CRITICAL,HIGH'
-        
+      
       - name: Security Summary
         if: always()
         run: |
-          echo "### í´’ Security Scan Completed" >> $GITHUB_STEP_SUMMARY
+          echo "### Security Scan Completed" >> $GITHUB_STEP_SUMMARY
           echo "Image scanned for CRITICAL and HIGH vulnerabilities" >> $GITHUB_STEP_SUMMARY
