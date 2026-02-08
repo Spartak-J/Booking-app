@@ -1,0 +1,80 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: 
+      - devops/frontend-deployment
+      - Inna
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm test -- --passWithNoTests
+        env:
+          CI: true
+
+  build-and-push:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/devops/frontend-deployment' || github.ref == 'refs/heads/Inna'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: spartakj
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build and Push Docker Image
+        working-directory: ./frontend
+        run: |
+          docker build \
+            --build-arg REACT_APP_API_BASE_URL=https://booking-oselya.pp.ua \
+            -t spartakj/booking-frontend:latest \
+            -t spartakj/booking-frontend:${{ github.sha }} \
+            .
+          docker push spartakj/booking-frontend:latest
+          docker push spartakj/booking-frontend:${{ github.sha }}
+      
+      - name: Image digest
+        run: echo "Image pushed successfully!"
+
+  security-scan:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: spartakj/booking-frontend:latest
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
