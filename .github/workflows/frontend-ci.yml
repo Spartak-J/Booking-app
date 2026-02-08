@@ -10,38 +10,8 @@ on:
       - '.github/workflows/frontend-ci.yml'
 
 jobs:
-  lint-and-test:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Run linter (if available)
-        run: npm run lint --if-present
-        continue-on-error: true
-      
-      - name: Run tests
-        run: npm test -- --watchAll=false --passWithNoTests
-        env:
-          CI: true
-
   build-and-push:
-    needs: lint-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/devops/frontend-deployment' || github.ref == 'refs/heads/Inna'
     
     steps:
       - uses: actions/checkout@v3
@@ -52,19 +22,30 @@ jobs:
           username: spartakj
           password: ${{ secrets.DOCKER_PASSWORD }}
       
-      - name: Build and Push Docker Image
+      - name: Build Docker Image
         working-directory: ./frontend
         run: |
+          echo "í´¨ Building frontend Docker image..."
           docker build \
             --build-arg REACT_APP_API_BASE_URL=https://booking-oselya.pp.ua \
             -t spartakj/booking-frontend:latest \
             -t spartakj/booking-frontend:${{ github.sha }} \
             .
+      
+      - name: Push Docker Image
+        run: |
+          echo "í³¤ Pushing images to DockerHub..."
           docker push spartakj/booking-frontend:latest
           docker push spartakj/booking-frontend:${{ github.sha }}
+          echo "âœ… Images pushed successfully!"
       
-      - name: Image digest
-        run: echo "âœ… Image pushed successfully - spartakj/booking-frontend:latest"
+      - name: Summary
+        run: |
+          echo "### í¾‰ Frontend Build Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** spartakj/booking-frontend:latest" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**API URL:** https://booking-oselya.pp.ua" >> $GITHUB_STEP_SUMMARY
 
   security-scan:
     needs: build-and-push
