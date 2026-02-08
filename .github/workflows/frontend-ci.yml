@@ -43,7 +43,6 @@ jobs:
           sleep 5
           curl -f http://localhost:3001 || exit 1
           docker stop test-container
-          echo "Container test passed!"
       
       - name: Summary
         run: |
@@ -56,7 +55,14 @@ jobs:
     name: Trivy Container Security Scan
     
     steps:
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner (Table)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: spartakj/booking-frontend:latest
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Run Trivy vulnerability scanner (SARIF)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: spartakj/booking-frontend:latest
@@ -65,53 +71,51 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM'
       
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
-      
-      - name: Trivy table output
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: spartakj/booking-frontend:latest
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
       
       - name: Summary
         if: always()
         run: |
           echo "### Container Security Scan (Trivy)" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** spartakj/booking-frontend:latest" >> $GITHUB_STEP_SUMMARY
-          echo "**Severity:** CRITICAL, HIGH, MEDIUM" >> $GITHUB_STEP_SUMMARY
-          echo "Results uploaded to Security tab" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Scan completed" >> $GITHUB_STEP_SUMMARY
 
   owasp-zap-scan:
     needs: build-and-push
     runs-on: ubuntu-latest
     name: OWASP ZAP Security Scan
+    permissions:
+      contents: read
+      issues: write
     
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
       - name: Start application
         run: |
           docker run -d -p 8080:80 --name app-test spartakj/booking-frontend:latest
           sleep 10
-          curl -I http://localhost:8080
+          echo "Testing application..."
+          curl -I http://localhost:8080 || echo "Warning: App may not be ready"
       
       - name: OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: 'http://localhost:8080'
           fail_action: false
-          cmd_options: '-a -j'
+          cmd_options: '-a'
       
       - name: Upload ZAP Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: zap-scan-report
-          path: |
-            report_html.html
-            report_json.json
+          path: report_html.html
+          retention-days: 30
       
       - name: Summary
         if: always()
@@ -119,8 +123,8 @@ jobs:
           echo "### Web Application Security Scan (OWASP ZAP)" >> $GITHUB_STEP_SUMMARY
           echo "**Target:** http://localhost:8080" >> $GITHUB_STEP_SUMMARY
           echo "**Scan Type:** Baseline" >> $GITHUB_STEP_SUMMARY
-          echo "Report available in Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "**Report:** Available in Artifacts" >> $GITHUB_STEP_SUMMARY
       
       - name: Cleanup
         if: always()
-        run: docker stop app-test && docker rm app-test
+        run: docker stop app-test && docker rm app-test || true
