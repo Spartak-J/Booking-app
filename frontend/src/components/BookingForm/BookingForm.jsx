@@ -12,13 +12,30 @@ import styles from "./BookingForm.module.css";
 
 export const BookingForm = ({
   price = "7 568",
-  setBookingStep
+  offerId,
+  setBookingStep,
+  startDate,
+  endDate,
+  guests
 }) => {
-  const { user } = useContext(AuthContext);
+  const { token, getMe } = useContext(AuthContext);
   const { t } = useTranslation();
   const { locationApi } = useContext(ApiContext);
   const navigate = useNavigate();
   const { language } = useLanguage();
+
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchUser = async () => {
+      const data = await getMe(language);
+      setUser(data);
+      console.log("Полученные данные пользователя:", data);
+    };
+
+    fetchUser();
+  }, [language, token]);
 
   const paymentMethods = [
     { key: "visa", label: t("Booking.payment_visa_mastercard") },
@@ -45,6 +62,7 @@ export const BookingForm = ({
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    offerId: offerId,
     adults: 1,
     children: 0,
     email: "",
@@ -53,6 +71,7 @@ export const BookingForm = ({
     phoneNumber: "",
     arrivalDate: "",
     departureDate: "",
+    clientNote: "",
     cardNum: "",
     businessTravel: false,
     wishes: "",
@@ -64,21 +83,29 @@ export const BookingForm = ({
     if (!user || !Array.isArray(countries) || !countries.length) return;
 
     const country = countries.find(c => c.id === user.countryId);
-
+    console.log(offerId);
     setFormData(prev => ({
       ...prev,
       id: user.id,
       firstName: user.username || "",
       lastName: user.lastName || "",
+      offerId: offerId > 0 ? offerId : 0,
       email: user.email || "",
       countryId: user.countryId || 0,
+      countryTitle: user.countryTitle || "",
+      arrivalDate: toInputDate(startDate),
+      departureDate: toInputDate(endDate),
+
+      adults: guests,
+      children: guests,
+      clientNote: "",
       phonePrefix: country?.phonePrefix || "",
       phoneNumber: user.phoneNumber || "",
       birthDate: user.birthDate
-        ? new Date(user.birthDate).toISOString()
-        : null
+        ? toInputDate(user.birthDate)
+        : ""
     }));
-  }, [user, countries]);
+  }, [user, countries, startDate, endDate, guests]);
 
 
 
@@ -94,16 +121,22 @@ export const BookingForm = ({
 
 
 
-  useEffect(() => {
-    if (user) {
-      setFormData((prev) => ({
-        ...prev,
-        firstName: user.name || "",
-        email: user.email || "",
-        phoneNumber: user.phoneNumber || "",
-      }));
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       firstName: user.username || "",
+  //       email: user.email || "",
+  //       phoneNumber: user.phoneNumber || "",
+  //     }));
+  //   }
+  // }, [user]);
+
+  const toInputDate = (date) => {
+    if (!date) return "";
+    return new Date(date).toISOString().split("T")[0];
+  };
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -113,14 +146,29 @@ export const BookingForm = ({
     }));
   };
 
+
+
+  const buildOfferBooking = () => {
+
+    return {
+      OfferId: formData.offerId > 0 ? formData.OfferId : 0,
+      Guests: formData.fuests ?? "",
+      StartDate: formData.arrivalDate ?? "",
+      EndDate: formData.departureDate ?? "",
+      ClientNote: formData.clientNote || "0"
+
+    };
+  };
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setBookingStep("loading");
 
-    const payload = {
-      ...formData,
-      phone: `${formData.phonePrefix}${formData.phoneNumber}`
-    };
+    const booking = buildOfferBooking();
+    console.log("Попытка отправки данных на бек:", JSON.stringify(booking, null, 2));
+
 
     //     console.log("Sending to server:", formData);
     //     const result = await updateMe(payload);
@@ -131,7 +179,7 @@ export const BookingForm = ({
     //     }
     // };
 
-    console.log("Отправка формы:", formData);
+    console.log("Отправка формы:", booking);
   };
 
   const phonePrefixes = ["UA +380", "RU +7", "US +1", "DE +49"];
@@ -245,21 +293,23 @@ export const BookingForm = ({
                 setFormData(prev => ({
                   ...prev,
                   countryId: selectedId,
-                  phonePrefix: selectedCountry?.phonePrefix || ""
+                  phonePrefix: selectedCountry?.phonePrefix || "",
                 }));
               }}
               className={`${styles.input} btn-h-59 btn-br-r-20 p-10`}
               required
             >
               <option value="" disabled>
-                {t("Prrofile.AccountPanel.select_country")}
+                {t("Profile.AccountPanel.select_country")}
               </option>
+
               {countries.map(country => (
                 <option key={country.id} value={country.id}>
-                  {country.title}
+                  {country.title}  {/* <-- это и отобразится в селекте */}
                 </option>
               ))}
             </select>
+
 
           </label>
 
@@ -352,10 +402,10 @@ export const BookingForm = ({
               name="arrivalDate"
               value={formData.arrivalDate || ""}
               onChange={handleChange}
-              placeholder=""
-              className={`${styles.input} btn-h-59  btn-br-r-20 p-10`}
+              className={`${styles.input} btn-h-59 btn-br-r-20 p-10`}
               required
             />
+
           </label>
 
           <label className={styles.bookingForm_label} >
@@ -365,12 +415,12 @@ export const BookingForm = ({
             <input
               type="date"
               name="departureDate"
-              value={formData.departure_date || ""}
+              value={formData.departureDate || ""}
               onChange={handleChange}
+              className={`${styles.input} btn-h-59 btn-br-r-20 p-10`}
               required
-              placeholder=""
-              className={`${styles.input} btn-h-59  btn-br-r-20 p-10`}
             />
+
           </label>
 
 

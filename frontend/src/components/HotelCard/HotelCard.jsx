@@ -21,9 +21,7 @@ export const HotelCard = ({
     price,
     startDate,
     endDate,
-    guests,
-    onClick,
-    onCheckAvailability,
+    guests
 }) => {
     const navigate = useNavigate();
 

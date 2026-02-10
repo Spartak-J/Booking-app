@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useLanguage } from "../../contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { ApiContext } from "../../contexts/ApiContext.jsx";
+import { useLanguage } from "../../contexts/LanguageContext.jsx"
+
 import { useParams, useLocation } from "react-router-dom";
 
 import { Header_Full } from "../../components/Header/Header_Full.jsx";
-import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { HotelReviews } from "../../components/Hotel/HotelReviews.jsx";
 import { HotelGallery } from "../../components/Hotel/HotelGallery.jsx";
 import { Hotel_info_card } from "../../components/Hotel/Hotel_info_card.jsx";
@@ -12,11 +15,7 @@ import { HotelParamsList } from "../../components/Hotel/HotelParamsList.jsx";
 import { HotelMap } from "../../components/Hotel/HotelMap.jsx";
 import { Footer } from "../../components/Footer/Footer.jsx";
 import { HotelInfoModal } from "../../components/modals/HotelInfoModal.jsx";
-
 import { Link } from "../../components/UI/Text/Link.jsx";
-
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import styles from "./HotelPage.module.css";
 
@@ -68,11 +67,10 @@ export const HotelPage = () => {
 Зручності: Гості можуть користуватися безкоштовним Wi-Fi у громадських зонах, платним трансфером та цілодобовою стійкою реєстрації. Для тих, хто воліє дослідити місто на двох колесах, передбачено велосипедне паркування.
 Местные достопримечательности: В окрестностях есть каток, который обеспечивает развлечения для посетителей.`;
 
+  const location = useLocation();
 
   const { id } = useParams();
-  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-
   const startDate = queryParams.get("checkin");
   const endDate = queryParams.get("checkout");
   const guests = queryParams.get("guests");
@@ -85,6 +83,11 @@ export const HotelPage = () => {
   const [images, setImages] = useState([]);
   const [paramValues, setParamValues] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+  useEffect(() => {
+    console.log({ hotelId: id })
+  });
 
   const reviews = [
     { id: 1, title: "reviews.overall_rating", grade: "9.1" },
@@ -177,7 +180,13 @@ export const HotelPage = () => {
         </div>
         <div id="prices" className="flex-left btn-w-full gap-20 btn-h-656">
 
-          <Hotel_info_card hotel={hotel} offer={offer} />
+          <Hotel_info_card
+            hotel={hotel}
+            offer={offer}
+            startDate={startDate}
+            endDate={endDate}
+            guests={guests}
+          />
 
         </div>
 

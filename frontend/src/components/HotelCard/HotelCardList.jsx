@@ -31,6 +31,9 @@ export const HotelCardList = ({
     return () => window.removeEventListener("resize", updateColumns);
   }, [cardWidth, gap]);
 
+useEffect(()=>{
+  console.log({hotelList: hotels})
+}, [hotels]);
 
   useEffect(() => {
     updateColumns();
@@ -52,8 +55,8 @@ export const HotelCardList = ({
           id={hotel.id}
           title={hotel.title}
           image={hotel.rentObj?.[0]?.mainImageUrl || "-image.jpg"}
-          city={hotel.city}
-          cityId={hotel.cityId}
+          city={hotel.rentObj.cityTitle}
+          cityId={hotel.rentObj?.[0]?.cityId}
           country={hotel.country}
           distance={hotel.distanceToCenter}
           rating={hotel.rating}
@@ -62,10 +65,9 @@ export const HotelCardList = ({
           guests={guests}
           startDate={startDate}
           endDate={endDate}
-          onClick={() => onCardClick && onCardClick(hotel.id)}
-          onCheckAvailability={() =>
-            onCheckAvailability && onCheckAvailability(hotel.id)
-          }
+          onClick={() => {
+            console.log ({id: hotel.id})
+          }}
         />
       ))}
     </div>

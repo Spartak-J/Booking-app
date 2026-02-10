@@ -225,7 +225,7 @@ export const SearchPage = () => {
 
 
   useEffect(() => {
-    paramsCategoryApi.getAll(language)
+    paramsCategoryApi.getAllCategories(language)
       .then((res) => setFiltersData(res.data))
       .catch(() => {
         console.warn("API недоступен, используется mock");
@@ -245,7 +245,7 @@ export const SearchPage = () => {
     });
   };
 
-  // Поиск при переходе со страницы с state
+
   useEffect(() => {
     if (!state || !state.startDate || !state.endDate || !locationId) return;
 

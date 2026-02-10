@@ -63,7 +63,7 @@ export const HousingPanel = () => {
         console.log({ MyOffers: res.data })
       })
       .catch(err => console.error("Error loading countries:", err));
-  }, [language]);
+  }, [language, showForm]);
 
 
   return (
@@ -78,7 +78,11 @@ export const HousingPanel = () => {
               className={`btn-w-fit-content btn_brdr_1 btn-h-60 btn-br-r-20 ${activeKey === btn.id ? "active" : ""
                 }`}
               isActive={activeKey === btn.id}
-              onClick={() => setActiveKey(btn.id)}
+              onClick={() => {
+                setActiveKey(btn.id)
+                setShowForm(false)
+                setShowHostelList(true)
+              }}
             />
           ))}
 
@@ -97,7 +101,7 @@ export const HousingPanel = () => {
                     setSelectedOffer(ht)
                     setShowForm(true)
                     setShowHostelList(false)
-                    console.log({ selectedOffer: ht.id })
+                    console.log({ selectedOffer: ht })
                   }}
                 />
               ))
@@ -112,7 +116,7 @@ export const HousingPanel = () => {
           </div>
         )}
         {showForm && selectedOffer && (
-          <HostPropertyForm hotel={selectedOffer} />
+          <HostPropertyForm hotel={selectedOffer} setShowForm={setShowForm}/>
         )}
       </div>
     </div >

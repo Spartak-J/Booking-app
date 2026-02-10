@@ -170,7 +170,7 @@ public class UserController : ControllerBase
 
         var offerObjResult = await _gateway.ForwardRequestAsync<object>(
                "OfferApiService",
-               $"/api/Offer/get/offers/{userId}",
+               $"/api/Offer/get/offersByOwner/{userId}",
                HttpMethod.Get,
                null
            );

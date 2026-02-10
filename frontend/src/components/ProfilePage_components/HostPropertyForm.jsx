@@ -12,8 +12,9 @@ import { ActionButton__Secondary } from "../UI/Button/ActionButton_Secondary.jsx
 import { ActionButton__Primary } from "../UI/Button/ActionButton_Primary.jsx";
 import { IconButtonArrow } from '../UI/Button/IconButton_arrow.jsx';
 import { CounterButton } from "../UI/Button/CounterButton.jsx";
+import { IconButtonClose } from "../UI/Button/IconButton_close.jsx";
 
-export const HostPropertyForm = ({ hotel }) => {
+export const HostPropertyForm = ({ hotel,setShowForm }) => {
     const { t } = useTranslation();
     const { locationApi, offerApi, paramsCategoryApi } = useContext(ApiContext);
     const navigate = useNavigate();
@@ -24,13 +25,10 @@ export const HostPropertyForm = ({ hotel }) => {
     const [offset, setOffset] = useState(0);
     const [categoriesParams, setCategoriesParams] = useState([]);
 
-   
+
     const classNameArrowLeft = darkMode ? "btn_arrow_left_dark" : "btn_arrow_left_light";
     const classNameArrowRight = darkMode ? "btn_arrow_right_dark" : "btn_arrow_right_light";
     const [countries, setCountries] = useState([]);
-    const [allRegions, setAllRegions] = useState([]);
-    const [allCities, setAllCities] = useState([]);
-    const [allDistricts, setAllDistricts] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
     const [uploadedImages, setUploadedImages] = useState([]);
 
@@ -47,59 +45,70 @@ export const HostPropertyForm = ({ hotel }) => {
     }, [language]);
 
 
-    const handleCountryChange = (e) => {
-        const countryId = Number(e.target.value);
+  const handleCountryChange = (e) => {
+  const selectedId = Number(e.target.value); // получаем выбранный id страны
+  const selectedCountry = countries.find(c => c.id === selectedId);
 
-        setForm(prev => ({
-            ...prev,
-            rentObj: {
-                ...prev.rentObj,
-                countryId,
-                regionId: null,
-                cityId: null,
-                districtId: null
-            }
-        }));
-    };
+  setForm(prev => ({
+    ...prev,
+    offer: {
+      ...prev.offer,
+      rentObj: {
+        ...prev.offer.rentObj,
+        countryId: selectedId,
+        countryTitle: selectedCountry ? selectedCountry.title : ""
+      }
+    }
+  }));
+};
+
+
 
     const handleRegionChange = (e) => {
         const regionId = Number(e.target.value);
 
         setForm(prev => ({
             ...prev,
-            rentObj: {
-                ...prev.rentObj,
-                regionId,
-                cityId: null,
-                districtId: null
+            offer: {
+                ...prev.offer,
+                rentObj: {
+                    ...prev.offer.rentObj,
+                    regionId,
+                    cityId: null,
+                    districtId: null
+                }
             }
         }));
     };
+   const handleCityChange = (e) => {
+    const cityId = Number(e.target.value);
+    const selectedCity = cities.find(c => c.id === cityId);
 
-    const handleCityChange = (e) => {
-        const cityId = Number(e.target.value);
-
-        setForm(prev => ({
-            ...prev,
+    setForm(prev => ({
+        ...prev,
+        offer: {
+            ...prev.offer,
             rentObj: {
-                ...prev.rentObj,
+                ...prev.offer.rentObj,
                 cityId,
-                districtId: null
+                cityTitle: selectedCity ? selectedCity.title : "",
+                districtId: null 
             }
-        }));
-    };
+        }
+    }));
+};
 
-    const handleDistrictChange = (e) => {
-        const districtId = Number(e.target.value);
+    // const handleDistrictChange = (e) => {
+    //     const districtId = Number(e.target.value);
 
-        setForm(prev => ({
-            ...prev,
-            rentObj: {
-                ...prev.rentObj,
-                districtId
-            }
-        }));
-    };
+    //     setForm(prev => ({
+    //         ...prev,
+    //         rentObj: {
+    //             ...prev.rentObj,
+    //             districtId
+    //         }
+    //     }));
+    // };
 
 
     const [form, setForm] = useState({
@@ -121,61 +130,69 @@ export const HostPropertyForm = ({ hotel }) => {
             checkInTime: "11:00:00",
             checkOutTime: "15:00:00",
             ownerId: null,
-            rentObjId: null
-        },
-        rentObj: {
-            id: -1,
-            countryId: null,
-            regionId: null,
-            cityId: null,
-            districtId: null,
-            countryTitle: "",
-            cityTitle: "",
-            latitude: null,
-            longitude: null,
-            street: "",
-            houseNumber: "",
-            postcode: "7900",
-            roomCount: 0,
-            livingRoomCount: 0,
-            bathroomCount: 0,
-            area: 0,
-            totalBedsCount: 0,
-            singleBedsCount: 0,
-            doubleBedsCount: 0,
-            hasBabyCrib: false,
-            paramValues: [],
-            images: []
+            rentObj: {
+                id: -1,
+                countryId: null,
+                countryTitle: "",
+                regionId: null,
+                cityId: null,
+                cityTitle: "",
+                districtId: null,
+                countryTitle: "",
+                cityTitle: "",
+                latitude: null,
+                longitude: null,
+                street: "",
+                houseNumber: "",
+                postcode: "",
+                roomCount: 0,
+                livingRoomCount: 0,
+                bathroomCount: 0,
+                area: 0,
+                totalBedsCount: 0,
+                singleBedsCount: 0,
+                doubleBedsCount: 0,
+                hasBabyCrib: false,
+                paramValues: [],
+                images: []
+            }
         }
     });
 
 
-    const selectedCountry = countries.find(c => c.id === form.rentObj.countryId);
+    const selectedCountry = countries.find(c => c.id === form.offer.rentObj.countryId);
     const regions = selectedCountry ? selectedCountry.regions : [];
 
 
-    const selectedRegion = regions.find(r => r.id === form.rentObj.regionId);
+    const selectedRegion = regions.find(r => r.id === form.offer.rentObj.regionId);
     const cities = selectedRegion ? selectedRegion.cities : [];
 
-    const selectedCity = cities.find(c => c.id === form.rentObj.cityId);
+    const selectedCity = cities.find(c => c.id === form.offer.rentObj.cityId);
     const districts = selectedCity ? selectedCity.districts : [];
 
     useEffect(() => {
         const selectedCity = cities.find(
-            c => c.id === form.rentObj.cityId
+            c => c.id === form.offer.rentObj?.cityId
         );
 
         if (selectedCity) {
+            console.log(selectedCity);
             setForm(prev => ({
                 ...prev,
-                rentObj: {
-                    ...prev.rentObj,
-                    postCode: selectedCity.postCode
+                offer: {
+                    ...prev.offer,
+                    rentObj: {
+                        ...prev.offer.rentObj,
+                        postcode: selectedCity.postCode
+                    }
                 }
             }));
         }
-    }, [form.rentObj.cityId, cities]);
+    }, [form.offer.rentObj?.cityId, cities]);
 
+    useEffect(() => {
+        console.log("Postcode updated:", form.offer.rentObj.postcode);
+    }, [form.offer.rentObj.postcode]);
 
     useEffect(() => {
         paramsCategoryApi.getAllCategories(language)
@@ -184,50 +201,62 @@ export const HostPropertyForm = ({ hotel }) => {
     }, [language]);
 
     useEffect(() => {
-        if (!hotel) return;
+        if (!hotel || !hotel.rentObj) return;
 
-        const ro = hotel.rentObj?.[0] || {};
+              console.log( "title hotel: ")
+              console.log({hotel })
+                
+       
+        const ro = hotel.rentObj[0];
+    
+        const id =ro.id;
+ console.log({id })
+
         setForm(prev => ({
             offer: {
                 ...prev.offer,
-                id: hotel.id,
-                title: hotel.title || "",
-                description: hotel.description || "",
-                pricePerDay: hotel.pricePerDay || "",
-                pricePerWeek: hotel.pricePerWeek || "",
-                pricePerMonth: hotel.pricePerMonth || "",
-                tax: hotel.tax || 0,
-                allowPets: hotel.allowPets || false,
-                allowSmoking: hotel.allowSmoking || false,
-                allowChildren: hotel.allowChildren || false,
-                allowParties: hotel.allowParties || false,
-                maxGuests: hotel.maxGuests || 1
-            },
-            rentObj: {
-                ...prev.rentObj,
-                id: ro.id || -1,
-                countryId: ro.countryId || null,
-                regionId: ro.regionId || null,
-                cityId: ro.cityId || null,
-                districtId: ro.districtId || null,
-                street: ro.street || "",
-                houseNumber: ro.houseNumber || "",
-                postcode: ro.postcode || "7900",
-                latitude: ro.latitude || null,
-                longitude: ro.longitude || null,
-                roomCount: ro.roomCount || 0,
-                livingRoomCount: ro.livingRoomCount || 0,
-                bathroomCount: ro.bathroomCount || 0,
-                area: ro.area || 0,
-                totalBedsCount: ro.totalBedsCount || 0,
-                singleBedsCount: ro.singleBedsCount || 0,
-                doubleBedsCount: ro.doubleBedsCount || 0,
-                hasBabyCrib: ro.hasBabyCrib || false,
-                paramValues: ro.paramValues || [],
-                images: ro.images || []
+                id: hotel.id ?? 0,
+                title: hotel.title ?? "",
+                description: hotel.description ?? "",
+                pricePerDay: hotel.pricePerDay ?? 0,
+                pricePerWeek: hotel.pricePerWeek ?? null,
+                pricePerMonth: hotel.pricePerMonth ?? null,
+                tax: hotel.tax ?? 0,
+                allowPets: !!hotel.allowPets,
+                allowSmoking: !!hotel.allowSmoking,
+                allowChildren: !!hotel.allowChildren,
+                allowParties: !!hotel.allowParties,
+                maxGuests: hotel.maxGuests ?? 1,
+                ownerId: hotel.ownerId ?? -1,
+                rentObj: {
+                    ...prev.rentObj,
+                    id: ro.id ?? 0,
+                    countryId: ro.countryId ?? 0,
+                    countryTitle: ro.countryTitle ?? "",
+                    regionId: ro.regionId ?? 0,
+                    cityId: ro.cityId ?? 0,
+                    cityTitle: ro.cityTitle ?? "",
+                    districtId: ro.districtId ?? null,
+                    street: ro.street ?? "",
+                    houseNumber: ro.houseNumber ?? "",
+                    postcode: ro.postcode ?? "",
+                    latitude: ro.latitude ?? null,
+                    longitude: ro.longitude ?? null,
+                    roomCount: ro.roomCount ?? 0,
+                    livingRoomCount: ro.livingRoomCount ?? 0,
+                    bathroomCount: ro.bathroomCount ?? 0,
+                    area: ro.area ?? 0,
+                    totalBedsCount: ro.totalBedsCount ?? 0,
+                    singleBedsCount: ro.singleBedsCount ?? 0,
+                    doubleBedsCount: ro.doubleBedsCount ?? 0,
+                    hasBabyCrib: !!ro.hasBabyCrib,
+                    paramValues: ro.paramValues ?? [],
+                    images: ro.images ?? []
+                }
             }
         }));
     }, [hotel]);
+
 
     const handleOfferChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -241,38 +270,55 @@ export const HostPropertyForm = ({ hotel }) => {
         const { name, value, type, checked } = e.target;
         setForm(prev => ({
             ...prev,
-            rentObj: { ...prev.rentObj, [name]: type === "checkbox" ? checked : (type === "number" ? Number(value) : value) }
+            offer: {
+                ...prev.offer,
+                rentObj: {
+                    ...prev.offer.rentObj,
+                    [name]: type === "checkbox" ? checked : (type === "number" ? Number(value) : value)
+                }
+            }
         }));
     };
 
-    const toggleOfferField = (field) => setForm(prev => ({
-        ...prev,
-        offer: { ...prev.offer, [field]: !prev.offer[field] }
-    }));
 
-    const toggleRentObjField = (field) => setForm(prev => ({
-        ...prev,
-        rentObj: { ...prev.rentObj, [field]: !prev.rentObj[field] }
-    }));
 
-    const isChecked = (paramItemId) => form.rentObj.paramValues.some(p => p.paramItemId === paramItemId && p.valueBool === true);
+    const isChecked = (paramItemId) =>
+        form.offer.rentObj.paramValues?.some(
+            p => p.paramItemId === paramItemId && p.valueBool === true
+        ) ?? false;
 
     const toggleParamValue = (paramItemId) => {
         setForm(prev => {
-            const exists = prev.rentObj.paramValues.find(p => p.paramItemId === paramItemId);
+            const paramValues = prev.offer.rentObj.paramValues || []; 
+
+            const exists = paramValues.find(p => p.paramItemId === paramItemId);
             let newValues;
 
             if (exists) {
-                newValues = prev.rentObj.paramValues.map(p =>
+                newValues = paramValues.map(p =>
                     p.paramItemId === paramItemId ? { ...p, valueBool: !p.valueBool } : p
                 );
             } else {
-                newValues = [...prev.rentObj.paramValues, { id: -1, rentObjId: prev.rentObj.id, paramItemId, valueBool: true }];
+                newValues = [
+                    ...paramValues,
+                    { id: -1, rentObjId: prev.offer.rentObj.id, paramItemId, valueBool: true }
+                ];
             }
 
-            return { ...prev, rentObj: { ...prev.rentObj, paramValues: newValues } };
+            return {
+                ...prev,
+                offer: {
+                    ...prev.offer,
+                    rentObj: {
+                        ...prev.offer.rentObj,
+                        paramValues: newValues
+                    }
+                }
+            };
         });
     };
+
+
 
     // Работа с изображениями
     const handleAddImages = (e) => {
@@ -280,98 +326,150 @@ export const HostPropertyForm = ({ hotel }) => {
 
         setForm(prev => ({
             ...prev,
-            rentObj: {
-                ...prev.rentObj,
-                images: [...prev.rentObj.images, ...files]
+            offer: {
+                ...prev.offer,
+                rentObj: {
+                    ...prev.offer.rentObj,
+                    images: [...prev.offer.rentObj.images, ...files]
+                }
             }
         }));
-
-        const newPreviews = files.map(file => URL.createObjectURL(file));
-        setImagePreviews(prev => [...prev, ...newPreviews]);
 
         e.target.value = "";
     };
 
+
+
     const removeImage = (index) => {
         setForm(prev => ({
             ...prev,
-            rentObj: {
-                ...prev.rentObj,
-                images: prev.rentObj.images.filter((_, i) => i !== index)
+            offer: {
+                ...prev.offer,
+                rentObj: {
+                    ...prev.offer.rentObj,
+                    images: prev.offer.rentObj.images.filter((_, i) => i !== index)
+                }
             }
         }));
-        setImagePreviews(prev => prev.filter((_, i) => i !== index));
     };
+
+    useEffect(() => {
+        return () => {
+            form.offer.rentObj.images.forEach(img => {
+                if (img instanceof File) {
+                    URL.revokeObjectURL(img);
+                }
+            });
+        };
+    }, [form.offer.rentObj.images]);
 
 
 
     useEffect(() => {
-        const urls = form.rentObj.images.map(file =>
-            typeof file === "string" ? file : URL.createObjectURL(file)
-        );
+        const urls = form.offer.rentObj.images.map(img => {
+            if (img instanceof File) {
+                return URL.createObjectURL(img);
+            }
+
+            if (typeof img === "string") {
+                return img;
+            }
+
+            if (img?.url) {
+                return img.url;
+            }
+
+            return "";
+        });
 
         setImagePreviews(urls);
-        return () => urls.forEach(url => URL.revokeObjectURL(url));
-    }, [form.rentObj.images]);
+
+        return () => {
+            urls.forEach((url, index) => {
+                if (form.offer.rentObj.images[index] instanceof File) {
+                    URL.revokeObjectURL(url);
+                }
+            });
+        };
+    }, [form.offer.rentObj.images]);
 
 
 
     const removeExistingImage = (id) => {
         setForm(prev => ({
             ...prev,
-            rentObj: { ...prev.rentObj, images: prev.rentObj.images.filter(img => img.id !== id) }
+            offer: {
+                ...prev.offer,
+                rentObj: {
+                    ...prev.offer.rentObj,
+                    images: prev.offer.rentObj.images.filter(img => img.id !== id)
+                }
+            }
         }));
     };
 
 
 
     const buildOfferPayload = () => {
-        form.rentObj.paramValues.forEach(p => {
-            if (p.valueString === undefined || p.valueString === null) {
-                p.valueString = "";
-            }
-        });
+        const rentObj = form.offer.rentObj || {};
+        const paramValues = Array.isArray(rentObj.paramValues) ? rentObj.paramValues : [];
+
+        console.log("rentObj.id");
+        console.log(rentObj.id);
+
+        const normalizedParamValues = paramValues.map(p => ({
+            paramItemId: p.paramItemId ?? 0,
+            valueBool: Boolean(p.valueBool),
+            valueInt: Number(p.valueInt) || 0,
+            valueString: (p.valueString ?? "").toString()
+        }));
 
         return {
-            offer: {
-                ...form.offer,
-                id: form.offer.id > 0 ? form.offer.id : 0,
-                pricePerDay: Number(form.offer.pricePerDay) || 0,
-                pricePerWeek: Number(form.offer.pricePerWeek) || 0,
-                pricePerMonth: Number(form.offer.pricePerMonth) || 0,
-                tax: form.offer.tax ?? 0,
-                minRentDays: Number(form.offer.minRentDays) || 1,
-                maxGuests: Number(form.offer.maxGuests) || 1,
-                ownerId: form.offer.ownerId ?? 1,
-                rentObjId: form.offer.rentObjId ?? 0
-            },
-            rentObj: {
-                ...form.rentObj,
-                id: form.rentObj.id > 0 ? form.rentObj.id : 0,
-                countryId: Number(form.rentObj.countryId) || 0,
-                regionId: Number(form.rentObj.regionId) || 0,
-                cityId: Number(form.rentObj.cityId) || 0,
-                districtId: Number(form.rentObj.districtId) || 0,
-                latitude: Number(form.rentObj.latitude) || 0,
-                longitude: Number(form.rentObj.longitude) || 0,
-                roomCount: Number(form.rentObj.roomCount) || 0,
-                livingRoomCount: Number(form.rentObj.livingRoomCount) || 0,
-                bathroomCount: Number(form.rentObj.bathroomCount) || 0,
-                area: Number(form.rentObj.area) || 0,
-                totalBedsCount: Number(form.rentObj.totalBedsCount) || 0,
-                singleBedsCount: Number(form.rentObj.singleBedsCount) || 0,
-                doubleBedsCount: Number(form.rentObj.doubleBedsCount) || 0,
-                hasBabyCrib: Boolean(form.rentObj.hasBabyCrib),
+            id: form.offer.id > 0 ? form.offer.id : 0,
+            Title: form.offer.title ?? "",
+            Description: form.offer.description ?? "",
+            TitleInfo: form.offer.titleInfo ?? "",
+            PricePerDay: Number(form.offer.pricePerDay) || 0,
+            PricePerWeek: form.offer.pricePerWeek != null ? Number(form.offer.pricePerWeek) : null,
+            PricePerMonth: form.offer.pricePerMonth != null ? Number(form.offer.pricePerMonth) : null,
+            Tax: form.offer.tax != null ? Number(form.offer.tax) : null,
+            MinRentDays: Number(form.offer.minRentDays) || 1,
+            AllowPets: Boolean(form.offer.allowPets),
+            AllowSmoking: Boolean(form.offer.allowSmoking),
+            AllowChildren: Boolean(form.offer.allowChildren),
+            AllowParties: Boolean(form.offer.allowParties),
+            MaxGuests: Number(form.offer.maxGuests) || 1,
+            CheckInTime: form.offer.checkInTime ?? "11:00:00",
+            CheckOutTime: form.offer.checkOutTime ?? "15:00:00",
+            OwnerId: form.offer.ownerId ?? 1,
+            RentObj: {
+                id: rentObj.id > 0 ? rentObj.id : 0,
+                offerId: form.offer.id > 0 ? form.offer.id : 0,
+                countryId: Number(rentObj.countryId) || 0,
+                 countryTitle: rentObj.countryTitle ?? "", 
+                regionId: Number(rentObj.regionId) || 0,
+                cityId: Number(rentObj.cityId) || 0,
+                cityTitle: rentObj.cityTitle ?? "", 
+                districtId: Number(rentObj.districtId) || 0,
+                street: rentObj.street ?? "",
+                houseNumber: rentObj.houseNumber ?? "",
+                postcode: rentObj.postcode ?? "",
+                latitude: Number(rentObj.latitude) || 0,
+                longitude: Number(rentObj.longitude) || 0,
+                roomCount: Number(rentObj.roomCount) || 0,
+                livingRoomCount: Number(rentObj.livingRoomCount) || 0,
+                bathroomCount: Number(rentObj.bathroomCount) || 0,
+                area: Number(rentObj.area) || 0,
+                totalBedsCount: Number(rentObj.totalBedsCount) || 0,
+                singleBedsCount: Number(rentObj.singleBedsCount) || 0,
+                doubleBedsCount: Number(rentObj.doubleBedsCount) || 0,
+                hasBabyCrib: Boolean(rentObj.hasBabyCrib),
                 images: [],
-                paramValues: form.rentObj.paramValues.map(p => ({
-                    paramItemId: p.paramItemId ?? 0,
-                    valueBool: Boolean(p.valueBool),
-                    valueInt: Number(p.valueInt) || 0,
-                    valueString: (p.valueString ?? "").toString()
-                }))
+                paramValues: normalizedParamValues
             }
         };
     };
+
 
 
 
@@ -388,12 +486,12 @@ export const HostPropertyForm = ({ hotel }) => {
             let offerId = form.offer.id;
             if (!offerId || offerId === -1) {
                 const response = await offerApi.createOffer({ formData: buildOfferPayload(), lang: language });
-                offerId = response.data; 
+                offerId = response.data;
             } else {
-                await offerApi.updateOffer(payload);
+                await offerApi.updateOffer({ formData: buildOfferPayload(), lang: language });
             }
 
-            const files = form.rentObj.images.filter(img => img instanceof File);
+            const files = form.offer.rentObj.images.filter(img => img instanceof File);
 
             console.log("FILES:", files);
 
@@ -419,14 +517,14 @@ export const HostPropertyForm = ({ hotel }) => {
             }
 
             alert("Объявление и фото успешно сохранены!");
-            navigate("/host");
-            navigate("/host/offers");
+            setShowForm(false);
+            navigate("/profile");
         } catch (error) {
             console.error(error);
             alert("Ошибка при сохранении");
         } finally {
             setUploading(false);
-            navigate("/host");
+            navigate("/profile");
         }
     };
 
@@ -468,30 +566,35 @@ export const HostPropertyForm = ({ hotel }) => {
                         <span className={styles.required_fields}>*</span>
                     </label>
 
-                    <div className={`${styles.input} flex-left ${styles.input_address}`}>
-                        <select
-                            className={styles.input_street}
-                            value={form.rentObj.countryId ?? ""}
-                            onChange={handleCountryChange}
-                        >
-                            <option value="">{t("Host.aboutHousing.housing.country")}</option>
-                            {countries.map(c => (
-                                <option key={c.id} value={c.id}>{c.title}</option>
-                            ))}
-                        </select>
 
-                        <select
-                            className={styles.input_house}
-                            value={form.rentObj.regionId ?? ""}
-                            onChange={handleRegionChange}
-                            disabled={!form.rentObj.countryId}
-                        >
-                            <option value="">{t("Host.aboutHousing.housing.region")}</option>
-                            {regions.map(r => (
-                                <option key={r.id} value={r.id}>{r.title}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <select
+                        className={styles.input}
+                        value={form.offer.rentObj.countryId ?? ""}
+                        onChange={handleCountryChange}
+                    >
+                        <option value="">
+                            {t("Host.aboutHousing.housing.country")}
+                        </option>
+
+                        {countries.map(c => (
+                            <option key={c.id} value={c.id}>
+                                {c.title}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        className={styles.input}
+                        value={form.offer.rentObj.regionId ?? ""}
+                        onChange={handleRegionChange}
+                        disabled={!form.offer.rentObj.countryId}
+                    >
+                        <option value="">{t("Host.aboutHousing.housing.region")}</option>
+                        {regions.map(r => (
+                            <option key={r.id} value={r.id}>{r.title}</option>
+                        ))}
+                    </select>
+
                 </fieldset>
 
 
@@ -504,9 +607,9 @@ export const HostPropertyForm = ({ hotel }) => {
                     <div className={`${styles.input} flex-left ${styles.input_address}`}>
                         <select
                             className={styles.input_street}
-                            value={form.rentObj.cityId ?? ""}
+                            value={form.offer.rentObj.cityId ?? ""}
                             onChange={handleCityChange}
-                            disabled={!form.rentObj.regionId}
+                            disabled={!form.offer.rentObj.regionId}
                         >
                             <option value="">{t("Host.aboutHousing.housing.city")}</option>
                             {cities.map(c => (
@@ -516,7 +619,7 @@ export const HostPropertyForm = ({ hotel }) => {
 
                         <input
                             className={styles.input_house}
-                            value={form.rentObj.postCode || ''}
+                            value={form.offer.rentObj.postcode || ''}
                             readOnly
                         />
                     </div>
@@ -538,14 +641,14 @@ export const HostPropertyForm = ({ hotel }) => {
                             className={styles.input_street}
                             name="street"
                             placeholder={t("Host.aboutHousing.housing.street")}
-                            value={form.rentObj.street}
+                            value={form.offer.rentObj.street}
                             onChange={handleRentObjChange}
                         />
                         <input
                             className={styles.input_house}
                             name="houseNumber"
                             placeholder={t("Host.aboutHousing.housing.number")}
-                            value={form.rentObj.houseNumber}
+                            value={form.offer.rentObj.houseNumber}
                             onChange={handleRentObjChange}
                         />
                     </div>
@@ -572,26 +675,38 @@ export const HostPropertyForm = ({ hotel }) => {
                 <div className={styles.label}>
                     <Text text={t("Host.propertyForm.owner.photo")} type="m_400_s_16" />
                 </div>
-                <div className={styles.photosWrapper}>
-                    <div className={styles.photosViewport}>
-                        <div className={styles.photos__container} style={{ transform: `translateX(${offset}px)` }}>
-                            {form.rentObj.images.length > 0 ? (
-                                form.rentObj.images.map((img, index) => {
-                                    const src = typeof img === 'string' ? img : imagePreviews[index];
-                                    return (
-                                        <div key={index} className={styles.previewWrapper}>
-                                            <img src={src} alt={`Preview ${index}`} className={styles.previewImage} />
-                                            <button type="button" onClick={() => removeImage(index)}>Удалить</button>
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <div className={styles.emptyImages}>Нет изображений</div>
-                            )}
-                        </div>
-                    </div>
+                <div className={styles.photos__container} style={{ transform: `translateX(${offset}px)` }}>
+                    {form.offer.rentObj.images.length > 0 ? (
+                        form.offer.rentObj.images.map((img, index) => {
+                            const key =
+                                img instanceof File
+                                    ? `file-${img.name}-${index}`
+                                    : `server-${img.id}`;
 
+                            const src =
+                                img instanceof File
+                                    ? URL.createObjectURL(img)
+                                    : img.url;
+
+                            return (
+                                <div key={key} className={styles.previewWrapper}>
+                                    <img
+                                        src={src}
+                                        alt={`Preview ${index}`}
+                                        className={styles.previewImage}
+                                    />
+                                    <IconButtonClose
+                                        icon_name="close_red"
+                                        className={styles.btn_close}
+                                        onClick={() => removeImage(index)} />
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className={styles.emptyImages}>Нет изображений</div>
+                    )}
                 </div>
+
 
                 <div className={styles.btn_container}>
                     <IconButtonArrow
@@ -615,7 +730,7 @@ export const HostPropertyForm = ({ hotel }) => {
                     <IconButtonArrow
                         onClick={() =>
                             setOffset(o =>
-                                Math.max(o - 300, -Math.max(0, (form.rentObj.images.length * 140) - 420))
+                                Math.max(o - 300, -Math.max(0, (form.offer.rentObj.images.length * 140) - 420))
                             )
                         }
                         className={classNameArrowRight}
@@ -671,15 +786,15 @@ export const HostPropertyForm = ({ hotel }) => {
                 </div>
                 <div className={styles.block_with_border__row}>
                     <Text text={t("Host.dataHousing.roomCount")} type="m_700_s_20" />
-                    <CounterButton value={form.rentObj.roomCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, roomCount: val } }))} />
+                    <CounterButton value={form.offer.rentObj.roomCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, roomCount: val } }))} />
                 </div>
                 <div className={styles.block_with_border__row}>
                     <Text text={t("Host.dataHousing.singleBedsCount")} type="m_700_s_20" />
-                    <CounterButton value={form.rentObj.singleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, singleBedsCount: val } }))} />
+                    <CounterButton value={form.offer.rentObj.singleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, singleBedsCount: val } }))} />
                 </div>
                 <div className={styles.block_with_border__row}>
                     <Text text={t("Host.dataHousing.doubleBedsCount")} type="m_700_s_20" />
-                    <CounterButton value={form.rentObj.doubleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, doubleBedsCount: val } }))} />
+                    <CounterButton value={form.offer.rentObj.doubleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, doubleBedsCount: val } }))} />
                 </div>
             </div>
 

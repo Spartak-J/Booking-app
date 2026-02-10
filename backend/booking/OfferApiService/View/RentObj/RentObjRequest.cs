@@ -8,7 +8,7 @@ namespace OfferApiService.View.RentObj
     public class RentObjRequest : IBaseRequest
     {
         public int id { get; set; }
-
+        public int OfferId { get; set; }
         public int CountryId { get; set; }
         public int RegionId { get; set; }
         public int CityId { get; set; }
@@ -58,6 +58,7 @@ namespace OfferApiService.View.RentObj
             return new RentObject
             {
                 id = request.id,
+                OfferId = request.OfferId,
                 CountryId = request.CountryId,
                 RegionId = request.RegionId,
                 CityId = request.CityId,

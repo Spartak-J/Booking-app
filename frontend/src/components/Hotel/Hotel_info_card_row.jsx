@@ -13,7 +13,13 @@ const paramList = [
     "1 двоспальне ліжко",
     "ванна кімната"
 ];
-export const Hotel_info_card_row = ({ hotel, offer }) => {
+export const Hotel_info_card_row = ({
+    hotel,
+    offer,
+    startDate,
+    endDate,
+    guests
+}) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     if (!hotel || !offer) return null;
@@ -75,10 +81,15 @@ export const Hotel_info_card_row = ({ hotel, offer }) => {
             <div className={`${styles.colApartment} ${styles.colBtn}`}>
                 <div className={styles.col_btn_container}>
                     <ActionButton__Primary text={t("hotel_info.more_btn")} className={`light_color_btn btn-w-385 btn-h-70 btn-br-r-10`} onClick={() => { }} />
-                    <ActionButton__Primary 
-                    text={t("hotel_info.booking")}
-                     className="btn-w-385 btn-h-70 btn-br-r-10"
-                          onClick={() => navigate("/booking")} />
+                    <ActionButton__Primary
+                        text={t("hotel_info.booking")}
+                        className="btn-w-385 btn-h-70 btn-br-r-10"
+                        onClick={() =>
+                            navigate(
+                                `/booking/${hotel.id}?startDate=${startDate}&endDate=${endDate}&guests=${guests}&price=${hotel.totalPrice}`
+                            )
+                        }
+                    />
                 </div>
             </div>
 

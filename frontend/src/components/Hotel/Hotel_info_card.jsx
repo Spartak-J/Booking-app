@@ -12,7 +12,13 @@ const paramList = [
     "1 двоспальне ліжко",
     "ванна кімната"
 ];
-export const Hotel_info_card = ({ hotel, offer }) => {
+export const Hotel_info_card = ({
+    hotel,
+    offer,
+    startDate,
+    endDate,
+    guests
+}) => {
     const { t } = useTranslation();
     if (!hotel || !offer) return null;
 
@@ -36,8 +42,20 @@ export const Hotel_info_card = ({ hotel, offer }) => {
                             <Text text={t("hotel_info.apartment")} type="m_500" />
                         </div>
                     </div>
-                    <Hotel_info_card_row hotel={hotel} offer={offer} />
-                    <Hotel_info_card_row hotel={hotel} offer={offer} />
+                    <Hotel_info_card_row
+                        hotel={hotel}
+                        offer={offer}
+                        startDate={startDate}
+                        endDate={endDate}
+                        guests={guests}
+                    />
+                        <Hotel_info_card_row
+                        hotel={hotel}
+                        offer={offer}
+                        startDate={startDate}
+                        endDate={endDate}
+                        guests={guests}
+                    />
 
                 </div>
                 <div className={styles.line}></div>

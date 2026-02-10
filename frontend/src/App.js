@@ -46,7 +46,7 @@ function App() {
             <Route path="/city/:citySlug" element={<CityPage />} />
              <Route path="/attraction/:attractionSlug" element={<AttractionPage />} />
 
-             <Route path="/booking" element={<BookingDetailsPage />} />
+             <Route path="/booking/:id" element={<BookingDetailsPage />} />
             {/* <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/settings" element={<SettingsPage />} /> */}
 

@@ -348,7 +348,7 @@ namespace WebApiGetway.Controllers
             //получаем рейтинг
             var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating/{id}", HttpMethod.Get, null);
             if (ratingObjResult is not OkObjectResult okRating)
-                return ratingObjResult;
+                return Ok(offerDictList);
             var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
 
             BffHelper.UpdateOfferListWithRating(offerDictList, ratingDictList);
@@ -435,11 +435,11 @@ namespace WebApiGetway.Controllers
         [HttpPost("create/booking-offer")]
         [Authorize]
         public async Task<IActionResult> CreateOffer(
-             [FromBody] CreateOfferFullRequest createOfferFullRequest,
+             [FromBody] OfferRequest Offer,
              [FromQuery] string lang)
         
         {
-            foreach (var param in createOfferFullRequest.RentObj.ParamValues)
+            foreach (var param in Offer.RentObj.ParamValues)
             {
                 param.ValueString ??= ""; 
             }
@@ -450,11 +450,11 @@ namespace WebApiGetway.Controllers
                 return ownerValidation.ErrorResult;
 
 
-            createOfferFullRequest.Offer.OwnerId = ownerValidation.UserId;
+            Offer.OwnerId = ownerValidation.UserId;
 
             var cityResult = await _gateway.ForwardRequestAsync<object>(
                 "LocationApiService",
-                $"/api/City/get/{createOfferFullRequest.RentObj.CityId}",
+                $"/api/City/get/{Offer.RentObj.CityId}",
                 HttpMethod.Get,
                 null
             );
@@ -466,15 +466,15 @@ namespace WebApiGetway.Controllers
             var cityLongitude = double.Parse(cityObj["longitude"].ToString());
             var cityLatitude = double.Parse(cityObj["latitude"].ToString());
 
-            createOfferFullRequest.RentObj.CityLatitude = cityLatitude;
-            createOfferFullRequest.RentObj.CityLongitude = cityLongitude;
+            Offer.RentObj.CityLatitude = cityLatitude;
+            Offer.RentObj.CityLongitude = cityLongitude;
 
 
             var offerIdResult = await _gateway.ForwardRequestAsync<object>(
                 "OfferApiService",
                 "/api/Offer/create/offer-with-rentobj-with-param-values",
                 HttpMethod.Post,
-                createOfferFullRequest
+                Offer
             );
 
             if (offerIdResult is not OkObjectResult okOfferId)
@@ -492,9 +492,9 @@ namespace WebApiGetway.Controllers
             {
                 EntityId = offerId,
                 Lang = sourceLang,
-                Title = createOfferFullRequest.Offer.Title,
-                TitleInfo = createOfferFullRequest.Offer.TitleInfo,
-                Description = createOfferFullRequest.Offer.Description
+                Title = Offer.Title,
+                TitleInfo = Offer.TitleInfo,
+                Description = Offer.Description
             };
 
             var translatedTranslation = new TranslationDto
@@ -540,13 +540,13 @@ namespace WebApiGetway.Controllers
         //============================================================================================
         //                             редактирование обьявления
         //============================================================================================
-        [HttpPut("update/booking-offer")]
+        [HttpPost("update/booking-offer")]
         [Authorize]
         public async Task<IActionResult> UpdateOffer(
-             [FromBody] UpdateOfferFullRequest updateOfferFullRequest,
-             string lang)
+             [FromBody] OfferRequest Offer,
+             [FromQuery]  string lang)
         {
-            var offerId = updateOfferFullRequest.Offer.id;
+            var offerId = Offer.id;
 
             var isValidResult = await _gateway.ForwardRequestAsync<object>(
                 "UserApiService",
@@ -566,7 +566,7 @@ namespace WebApiGetway.Controllers
                     "OfferApiService",
                     "/api/Offer/update/offer-with-rentobj-with-param-values",
                     HttpMethod.Put,
-                    updateOfferFullRequest
+                    Offer
                 );
 
                 if (offerUpdateResult is not OkObjectResult okOfferUpdate)
@@ -580,21 +580,52 @@ namespace WebApiGetway.Controllers
                 return BadRequest("Offer ID mismatch after update.");
             }
 
-            var translateOfferRequest = new TranslationDto
-                {
-                    EntityId = offerId,
-                    Lang = lang,
-                    Title = updateOfferFullRequest.Offer.Title,
-                    Description = updateOfferFullRequest.Offer.Description
-                };
+            var sourceLang = lang; // "uk" или "en"
+            var targetLang = sourceLang == "uk" ? "en" : "uk";
 
-                var translateResult = await _gateway.ForwardRequestAsync<object>(
-                    "TranslationApiService",
-                    $"/api/Offer/update-translations/{offerId}/{lang}",
-                    HttpMethod.Put,
-                    translateOfferRequest
-                );
-            
+            var sourceTranslation = new TranslationDto
+            {
+                EntityId = offerId,
+                Lang = sourceLang,
+                Title = Offer.Title,
+                TitleInfo = Offer.TitleInfo,
+                Description = Offer.Description
+            };
+
+            var translatedTranslation = new TranslationDto
+            {
+                EntityId = offerId,
+                Lang = targetLang,
+                Title = await TranslateAsync(
+                    sourceTranslation.Title, sourceLang, targetLang),
+                TitleInfo = await TranslateAsync(
+                    sourceTranslation.TitleInfo, sourceLang, targetLang),
+                Description = await TranslateAsync(
+                    sourceTranslation.Description, sourceLang, targetLang)
+            };
+
+
+            var sourceTranslationResult = await _gateway.ForwardRequestAsync<object>(
+                "TranslationApiService",
+                $"/api/Offer/create-translations/{lang}",
+                HttpMethod.Post,
+                sourceTranslation
+            );
+
+            var translatedTranslationResult = await _gateway.ForwardRequestAsync<object>(
+              "TranslationApiService",
+              $"/api/Offer/create-translations/{lang}",
+              HttpMethod.Post,
+              translatedTranslation
+          );
+
+            var addToOwnerLink = await _gateway.ForwardRequestAsync<object>(
+              "UserApiService",
+              $"/api/User/owner/offers/add/{offerId}",
+              HttpMethod.Post,
+              null
+          );
+
             return Ok(offerId);
         }
 

@@ -77,6 +77,11 @@
         <line x1="1.5" y1="-1.5" x2="36.7099" y2="-1.5" transform="matrix(-0.732794 0.680451 0.680451 0.732794 30 1.57861)" stroke="#0D2D4A" stroke-width="3" stroke-linecap="round"/>
     </symbol>
 
+      <symbol id ="close_red" width="30" height="28" viewBox="0 0 30 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="2.11987" y1="1.5001" x2="27.9215" y2="25.4587" stroke="red" stroke-width="3" stroke-linecap="round"/>
+        <line x1="1.5" y1="-1.5" x2="36.7099" y2="-1.5" transform="matrix(-0.732794 0.680451 0.680451 0.732794 30 1.57861)" stroke="red" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+
     <symbol id="arrow_left_t_light" width="30" height="15" viewBox="0 0 30 15" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M9.06934 14.0002C9.06934 14.0002 1.00037 10.6644 1.00037 7.7455C1.00037 4.82662 9.06934 1.00024 9.06934 1.00024" stroke="#0D2D4A" stroke-width="2" stroke-linecap="round"/>
          <line x1="2" y1="7.17261" x2="28.6897" y2="7.17261" stroke="#0D2D4A" stroke-width="2" stroke-linecap="round"/>

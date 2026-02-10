@@ -6,8 +6,8 @@ namespace WebApiGetway.View
 {
     public class RentObjRequest : IBaseRequest
     {
-        public int id { get; set; }
-
+        public int? id { get; set; }
+        public int? OfferId { get; set; }
         public int CountryId { get; set; }
         public int RegionId { get; set; }
         public int CityId { get; set; }

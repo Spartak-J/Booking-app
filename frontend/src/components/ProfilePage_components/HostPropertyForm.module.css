@@ -108,14 +108,15 @@
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
-  max-width: 100%;    
+  max-width: 100%; 
+    position: relative;   
 }
 
 .photosViewport {
-   flex: 1 1 auto;
-  width: 100%;
-  min-width: 0;
-  overflow: hidden !important;
+    overflow: hidden;
+  width: 100%; 
+  margin: 0 auto;
+  border-radius: 20px;
 }
 
 
@@ -124,18 +125,31 @@
   height: 270px;
   gap: 10px;
   margin-bottom: 12px;
-
+  position: relative;
 
   will-change: transform;
   transition: transform 0.3s ease;
 }
-
+.previewWrapper{
+  position: relative;
+}
+.btn_close{
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--color-text);
+  border-radius: 5px;
+  background-color:  rgba(171, 170, 170, 0.8);
+}
 .previewImage {
   width: 300px;
   height: 100%;
   object-fit: cover;
   border-radius: 12px;
   display: block;
+  position: relative;
 }
 .emptyImages {
   width: 300px;
@@ -146,6 +160,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.btn_delete{
+  position: absolute;
+  right: 5px;
+  top:5px
 }
 
 .btn_container {

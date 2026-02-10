@@ -1,10 +1,8 @@
 import http from "./http";
 
 
- export const offerApi = {
+export const offerApi = {
   createOffer: ({ formData, lang }) => {
-    console.log("lang:", lang);
-    console.log("formData:", formData);
     return http.post(`/Bff/create/booking-offer?lang=${encodeURIComponent(lang ?? '')}`, formData, {
       headers: {
         'Content-Type': 'application/json'
@@ -12,20 +10,21 @@ import http from "./http";
     });
   },
 
-
-
   createOfferImg: ({ formData, offerId }) =>
     http.post(`/Bff/img/booking-offer/${offerId}/add`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
 
-  updateOffer: ({ formData, lang }) =>
-    http.put(`/Bff/update/booking-offer`, {
-      formData, lang
-    }),
+  updateOffer: ({ formData, lang }) => {
+    return http.post(`/Bff/update/booking-offer?lang=${encodeURIComponent(lang ?? '')}`, formData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  },
 
   searchOffers: ({ startDate, endDate, guests, userDiscountPercent, lang, cityId, paramItemFilters }) => {
-    // Форматируем даты в ISO
+
     const startIso = new Date(startDate).toISOString();
     const endIso = new Date(endDate).toISOString();
 
@@ -44,9 +43,9 @@ import http from "./http";
 
   searchId: ({ id, startDate, endDate, guests, userDiscountPercent, lang }) => {
     const params = new URLSearchParams({
-      startDate,
-      endDate,
-      guests: guests.toString(),
+      StartDate: startDate,   // ВАЖНО: PascalCase
+      EndDate: endDate,
+      Guests: guests.toString(),
       userDiscountPercent: userDiscountPercent.toString(),
     });
 

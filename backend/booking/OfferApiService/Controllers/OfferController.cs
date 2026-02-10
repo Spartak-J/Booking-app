@@ -75,37 +75,37 @@ namespace OfferApiService.Controllers
             //var baseUrl = $"{Request.Scheme}://{Request.Host}";
 
             var result = offers.Select(o => OfferShortResponse.MapToShortResponse(o, _baseUrl)).ToList();
-            foreach (var o in result)
-            {
-                o.GuestCount = request.Guests;
+            //foreach (var o in result)
+            //{
+            //    o.GuestCount = request.Guests;
 
-                DateTime startDate = request.StartDate;
-                DateTime endDate = request.EndDate;
-                TimeSpan difference = endDate - startDate;
-                int daysCount = difference.Days;
-                o.DaysCount = daysCount;
+            //    DateTime startDate = request.StartDate;
+            //    DateTime endDate = request.EndDate;
+            //    TimeSpan difference = endDate - startDate;
+            //    int daysCount = difference.Days;
+            //    o.DaysCount = daysCount;
 
-                if (daysCount < 7)
-                    o.OrderPrice = daysCount * o.PricePerDay;
-                else if (daysCount < 30)
-                    o.OrderPrice = daysCount * (o.PricePerWeek / 7);
-                else
-                    o.OrderPrice = daysCount * (o.PricePerMonth / 30);
-
-
-
-                // Скидка
-                var discountPercent = userDiscountPercent;
-                var discountAmount = o.OrderPrice * discountPercent / 100;
+            //    if (daysCount < 7)
+            //        o.OrderPrice = daysCount * o.PricePerDay;
+            //    else if (daysCount < 30)
+            //        o.OrderPrice = daysCount * (o.PricePerWeek / 7);
+            //    else
+            //        o.OrderPrice = daysCount * (o.PricePerMonth / 30);
 
 
-                // Налог на аренду
-                var taxAmount = (o.OrderPrice - discountAmount) * o.Tax / 100;
-                o.TaxAmount = (decimal)taxAmount;
-                // Итоговая стоимость
-               o.TotalPrice = (o.OrderPrice - discountAmount) + taxAmount;
 
-            }
+            //    // Скидка
+            //    var discountPercent = userDiscountPercent;
+            //    var discountAmount = o.OrderPrice * discountPercent / 100;
+
+
+            //    // Налог на аренду
+            //    var taxAmount = (o.OrderPrice - discountAmount) * o.Tax / 100;
+            //    o.TaxAmount = (decimal)taxAmount;
+            //    // Итоговая стоимость
+            //   o.TotalPrice = (o.OrderPrice - discountAmount) + taxAmount;
+
+            //}
 
 
             return Ok(result);
@@ -226,11 +226,11 @@ namespace OfferApiService.Controllers
 
         [HttpPost("create/offer-with-rentobj-with-param-values")]
         public async Task<ActionResult<OfferResponse>> CreateOffer(
-         [FromBody] CreateOfferFullRequest createOfferFullRequest
+         [FromBody] OfferRequest Offer
             )
         {
-            var offerRequest = createOfferFullRequest.Offer;
-            var rentObjRequest = createOfferFullRequest.RentObj;
+            var offerRequest = Offer;
+            var rentObjRequest = Offer.RentObj;
 
             var coords = await GetCoordinatesAsync(rentObjRequest);
 
@@ -251,7 +251,7 @@ namespace OfferApiService.Controllers
             {
                 rentObjRequest.ParamValues.Add(new RentObjParamValueRequest
                 {
-                    ParamItemId = 26, // "Менше 1 км" 
+                    ParamItemId = 26,
                     ValueBool = true
                 });
             }
@@ -278,14 +278,18 @@ namespace OfferApiService.Controllers
 
             var rentObjModel = RentObjRequest.MapToModel(rentObjRequest);
 
-            var idRentObj = await _rentObjService.AddRentObjWithParamValuesAsync(rentObjModel);
+            //var idRentObj = await _rentObjService.AddRentObjWithParamValuesAsync(rentObjModel);
 
-            if (idRentObj == -1)
-                return StatusCode(500, new { message = "Error creating item" });
+            //if (idRentObj == -1)
+            //    return StatusCode(500, new { message = "Error creating item" });
 
-            offerRequest.RentObjId = idRentObj;
-            var modelOffer = OfferRequest.MapToModel(offerRequest);
-            var idOffer = await _offerService.AddEntityGetIdAsync(modelOffer);
+            //offerRequest.RentObjId = idRentObj;
+            //var modelOffer = OfferRequest.MapToModel(offerRequest);
+
+            offerRequest.RentObj = rentObjRequest;
+            var modelOffer = OfferRequest.MapToModel(offerRequest,_baseUrl);
+
+            var idOffer = await _offerService.AddOfferWithRentObjAndParamValuesAsync(modelOffer);
             if (idOffer == -1)
                 return StatusCode(500, new { message = "Error creating item" });
 
@@ -298,13 +302,13 @@ namespace OfferApiService.Controllers
 
         [HttpPut("update/offer-with-rentobj-with-param-values")]
         public async Task<ActionResult<OfferResponse>> UpdateOffer(
-         [FromBody] UpdateOfferFullRequest updateOfferFullRequest
+         [FromBody] OfferRequest Offer
             )
         {
-            var offerId = updateOfferFullRequest.Offer.id;
-            var rentObjId = updateOfferFullRequest.Offer.RentObjId;
-            var offerRequest = updateOfferFullRequest.Offer;
-            var rentObjRequest = updateOfferFullRequest.RentObj;
+            var offerId = Offer.id;
+            var rentObjId = Offer.RentObj.id;
+            var offerRequest = Offer;
+            var rentObjRequest = Offer.RentObj;
 
 
 
@@ -328,37 +332,40 @@ namespace OfferApiService.Controllers
             rentObjRequest.DistanceToCenter = (int)Helper.CalculateDistanceMeters(latitude, longitude, cityLatitude, cityLongitude);
 
 
-            PatchHelper.ApplyPatch<RentObject, RentObjRequest>(
-                 existingRentObj,
-                 rentObjRequest,
-                 nameof(RentObject.id)
-             );
+            //PatchHelper.ApplyPatch<RentObject, RentObjRequest>(
+            //     existingRentObj,
+            //     rentObjRequest,
+            //     nameof(RentObject.id),
+            //     nameof(RentObject.Images)
+            // );
 
-            var success = await _rentObjService.UpdateEntityAsync(existingRentObj);
-            if (!success)
-                return StatusCode(500, new { message = "Error updating item" });
+            // var success = await _rentObjService.UpdateEntityAsync(existingRentObj);
+            // if (!success)
+            //     return StatusCode(500, new { message = "Error updating item" });
 
 
+            // var existingOffer = await _offerService.GetOnlyOfferAsync(offerId);
+            // if (existingOffer == null)
+            //     return NotFound(new { message = "offer not found" });
 
+            // PatchHelper.ApplyPatch<Offer, OfferRequest>(
+            //    existingOffer,
+            //    offerRequest,
+            //    nameof(Offer.id),
+            //    nameof(Offer.OwnerId)
+            //    //nameof(Offer.RentObjId)
+            //);
 
-            var existingOffer = await _offerService.GetEntityAsync(offerId);
-            if (existingOffer == null)
-                return NotFound(new { message = "offer not found" });
+            // var offerUpdated = await _offerService.UpdateEntityAsync(existingOffer);
+            // if (!offerUpdated)
+            //     return StatusCode(500, new { message = "Error updating offer" });
 
-            PatchHelper.ApplyPatch<Offer, OfferRequest>(
-               existingOffer,
-               offerRequest,
-               nameof(Offer.id),
-               nameof(Offer.OwnerId),
-               nameof(Offer.RentObjId)
-           );
+            
 
-            var offerUpdated = await _offerService.UpdateEntityAsync(existingOffer);
-            if (!offerUpdated)
-                return StatusCode(500, new { message = "Error updating offer" });
-
-            var modelOffer = OfferRequest.MapToModel(offerRequest);
-            return Ok(modelOffer);
+            var modelOffer = OfferRequest.MapToModel(offerRequest,_baseUrl);
+            var offerUpdId = await _offerService
+                .UpdateOfferWithRentObjAndParamValuesAsyn(modelOffer);
+            return Ok(MapToResponse( modelOffer));
         }
 
 
@@ -437,8 +444,8 @@ namespace OfferApiService.Controllers
                existingOffer,
                updateOfferPriceRequest,
                nameof(Offer.id),
-               nameof(Offer.OwnerId),
-               nameof(Offer.RentObjId)
+               nameof(Offer.OwnerId)
+               //nameof(Offer.RentObjId)
            );
 
             var successOffer = await _offerService.UpdateEntityAsync(existingOffer);
@@ -466,7 +473,8 @@ namespace OfferApiService.Controllers
                 return NotFound(new { message = "offer not found in DB" });
 
 
-            return Ok(existingOffer.RentObjId);
+            return Ok(existingOffer.RentObj.id);
+        
         }
 
 
@@ -474,8 +482,8 @@ namespace OfferApiService.Controllers
         //  получение обьявлений по id владельца
         //===========================================================================================
 
-        [HttpGet("get/offers/{ownerId}")]
-        public async Task<ActionResult<OfferResponse>> GetOfferById(
+        [HttpGet("get/offersByOwner/{ownerId}")]
+        public async Task<ActionResult<OfferResponse>> GetOfferByOwnerId(
         int ownerId)
         {
 
@@ -490,13 +498,35 @@ namespace OfferApiService.Controllers
             {
                 var response = OfferResponse.MapToResponse(
                 offer,
-                baseUrl);
+                _baseUrl);
                 responseList.Add(response);
             }
 
             return Ok(responseList);
         }
 
+        //[HttpGet("get/offers/{ids}")]
+        //public async Task<ActionResult<OfferResponse>> GetOfferById(
+        //int ownerId)
+        //{
+
+        //    var offerList = await _offerService.GetOffersByIdAsync(ownerId);
+
+        //    if (offerList.Count() == 0)
+        //        return NotFound();
+
+        //    var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        //    var responseList = new List<OfferResponse>();
+        //    foreach (var offer in offerList)
+        //    {
+        //        var response = OfferResponse.MapToResponse(
+        //        offer,
+        //        _baseUrl);
+        //        responseList.Add(response);
+        //    }
+
+        //    return Ok(responseList);
+        //}
 
         //===========================================================================================
         //  получение обьявлений по id владельца и городу
@@ -519,7 +549,7 @@ namespace OfferApiService.Controllers
             {
                 var response = OfferResponse.MapToResponse(
                 offer,
-                baseUrl);
+                _baseUrl);
                 responseList.Add(response);
             }
            
@@ -548,7 +578,7 @@ namespace OfferApiService.Controllers
             {
                 var response = OfferResponse.MapToResponse(
                 offer,
-                baseUrl);
+                _baseUrl);
                 responseList.Add(response);
             }
 
@@ -558,7 +588,7 @@ namespace OfferApiService.Controllers
         //===========================================================================================
         protected override Offer MapToModel(OfferRequest request)
         {
-            return  OfferRequest.MapToModel(request);
+            return  OfferRequest.MapToModel(request, _baseUrl);
         }
 
 
@@ -570,13 +600,26 @@ namespace OfferApiService.Controllers
 
         private async Task<(double lat, double lon)?> GetCoordinatesAsync(RentObjRequest request)
         {
-            return await _geocodingService.GetCoordinatesAsync(
-                request.Street,
-                request.HouseNumber,
-                request.CityTitle,
-                request.Postcode,
-                request.CountryTitle
-            );
+            if (!string.IsNullOrWhiteSpace(request.Street) &&
+            !string.IsNullOrWhiteSpace(request.CityTitle) &&
+            !string.IsNullOrWhiteSpace(request.CountryTitle))
+                    {
+                var coords = await _geocodingService.GetCoordinatesAsync(
+                    request.Street,
+                    request.HouseNumber ?? "",
+                    request.CityTitle,
+                    request.Postcode ?? "",
+                    request.CountryTitle
+                );
+
+                return coords;
+            }
+            else
+            {
+                Console.WriteLine("Недостаточно данных для геокодинга");
+                return null;
+            }
+
         }
 
     }
