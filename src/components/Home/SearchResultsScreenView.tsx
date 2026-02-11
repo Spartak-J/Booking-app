@@ -4,7 +4,6 @@ import {
   Animated,
   Easing,
   FlatList,
-  Pressable,
   RefreshControl,
   StyleSheet,
   View,
@@ -22,7 +21,7 @@ import { Offer, City, PaginatedResponse } from '@/types';
 import { useTheme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { useAuthStore } from '@/store/authStore';
-import { Button, HeaderBar, Modal, Typography } from '@/ui';
+import { Button, HeaderBar, Modal, Pagination, Typography } from '@/ui';
 import { radius } from '@/theme';
 import { s } from '@/utils/scale';
 
@@ -233,43 +232,13 @@ export const SearchResultsScreenView: React.FC<SearchResultsScreenViewProps> = (
         )}
         contentContainerStyle={styles.list}
         ListFooterComponent={
-          <View style={styles.pagination}>
-            <Pressable
-              style={styles.paginationArrow}
-              onPress={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage <= 1}
-            >
-              <View style={styles.paginationArrowLineTop} />
-              <View style={styles.paginationArrowLineBottom} />
-            </Pressable>
-            <View style={styles.paginationNumbers}>
-              {Array.from({ length: totalPages }, (_, idx) => String(idx + 1)).map((label) => {
-                const isActive = label === String(currentPage);
-                return (
-                  <Pressable
-                    key={label}
-                    onPress={() => setCurrentPage(Number(label))}
-                    style={[styles.paginationItem, isActive && styles.paginationItemActive]}
-                  >
-                    <Typography
-                      variant="caption"
-                      style={[styles.paginationText, isActive && styles.paginationTextActive]}
-                    >
-                      {label}
-                    </Typography>
-                  </Pressable>
-                );
-              })}
-            </View>
-            <Pressable
-              style={[styles.paginationArrow, styles.paginationArrowRight]}
-              onPress={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={currentPage >= totalPages}
-            >
-              <View style={styles.paginationArrowLineTop} />
-              <View style={styles.paginationArrowLineBottom} />
-            </Pressable>
-          </View>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            maxVisible={5}
+            style={styles.pagination}
+          />
         }
         refreshControl={
           <RefreshControl refreshing={isFetching && !isLoading} onRefresh={onRefresh} />
@@ -449,53 +418,6 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
       justifyContent: 'space-between',
       alignSelf: 'center',
       paddingHorizontal: s(6),
-    },
-    paginationNumbers: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: s(8),
-    },
-    paginationItem: {
-      minWidth: s(24),
-      height: s(24),
-      borderRadius: radius.lg,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    paginationItemActive: {
-      backgroundColor: palette.paginationActiveBg,
-    },
-    paginationText: {
-      color: palette.paginationText,
-      fontSize: s(14),
-      lineHeight: s(17),
-    },
-    paginationTextActive: {
-      color: palette.paginationActiveText,
-    },
-    paginationArrow: {
-      width: s(18),
-      height: s(18),
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    paginationArrowRight: {
-      transform: [{ rotate: '180deg' }],
-    },
-    paginationArrowLineTop: {
-      width: s(12),
-      height: 2,
-      backgroundColor: palette.paginationText,
-      borderRadius: radius.sm,
-      transform: [{ rotate: '40deg' }],
-    },
-    paginationArrowLineBottom: {
-      width: s(12),
-      height: 2,
-      backgroundColor: palette.paginationText,
-      borderRadius: radius.sm,
-      transform: [{ rotate: '-40deg' }],
-      marginTop: s(4),
     },
   });
 

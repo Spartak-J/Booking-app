@@ -11,5 +11,8 @@ export { default as ListItem } from './ListItem';
 export { default as Loader } from './Loader';
 export { default as LineWithDots } from './LineWithDots';
 export { default as Modal } from './Modal';
+export { default as Pagination } from './Pagination';
+export { default as UnreadBadge } from './UnreadBadge';
+export { default as ScreenShell } from './ScreenShell';
 export { default as ScreenContainer } from './ScreenContainer';
 export { default as Typography } from './Typography';

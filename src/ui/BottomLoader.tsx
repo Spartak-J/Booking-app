@@ -77,9 +77,13 @@ const BottomLoaderComponent: React.FC<BottomLoaderProps> = ({
     outputRange: [fillStart, fillEnd],
   });
 
+  // Движение бегунка синхронизируем с фронтом заливки:
+  // центр бегунка «приклеен» к фронту fill (сдвигаем на половину размера).
+  const knobStart = Math.max(fillStart - effectiveKnob / 2, 0);
+  const knobEnd = Math.max(fillEnd - effectiveKnob / 2, 0);
   const knobTranslateX = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, Math.max(width - effectiveKnob, 0)],
+    outputRange: [knobStart, knobEnd],
   });
 
   return (

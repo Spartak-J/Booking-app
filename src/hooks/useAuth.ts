@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { authService } from '@/services/authService';
+import { profileService } from '@/services/profile/profileService';
 import { useAuthStore } from '@/store/authStore';
 import { Role, User } from '@/types';
 
@@ -34,7 +35,8 @@ export const useAuth = () => {
   const register = async (payload: RegisterPayload) => {
     setLoading(true);
     try {
-      const data = await authService.register(payload);
+      const registerRole: Role = role === 'owner' ? 'owner' : 'user';
+      const data = await authService.register({ ...payload, role: registerRole });
       await setAuth({ ...data, baseRole: data.user.role });
     } finally {
       setLoading(false);
@@ -74,7 +76,7 @@ export const useAuth = () => {
 
   const updateProfile = async (payload: Partial<User>) => {
     if (!user) return;
-    const updated = await authService.updateProfile(user.id, payload);
+    const updated = await profileService.updateProfile(user.id, payload);
     await setAuth({ user: updated, token: token ?? '', role: updated.role });
   };
 

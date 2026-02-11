@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { HeaderBar, IconButton, Typography } from '@/ui';
+import { IconButton, Typography, ScreenShell } from '@/ui';
 import { useTheme, withOpacity } from '@/theme';
 import { getColorTokens } from '@/theme';
 import { s } from '@/utils/scale';
@@ -17,6 +17,7 @@ type PastBookingDetailsProps = {
   onBack?: () => void;
   booking: {
     id: string;
+    bookingId?: string;
     hotelId?: string;
     title: string;
     image: number;
@@ -66,18 +67,10 @@ export const PastBookingDetails: React.FC<PastBookingDetailsProps> = ({
     [isDark, colors, tokens.accent, tokens.success],
   );
   const styles = useMemo(() => getStyles(palette), [palette]);
+  const visibleReviews = reviews && reviews.length ? (isReviewsOpen ? reviews : reviews.slice(0, 1)) : [];
 
   return (
-    <View style={styles.root}>
-      <HeaderBar
-        title={t('bookingDetails.title')}
-        onBack={onBack}
-        backIconName="chevron-left"
-        backIconSize={s(20)}
-        style={styles.header}
-        titleStyle={styles.headerTitle}
-        backStyle={styles.backButton}
-      />
+    <ScreenShell title={t('bookingDetails.title')} onBack={onBack} showKeys>
       {onLeaveReview ? (
         <IconButton
           onPress={onLeaveReview}
@@ -169,62 +162,75 @@ export const PastBookingDetails: React.FC<PastBookingDetailsProps> = ({
         </View>
 
         <View style={styles.reviews}>
-          <Typography style={styles.sectionTitle} numberOfLines={1} ellipsizeMode="tail">
-            {t('offer.reviews')}
-          </Typography>
-          {(reviews && reviews.length
-            ? isReviewsOpen
-              ? reviews
-              : reviews.slice(0, 1)
-            : [
-                {
-                  id: 'review-fallback',
-                  author: 'Олена',
-                  rating: 5,
-                  text: t('reviews.fallbackText'),
-                },
-              ]
-          ).map((review) => (
-            <View key={review.id} style={styles.reviewCard}>
-              <View style={styles.reviewHeader}>
-                <View style={styles.reviewAvatar}>
-                  <Typography style={styles.reviewAvatarText}>
-                    {review.author ? review.author[0]?.toUpperCase() : 'О'}
-                  </Typography>
-                </View>
-                <View style={styles.reviewMeta}>
-                  <Typography style={styles.reviewAuthor} numberOfLines={1} ellipsizeMode="tail">
-                    {review.author ?? 'Олена'}
-                  </Typography>
-                  <View style={styles.reviewStars}>
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <MaterialCommunityIcons
-                        key={`${review.id}-star-${index}`}
-                        name={index < (review.rating ?? 5) ? 'star' : 'star-outline'}
-                        size={s(12)}
-                        color={index < (review.rating ?? 5) ? palette.icon : palette.starInactive}
-                      />
-                    ))}
-                    <Typography
-                      style={styles.reviewRatingText}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {review.rating ?? 5}
+          <View style={styles.reviewsHeader}>
+            <Typography style={styles.sectionTitle} numberOfLines={1} ellipsizeMode="tail">
+              {t('offer.reviews')}
+            </Typography>
+            {onLeaveReview ? (
+              <IconButton
+                onPress={onLeaveReview}
+                icon={
+                  <MaterialCommunityIcons
+                    name="message-text-outline"
+                    size={s(18)}
+                    color={palette.icon}
+                  />
+                }
+                circular
+                bordered
+                dimension={s(32)}
+                style={styles.reviewButtonInline}
+                preserveIconColor
+              />
+            ) : null}
+          </View>
+          {visibleReviews.length > 0 ? (
+            visibleReviews.map((review) => (
+              <View key={review.id} style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                  <View style={styles.reviewAvatar}>
+                    <Typography style={styles.reviewAvatarText}>
+                      {review.author ? review.author[0]?.toUpperCase() : 'О'}
                     </Typography>
                   </View>
+                  <View style={styles.reviewMeta}>
+                    <Typography style={styles.reviewAuthor} numberOfLines={1} ellipsizeMode="tail">
+                      {review.author ?? 'Олена'}
+                    </Typography>
+                    <View style={styles.reviewStars}>
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <MaterialCommunityIcons
+                          key={`${review.id}-star-${index}`}
+                          name={index < (review.rating ?? 5) ? 'star' : 'star-outline'}
+                          size={s(12)}
+                          color={index < (review.rating ?? 5) ? palette.icon : palette.starInactive}
+                        />
+                      ))}
+                      <Typography
+                        style={styles.reviewRatingText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {review.rating ?? 5}
+                      </Typography>
+                    </View>
+                  </View>
                 </View>
+                <Typography style={styles.reviewText}>{review.text}</Typography>
               </View>
-              <Typography style={styles.reviewText}>{review.text}</Typography>
-            </View>
-          ))}
-          <TouchableOpacity
-            onPress={() => setIsReviewsOpen((prev) => !prev)}
-            activeOpacity={0.7}
-            style={styles.reviewsToggle}
-          >
-            <View style={styles.sectionLine} />
-          </TouchableOpacity>
+            ))
+          ) : (
+            <Typography style={styles.emptyReviewsText}>{t('offer.reviews.empty')}</Typography>
+          )}
+          {reviews && reviews.length > 1 ? (
+            <TouchableOpacity
+              onPress={() => setIsReviewsOpen((prev) => !prev)}
+              activeOpacity={0.7}
+              style={styles.reviewsToggle}
+            >
+              <View style={styles.sectionLine} />
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         <View style={styles.contact}>
@@ -245,7 +251,7 @@ export const PastBookingDetails: React.FC<PastBookingDetailsProps> = ({
           </View>
         </View>
       </ScrollView>
-    </View>
+    </ScreenShell>
   );
 };
 
@@ -265,24 +271,9 @@ const getStyles = (palette: {
       flex: 1,
       backgroundColor: palette.background,
     },
-    header: {
-      height: s(36),
-      backgroundColor: palette.background,
-    },
-    backButton: {
-      position: 'absolute',
-      left: s(8),
-      top: s(6),
-      width: s(24),
-      height: s(24),
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    headerTitle: {
-      color: palette.text,
-      fontSize: s(16),
-      fontWeight: '700',
-    },
+    header: {},
+    backButton: {},
+    headerTitle: {},
     reviewButton: {
       position: 'absolute',
       right: s(16),
@@ -406,6 +397,12 @@ const getStyles = (palette: {
       backgroundColor: palette.section,
       borderRadius: s(10),
       padding: s(12),
+      gap: s(8),
+    },
+    reviewsHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
     infoText: {
       marginTop: s(10),
@@ -439,6 +436,9 @@ const getStyles = (palette: {
     },
     reviewsToggle: {
       marginTop: s(8),
+    },
+    reviewButtonInline: {
+      padding: 0,
     },
     reviewCard: {
       marginTop: s(12),
@@ -489,6 +489,10 @@ const getStyles = (palette: {
       color: palette.text,
       fontSize: s(12),
       lineHeight: s(15),
+    },
+    emptyReviewsText: {
+      color: palette.text,
+      fontSize: s(12),
     },
     contact: {
       marginTop: s(16),

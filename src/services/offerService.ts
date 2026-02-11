@@ -6,6 +6,8 @@ import { getApiLang, mapOfferFull, mapOfferShort } from '@/utils/apiAdapters';
 import { getAuthState } from '@/store/authStore';
 import { cityService } from '@/services/cityService';
 import { mockOffers } from '@/utils/mockData';
+import { BookingRepository } from '@/data/bookings';
+import { isOfferAvailableForDates } from '@/services/bookingAvailability';
 
 export type OfferFilters = {
   cityId?: string;
@@ -39,7 +41,19 @@ export const offerService = {
         );
       }
       if (filters.guests) {
-        items = items.filter((item) => item.guests >= (filters.guests ?? 1));
+        items = items.filter((item) => (item.maxGuests ?? item.guests) >= (filters.guests ?? 1));
+      }
+      if (filters.dates?.from && filters.dates?.to) {
+        const bookings = await BookingRepository.getAll();
+        items = items.filter((item) =>
+          isOfferAvailableForDates(
+            item.id,
+            filters.dates!.from,
+            filters.dates!.to,
+            bookings,
+            item.stock ?? 1,
+          ),
+        );
       }
       if (filters.amenities?.length) {
         const hasAmenity = (offerAmenities: string[] = [], id: string) => {
@@ -250,6 +264,8 @@ export const offerService = {
         pricePerNight: payload.pricePerNight ?? 100,
         rating: payload.rating ?? 4.8,
         guests: payload.guests ?? 2,
+        maxGuests: payload.maxGuests ?? payload.guests ?? 2,
+        stock: payload.stock ?? 1,
         bedrooms: payload.bedrooms ?? 1,
         amenities: payload.amenities ?? [],
         images: payload.images ?? [],
@@ -261,15 +277,27 @@ export const offerService = {
         reviews: payload.reviews ?? [],
         rooms: payload.rooms ?? [],
       };
+      mockOffers.unshift(offer);
       return offer;
     }
     throw new Error('Создание объявлений через мобильное приложение пока не подключено к API');
   },
   update: async (id: string, payload: Partial<Offer>): Promise<Offer> => {
     if (USE_MOCKS) {
-      const existing = mockOffers.find((item) => item.id === id);
+      const index = mockOffers.findIndex((item) => item.id === id);
+      const existing = index >= 0 ? mockOffers[index] : undefined;
       if (!existing) throw new Error('Предложение не найдено');
-      return { ...existing, ...payload };
+      const updated: Offer = {
+        ...existing,
+        ...payload,
+        city: payload.city ?? existing.city,
+        amenities: payload.amenities ?? existing.amenities,
+        images: payload.images ?? existing.images,
+        reviews: payload.reviews ?? existing.reviews ?? [],
+        rooms: payload.rooms ?? existing.rooms ?? [],
+      };
+      mockOffers[index] = updated;
+      return updated;
     }
     throw new Error(
       'Редактирование объявлений через мобильное приложение пока не подключено к API',
@@ -277,7 +305,10 @@ export const offerService = {
   },
   remove: async (id: string): Promise<void> => {
     if (USE_MOCKS) {
-      void id;
+      const index = mockOffers.findIndex((item) => item.id === id);
+      if (index >= 0) {
+        mockOffers.splice(index, 1);
+      }
       return;
     }
     throw new Error('Удаление объявлений через мобильное приложение пока не подключено к API');

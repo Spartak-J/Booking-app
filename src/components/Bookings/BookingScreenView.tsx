@@ -1,5 +1,5 @@
 // Component: BookingScreenView. Used in: BookingScreen.
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,6 +17,8 @@ import { useTranslation } from '@/i18n';
 import { useAuthStore } from '@/store/authStore';
 import { Button, LineWithDots, Loader, Typography } from '@/ui';
 import { radius } from '@/theme';
+import { PaymentRepository } from '@/data/payment';
+import type { PaymentCard } from '@/data/payment/types';
 
 const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -66,6 +68,8 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [country, setCountry] = useState('');
+  const [cards, setCards] = useState<PaymentCard[]>([]);
+  const [selectedCardId, setSelectedCardId] = useState<string | undefined>(undefined);
   const paymentType: PaymentType =
     paymentMethod === 'cash' ? 'cash' : paymentMethod === 'card' ? 'card' : 'online';
 
@@ -83,6 +87,17 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
       setDates({ from: '', to: '' });
     }
   };
+
+  useEffect(() => {
+    PaymentRepository.getCards()
+      .then((list) => {
+        setCards(list);
+        if (list.length > 0 && !selectedCardId) {
+          setSelectedCardId(list[0].id);
+        }
+      })
+      .catch(() => setCards([]));
+  }, [selectedCardId]);
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -104,7 +119,10 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         totalPrice: booking.totalPrice,
       });
     },
-    onError: (err: unknown) => Alert.alert(t('booking.error'), String(err)),
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? t(err.message) : String(err);
+      Alert.alert(t('booking.error'), message);
+    },
   });
 
   if (isLoading || !offer) {
@@ -163,6 +181,40 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         />
         <BookingTripPurpose value={tripPurpose} onChange={setTripPurpose} />
         <BookingPaymentMethod value={paymentMethod} onChange={setPaymentMethod} />
+        {paymentMethod === 'card' ? (
+          <View style={styles.cardsBlock}>
+            <Typography variant="body" tone="primary" style={styles.cardsTitle}>
+              {t('profile.payment.yourCard')}
+            </Typography>
+            {cards.length === 0 ? (
+              <Typography variant="caption" tone="secondary">
+                {t('profile.payment.noCard')}
+              </Typography>
+            ) : (
+              <View style={styles.cardsRow}>
+                {cards.map((card) => (
+                  <Pressable
+                    key={card.id}
+                    onPress={() => setSelectedCardId(card.id)}
+                    style={[
+                      styles.cardChip,
+                      selectedCardId === card.id && styles.cardChipActive,
+                    ]}
+                  >
+                    <Typography
+                      variant="caption"
+                      tone="primary"
+                      style={styles.cardChipText}
+                      numberOfLines={1}
+                    >
+                      {card.numberMasked ?? card.holderName}
+                    </Typography>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </View>
+        ) : null}
 
         <View style={styles.summary}>
           <Typography variant="caption" tone="primary">
@@ -252,6 +304,32 @@ const getStyles = (colors: any, isDark: boolean, headerTextColor: string) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+    },
+    cardsBlock: {
+      gap: s(8),
+    },
+    cardsTitle: {
+      fontWeight: '600',
+    },
+    cardsRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: s(8),
+    },
+    cardChip: {
+      paddingHorizontal: s(10),
+      paddingVertical: s(8),
+      borderRadius: radius.xl,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: isDark ? colors.bgCard : colors.bgPanel,
+    },
+    cardChipActive: {
+      borderColor: colors.primary,
+      backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLight,
+    },
+    cardChipText: {
+      fontWeight: '600',
     },
   });
 

@@ -8,6 +8,7 @@ import { formatPrice } from '@/utils/price';
 import { useTheme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { useSavedStore } from '@/store/savedStore';
+import { useAuthStore } from '@/store/authStore';
 
 import { CachedImage } from './CachedImage';
 
@@ -22,14 +23,27 @@ export const OfferCard: React.FC<Props> = ({ offer, onPress }) => {
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
   const styles = useMemo(() => getStyles(colors, tokens, isDark), [colors, tokens, isDark]);
   const { t } = useTranslation();
-  const toggleSaved = useSavedStore((s) => s.toggle);
+  const hydrateForUser = useSavedStore((s) => s.hydrateForUser);
+  const resetSaved = useSavedStore((s) => s.reset);
+  const toggleForUser = useSavedStore((s) => s.toggleForUser);
   const isSaved = useSavedStore((s) => s.isSaved(offer.id));
+  const userId = useAuthStore((s) => s.user?.id);
   const anim = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
     Animated.timing(anim, { toValue: 1, duration: 250, useNativeDriver: true }).start();
   }, [anim]);
+
+  useEffect(() => {
+    if (userId) {
+      void hydrateForUser(userId);
+      return;
+    }
+    resetSaved();
+  }, [hydrateForUser, resetSaved, userId]);
   const cover = offer.images?.[0];
+  const maxGuests = offer.maxGuests ?? offer.guests;
+  const capacityLabel = `${t('common.upTo')} ${maxGuests} ${t('bookings.guests').toLowerCase()}`;
   return (
     <Animated.View style={{ opacity: anim }}>
       <Pressable onPress={onPress} style={styles.card}>
@@ -46,7 +60,14 @@ export const OfferCard: React.FC<Props> = ({ offer, onPress }) => {
               <Text style={styles.ratingText}>★ {offer.rating.toFixed(1)}</Text>
             </View>
           )}
-          <Pressable style={styles.save} onPress={() => toggleSaved(offer.id)}>
+          <Pressable
+            style={styles.save}
+            onPress={(event) => {
+              event.stopPropagation();
+              if (!userId) return;
+              void toggleForUser(userId, offer.id);
+            }}
+          >
             <Text style={styles.saveText}>{isSaved ? '♥' : '♡'}</Text>
           </Pressable>
         </View>
@@ -66,6 +87,7 @@ export const OfferCard: React.FC<Props> = ({ offer, onPress }) => {
               {offer.address ? `${offer.address}, ${offer.city.name}` : offer.city.name}
             </Text>
           </View>
+          <Text style={styles.capacityText}>{capacityLabel}</Text>
         </View>
       </Pressable>
     </Animated.View>
@@ -143,6 +165,11 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
       textDecorationLine: 'underline',
       fontFamily: 'MontserratAlternates-Regular',
       color: colors.textPrimary ?? colors.text,
+    },
+    capacityText: {
+      fontSize: 12,
+      fontFamily: 'MontserratAlternates-Regular',
+      color: colors.textSecondary ?? colors.muted,
     },
     fromLabel: {
       fontSize: 13,

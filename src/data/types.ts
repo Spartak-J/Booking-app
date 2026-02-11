@@ -7,6 +7,8 @@ export type Hotel = {
   description: string;
   amenities: string[];
   ownerId: string;
+  image?: string;
+  images?: string[];
 };
 
 export type Owner = {
@@ -48,5 +50,10 @@ export type User = {
   role: UserRole;
   phone?: string;
   avatar?: string;
+  city?: string;
+  rating?: number;
   isBlocked?: boolean;
+  birthDate?: string;
+  country?: string;
+  ownerDescription?: string;
 };

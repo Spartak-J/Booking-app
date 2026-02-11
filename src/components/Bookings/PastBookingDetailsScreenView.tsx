@@ -12,6 +12,7 @@ import noBookingWhiteImage from '@/assets/images/nobooking_white.png';
 
 type BookingPayload = {
   id: string;
+  bookingId?: string;
   hotelId?: string;
   title: string;
   image: number;

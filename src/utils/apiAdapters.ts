@@ -86,6 +86,24 @@ export const mapOfferShort = (input: any): Offer => {
     pricePerNight: pickNumber(input?.pricePerDay ?? input?.orderPrice),
     rating: input?.rating ? pickNumber(input?.rating) : undefined,
     guests: pickNumber(input?.guestCount ?? rentObjRaw?.bedsCount ?? rentObjRaw?.roomCount ?? 1, 1),
+    maxGuests: pickNumber(
+      input?.maxGuests ??
+        input?.guestCount ??
+        rentObjRaw?.maxGuests ??
+        rentObjRaw?.bedsCount ??
+        rentObjRaw?.roomCount ??
+        1,
+      1,
+    ),
+    stock: pickNumber(
+      input?.stock ??
+        input?.availabilityCount ??
+        input?.freeRoomsCount ??
+        rentObjRaw?.stock ??
+        rentObjRaw?.availabilityCount ??
+        1,
+      1,
+    ),
     bedrooms: pickNumber(rentObjRaw?.bedroomsCount ?? rentObjRaw?.roomCount ?? 1, 1),
     amenities: [],
     images,

@@ -8,7 +8,7 @@ import successBackground from '@/assets/images/background_success.png';
 import successIcon from '@/assets/images/success.png';
 import { useTranslation } from '@/i18n';
 import { BottomLoader, IconButton, LineWithDots, Typography } from '@/ui';
-import { palette } from '@/theme';
+import { palette, useTheme } from '@/theme';
 
 const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -30,6 +30,7 @@ export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> =
   onHome,
 }) => {
   const { t } = useTranslation();
+  const { tokens } = useTheme();
   const [loadingFinished, setLoadingFinished] = useState(false);
   const styles = useMemo(() => getStyles(), []);
 
@@ -74,8 +75,8 @@ export const BookingSuccessScreenView: React.FC<BookingSuccessScreenViewProps> =
             height={LOAD_HEIGHT}
             knobSize={LOAD_KNOB}
             showKnob={false}
-            borderColor={SUCCESS_COLOR}
-            fillColor={SUCCESS_COLOR}
+            borderColor={tokens.accent}
+            fillColor={tokens.accent}
             knobColor={SUCCESS_COLOR}
             minFillWidth={s(38)}
             duration={3000}
@@ -148,16 +149,16 @@ const getStyles = () =>
     },
     successGroup: {
       position: 'absolute',
-      width: s(116.5),
-      height: s(114.5),
-      left: s(148),
-      top: s(370),
+      width: s(170),
+      height: s(168),
+      left: (SCREEN_WIDTH - s(170)) / 2,
+      top: s(342),
       alignItems: 'center',
       justifyContent: 'center',
     },
     successIcon: {
-      width: s(116.5),
-      height: s(114.5),
+      width: s(170),
+      height: s(168),
       resizeMode: 'contain',
     },
     bottomLoaderWrapper: {

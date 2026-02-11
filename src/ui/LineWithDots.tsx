@@ -13,13 +13,13 @@ type LineWithDotsProps = {
 export const LineWithDots: React.FC<LineWithDotsProps> = ({
   width,
   color,
-  thickness = 3,
-  dotSize,
+  thickness = 2,
+  dotSize = 16,
   style,
 }) => {
   const { tokens } = useTheme();
   const resolvedColor = color ?? tokens.textPrimary;
-  const size = dotSize ?? thickness * 4;
+  const size = dotSize;
   return (
     <View style={[styles.container, { width }, style]}>
       <View
@@ -28,7 +28,7 @@ export const LineWithDots: React.FC<LineWithDotsProps> = ({
           { width: size, height: size, borderRadius: size / 2, backgroundColor: resolvedColor },
         ]}
       />
-      <View style={[styles.line, { height: thickness, backgroundColor: resolvedColor }]} />
+      <View style={[styles.line, { height: thickness, backgroundColor: resolvedColor, marginHorizontal: -(thickness / 2) }]} />
       <View
         style={[
           styles.dot,

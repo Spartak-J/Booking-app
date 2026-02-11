@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-import { HeaderBar, Typography } from '@/ui';
+import { Typography, ScreenShell } from '@/ui';
 import { useTheme } from '@/theme';
 import { getColorTokens } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -10,8 +10,6 @@ import { s } from '@/utils/scale';
 import { BookingsTabs } from '@/components/Bookings/BookingsTabs';
 import { ActiveTripCard } from '@/components/Bookings/ActiveTripCard';
 import { PastTripsList } from '@/components/Bookings/PastTripsList';
-import KeysBackground from '@/components/layout/KeysBackground';
-
 import noBookingBlackImage from '@/assets/images/nobooking_black.png';
 import noBookingWhiteImage from '@/assets/images/nobooking_white.png';
 
@@ -27,6 +25,7 @@ export type ActiveBooking = {
 
 export type PastBookingItem = {
   id: string;
+  bookingId?: string;
   hotelId?: string;
   title: string;
   image: number;
@@ -56,7 +55,7 @@ export const BookingsScreenView: React.FC<BookingsScreenViewProps> = ({
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
   const palette = useMemo(
     () => ({
-      background: tokens.bgPanel,
+      background: tokens.bgScreen, // фон как на экране Messages
       header: tokens.bgHeader,
       text: tokens.textPrimary,
       border: tokens.borderStrong,
@@ -74,20 +73,25 @@ export const BookingsScreenView: React.FC<BookingsScreenViewProps> = ({
   const { t } = useTranslation();
 
   const emptyImage = isDark ? noBookingWhiteImage : noBookingBlackImage;
+  const isActiveTabEmpty = tab === 'active' && !activeBooking;
+  const isPastTabEmpty = tab === 'past' && pastItems.length === 0;
+  const isCancelledTabEmpty = tab === 'cancelled';
+  const shouldShowEmptyState = isActiveTabEmpty || isPastTabEmpty || isCancelledTabEmpty;
+
+  const emptyText = isActiveTabEmpty
+    ? t('bookings.emptyActive')
+    : isPastTabEmpty
+      ? t('bookings.emptyPast')
+      : t('bookings.emptyCancelled');
 
   return (
-    <View style={styles.root}>
+    <ScreenShell
+      title={t('profile.menu.trips')}
+      onBack={onBack}
+      showKeys
+      contentStyle={styles.content}
+    >
       <View style={styles.screen}>
-        <HeaderBar
-          title={t('profile.menu.trips')}
-          onBack={onBack}
-          backIconName="chevron-left"
-          backIconSize={s(20)}
-          style={styles.header}
-          titleStyle={styles.title}
-          backStyle={styles.backButton}
-        />
-
         <BookingsTabs
           value={tab}
           onChange={setTab}
@@ -116,7 +120,7 @@ export const BookingsScreenView: React.FC<BookingsScreenViewProps> = ({
           />
         ) : null}
 
-        {tab === 'past' ? (
+        {tab === 'past' && pastItems.length > 0 ? (
           <PastTripsList
             items={pastItems}
             colors={{
@@ -128,7 +132,7 @@ export const BookingsScreenView: React.FC<BookingsScreenViewProps> = ({
         ) : null}
       </View>
 
-      {tab === 'cancelled' ? (
+      {shouldShowEmptyState ? (
         <View style={styles.emptyState}>
           <Image source={emptyImage} style={styles.centerImage} />
           <Typography
@@ -139,13 +143,11 @@ export const BookingsScreenView: React.FC<BookingsScreenViewProps> = ({
             adjustsFontSizeToFit
             minimumFontScale={0.85}
           >
-            {t('bookings.emptyCancelled')}
+            {emptyText}
           </Typography>
         </View>
       ) : null}
-
-      {tab === 'cancelled' ? <KeysBackground /> : null}
-    </View>
+    </ScreenShell>
   );
 };
 
@@ -171,21 +173,14 @@ const getStyles = (palette: Palette) =>
     },
     screen: {
       flex: 1,
-      backgroundColor: palette.background,
+      backgroundColor: 'transparent',
     },
-    header: {
-      height: s(36),
-      backgroundColor: palette.background,
+    content: {
+      paddingTop: s(4),
+      paddingHorizontal: s(12),
     },
-    backButton: {
-      position: 'absolute',
-      left: s(8),
-      top: s(6),
-      width: s(24),
-      height: s(24),
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
+    header: {},
+    backButton: {},
     title: {
       color: palette.text,
       fontSize: s(16),

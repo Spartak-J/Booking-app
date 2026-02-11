@@ -1,4 +1,4 @@
-import { Booking, Offer, OwnerProfile, Payment, Review, Room, User } from '@/types';
+import { Offer, OwnerProfile, Payment, Review, Room, User } from '@/types';
 
 export const mockUsers: User[] = [
   {
@@ -7,13 +7,18 @@ export const mockUsers: User[] = [
     name: 'Demo User',
     role: 'user',
     phone: '+380501111111',
+    country: 'Україна',
+    birthDate: '1994-04-07',
   },
   {
     id: 'owner-1',
     email: 'owner@oselya.app',
-    name: 'Owner One',
+    name: 'Василина Сухова',
     role: 'owner',
-    phone: '+380661112222',
+    phone: '+380976358894',
+    country: 'Україна',
+    birthDate: '1994-04-07',
+    ownerDescription: 'Власниця затишних апартаментів у центрі міста.',
   },
   {
     id: 'owner-2',
@@ -54,16 +59,6 @@ export const mockReviews: Review[] = [
     rating: 4,
     comment: 'Отличное расположение, но парковка платная.',
     createdAt: '2024-02-05',
-    status: 'published',
-  },
-  {
-    id: 'review-3',
-    offerId: 'offer-2',
-    bookingId: 'booking-2',
-    userName: 'Мария',
-    rating: 5,
-    comment: 'Вид на море — космос. Терраса огромная.',
-    createdAt: '2024-01-18',
     status: 'published',
   },
   {
@@ -467,45 +462,13 @@ const baseOffers: Offer[] = [
 
 export const mockOffers: Offer[] = baseOffers.map((offer, index) => ({
   ...offer,
+  maxGuests: offer.maxGuests ?? offer.guests,
+  stock: offer.stock ?? (offer.bedrooms > 1 ? 2 : 1),
   owner: ownerProfiles[offer.ownerId] ?? defaultOwner(offer.ownerId),
   rooms: offer.rooms ?? defaultRooms(offer, index),
 }));
 
-export const mockBookings: Booking[] = [
-  {
-    id: 'booking-1',
-    offerId: 'offer-1',
-    userId: 'user-1',
-    checkIn: new Date().toISOString(),
-    checkOut: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    guests: 2,
-    totalPrice: 120 * 3,
-    status: 'active',
-    paymentType: 'card',
-  },
-  {
-    id: 'booking-2',
-    offerId: 'offer-2',
-    userId: 'user-1',
-    checkIn: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
-    checkOut: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-    guests: 4,
-    totalPrice: 90 * 4,
-    status: 'pending',
-    paymentType: 'cash',
-  },
-  {
-    id: 'booking-3',
-    offerId: 'offer-3',
-    userId: 'user-1',
-    checkIn: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    checkOut: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    guests: 2,
-    totalPrice: 150 * 4,
-    status: 'completed',
-    paymentType: 'online',
-  },
-];
+// legacy bookings moved to src/data/bookings/bookings.mock.ts
 
 export const mockPayments: Payment[] = [
   {

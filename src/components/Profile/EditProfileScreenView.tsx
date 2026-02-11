@@ -1,111 +1,43 @@
-// Component: EditProfileScreenView. Used in: EditProfileScreen.
-import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React from 'react';
 
-import { Button, HeaderBar, Input } from '@/ui';
-import { useTheme } from '@/theme';
-import { spacing } from '@/theme';
-import { useTranslation } from '@/i18n';
-import KeysBackground from '@/components/layout/KeysBackground';
-import { s } from '@/utils/scale';
-
-type EditProfileValues = {
-  name: string;
-  birthDate: string;
-  email: string;
-  phone: string;
-  country: string;
-};
+import AdminAccountScreenView from './AdminAccountScreenView';
+import OwnerAccountScreenView from './OwnerAccountScreenView';
+import UserAccountScreenView from './UserAccountScreenView';
+import { ProfileFormValues } from '@/types/profile';
 
 type EditProfileScreenViewProps = {
-  initialValues: EditProfileValues;
+  initialValues: ProfileFormValues;
+  isOwner: boolean;
+  isAdmin: boolean;
   onBack: () => void;
-  onSubmit: (values: EditProfileValues) => void;
+  onPickAvatar?: () => Promise<string | undefined>;
+  onSubmit: (values: ProfileFormValues) => void;
 };
 
 export const EditProfileScreenView: React.FC<EditProfileScreenViewProps> = ({
   initialValues,
+  isOwner,
+  isAdmin,
   onBack,
+  onPickAvatar,
   onSubmit,
 }) => {
-  const { tokens } = useTheme();
-  const styles = useMemo(() => getStyles(tokens), [tokens]);
-  const { t } = useTranslation();
-  const contentStyle = useMemo(() => [styles.content], [styles.content]);
+  if (isAdmin) {
+    return <AdminAccountScreenView initialValues={initialValues} onBack={onBack} onSubmit={onSubmit} />;
+  }
 
-  const [values, setValues] = useState<EditProfileValues>(initialValues);
+  if (isOwner) {
+    return (
+      <OwnerAccountScreenView
+        initialValues={initialValues}
+        onBack={onBack}
+        onPickAvatar={onPickAvatar}
+        onSubmit={onSubmit}
+      />
+    );
+  }
 
-  return (
-    <View style={styles.root}>
-      <HeaderBar title={t('profile.account.title')} onBack={onBack} />
-
-      <ScrollView contentContainerStyle={contentStyle} showsVerticalScrollIndicator={false}>
-        <View style={styles.form}>
-          <Input
-            label={t('profile.account.field.name')}
-            placeholder={t('profile.account.sample.name')}
-            value={values.name}
-            onChangeText={(text) => setValues((prev) => ({ ...prev, name: text }))}
-          />
-          <Input
-            label={t('profile.account.field.birthDate')}
-            placeholder={t('profile.account.sample.birthDate')}
-            value={values.birthDate}
-            onChangeText={(text) => setValues((prev) => ({ ...prev, birthDate: text }))}
-          />
-          <Input
-            label={t('profile.account.field.email')}
-            placeholder={t('profile.account.sample.email')}
-            value={values.email}
-            onChangeText={(text) => setValues((prev) => ({ ...prev, email: text }))}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <Input
-            label={t('profile.account.field.phone')}
-            placeholder={t('profile.account.sample.phone')}
-            value={values.phone}
-            onChangeText={(text) => setValues((prev) => ({ ...prev, phone: text }))}
-            keyboardType="phone-pad"
-          />
-          <Input
-            label={t('profile.account.field.country')}
-            placeholder={t('profile.account.sample.country')}
-            value={values.country}
-            onChangeText={(text) => setValues((prev) => ({ ...prev, country: text }))}
-          />
-        </View>
-
-        <Button
-          title={t('profile.account.submit')}
-          onPress={() => onSubmit(values)}
-          style={styles.submit}
-        />
-      </ScrollView>
-
-      <KeysBackground />
-    </View>
-  );
+  return <UserAccountScreenView initialValues={initialValues} onBack={onBack} onSubmit={onSubmit} />;
 };
-
-const getStyles = (tokens: Record<string, string>) =>
-  StyleSheet.create({
-    root: {
-      flex: 1,
-      backgroundColor: tokens.bgScreen,
-    },
-    content: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
-      gap: spacing.lg,
-    },
-    form: {
-      gap: spacing.md,
-    },
-    submit: {
-      alignSelf: 'center',
-      minWidth: s(180),
-    },
-  });
 
 export default EditProfileScreenView;

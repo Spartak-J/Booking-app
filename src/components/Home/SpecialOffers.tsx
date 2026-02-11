@@ -5,8 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 
 import { Button, Typography } from '@/ui';
-import { radius, withOpacity } from '@/theme';
-import { useTheme } from '@/theme';
+import { radius, withOpacity, useTheme } from '@/theme';
 import { s } from '@/utils/scale';
 import type { OfferPromo } from './types';
 
@@ -16,15 +15,14 @@ type SpecialOffersProps = {
 };
 
 export const SpecialOffers: React.FC<SpecialOffersProps> = ({ data, onPress }) => {
-  const { colors, mode } = useTheme();
-  const isDark = mode === 'dark';
+  const { colors, tokens } = useTheme();
   const palette = useMemo(() => getPalette(colors), [colors]);
   const styles = useMemo(() => getStyles(palette), [palette]);
 
   return (
     <View style={styles.block}>
       <View style={styles.headerRow}>
-        <Typography variant="h2" tone={isDark ? 'onAccent' : 'primary'}>
+        <Typography variant="h2" style={[styles.headerText, { color: tokens.textPrimary }]}>
           Ми також пропонуємо
         </Typography>
       </View>
@@ -70,7 +68,8 @@ export const SpecialOffers: React.FC<SpecialOffersProps> = ({ data, onPress }) =
 const getPalette = (colors: Record<string, string>) => ({
   primary: colors.primary,
   transparent: colors.transparent,
-  surfaceGlass: withOpacity(colors.surfaceLightDarker ?? colors.surface ?? colors.background, 0.1),
+  surfaceGlass: withOpacity(colors.black ?? '#000', 0.35),
+  textOverlay: colors.white ?? '#FFFFFF',
 });
 
 const getStyles = (palette: ReturnType<typeof getPalette>) =>
@@ -80,6 +79,9 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
       alignSelf: 'center',
       width: s(412),
       height: s(200),
+    },
+    headerText: {
+      color: palette.textOverlay,
     },
     headerRow: {
       position: 'absolute',
@@ -153,6 +155,7 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
     },
     labelText: {
       textAlign: 'center',
+      color: palette.textOverlay,
     },
   });
 

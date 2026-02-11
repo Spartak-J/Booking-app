@@ -1,27 +1,25 @@
 // Component: SavedScreenView. Used in: SavedScreen.
 import React, { useMemo } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 
 import { useTranslation } from '@/i18n';
 import { spacing } from '@/theme';
 import { OfferCard } from '@/components/OfferCard';
 import type { Offer } from '@/types';
-import { Card, Typography } from '@/ui';
+import { Card, ScreenShell, Typography } from '@/ui';
 
 type SavedScreenViewProps = {
   offers: Offer[];
+  onBack: () => void;
   onOpenOffer: (offerId: string) => void;
 };
 
-export const SavedScreenView: React.FC<SavedScreenViewProps> = ({ offers, onOpenOffer }) => {
+export const SavedScreenView: React.FC<SavedScreenViewProps> = ({ offers, onBack, onOpenOffer }) => {
   const { t } = useTranslation();
   const styles = useMemo(() => getStyles(), []);
 
   return (
-    <View style={styles.content}>
-      <Typography variant="h2" tone="primary">
-        {t('saved.title')}
-      </Typography>
+    <ScreenShell title={t('saved.title')} onBack={onBack} showKeys contentStyle={styles.content}>
       {offers.length === 0 ? (
         <Card style={styles.card} padding="lg">
           <Typography variant="caption" tone="secondary">
@@ -36,7 +34,7 @@ export const SavedScreenView: React.FC<SavedScreenViewProps> = ({ offers, onOpen
           contentContainerStyle={styles.listContent}
         />
       )}
-    </View>
+    </ScreenShell>
   );
 };
 

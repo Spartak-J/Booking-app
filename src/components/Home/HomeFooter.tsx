@@ -1,7 +1,6 @@
 // Component: HomeFooter. Used in: RootNavigator.tsx.
 import React, { useMemo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Typography } from '@/ui';
 import { radius } from '@/theme';
@@ -24,6 +23,7 @@ import type { FooterNavItem } from './types';
 type HomeFooterProps = {
   items: FooterNavItem[];
   activeId?: FooterNavItem['id'];
+  bottomInset?: number;
 };
 
 const FOOTER_WIDTH = s(412);
@@ -77,20 +77,19 @@ const getPalette = (mode: string, colors: Record<string, string>) => ({
   transparent: colors.transparent,
 });
 
-export const HomeFooter: React.FC<HomeFooterProps> = ({ items, activeId = 'home' }) => {
+export const HomeFooter: React.FC<HomeFooterProps> = ({
+  items,
+  activeId = 'home',
+  bottomInset = 0,
+}) => {
   const { colors, mode } = useTheme();
-  const insets = useSafeAreaInsets();
   const palette = useMemo(() => getPalette(mode, colors), [mode, colors]);
   const styles = useMemo(() => getStyles(palette), [palette]);
   const isDark = mode === 'dark';
 
   return (
-    <View
-      style={[
-        styles.bottomNav,
-        { height: FOOTER_HEIGHT + insets.bottom, paddingBottom: insets.bottom },
-      ]}
-    >
+    <View style={[styles.container, { paddingBottom: bottomInset, backgroundColor: palette.bg }]}>
+      <View style={styles.bottomNav}>
       {items.map((item) => {
         const layout = NAV_LAYOUT[item.id as keyof typeof NAV_LAYOUT];
         const isActive = item.id === activeId;
@@ -118,20 +117,23 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({ items, activeId = 'home'
           </Button>
         );
       })}
+      </View>
     </View>
   );
 };
 
 const getStyles = (palette: ReturnType<typeof getPalette>) =>
   StyleSheet.create({
+    container: {
+      width: FOOTER_WIDTH,
+      left: (SCREEN_WIDTH - FOOTER_WIDTH) / 2,
+      borderRadius: radius.md,
+      overflow: 'hidden',
+    },
     bottomNav: {
-      position: 'absolute',
       width: FOOTER_WIDTH,
       height: FOOTER_HEIGHT,
-      left: (SCREEN_WIDTH - FOOTER_WIDTH) / 2,
-      bottom: 0,
       backgroundColor: palette.bg,
-      borderRadius: radius.md,
     },
     navItem: {
       position: 'absolute',

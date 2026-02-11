@@ -4,7 +4,8 @@ import { getApiLang, mapReview } from '@/utils/apiAdapters';
 import { Review } from '@/types';
 import { getAuthState } from '@/store/authStore';
 import { USE_MOCKS } from '@/config/constants';
-import { mockReviews } from '@/utils/mockData';
+import { mockOffers, mockReviews } from '@/utils/mockData';
+import { BookingRepository } from '@/data/bookings';
 
 type ReviewPayload = {
   bookingId: string;
@@ -13,7 +14,37 @@ type ReviewPayload = {
   comment: string;
 };
 
+const isEligibleCheckoutDate = (checkOut: string) => {
+  const checkoutDate = new Date(checkOut);
+  if (Number.isNaN(checkoutDate.getTime())) return false;
+  checkoutDate.setHours(0, 0, 0, 0);
+  checkoutDate.setDate(checkoutDate.getDate() + 1);
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now.getTime() >= checkoutDate.getTime();
+};
+
 export const reviewService = {
+  canLeaveReview: async (bookingId: string, userId?: string) => {
+    if (!USE_MOCKS) return { allowed: true as const };
+
+    const currentUserId = userId ?? getAuthState().user?.id;
+    if (!currentUserId) return { allowed: false as const, reason: 'auth.book.message' };
+
+    const booking = await BookingRepository.getById(bookingId);
+    if (!booking) return { allowed: false as const, reason: 'bookings.notFound' };
+    if (booking.userId !== currentUserId) {
+      return { allowed: false as const, reason: 'bookings.review.notAllowed' };
+    }
+    if (booking.status !== 'completed') {
+      return { allowed: false as const, reason: 'bookings.review.notAllowed' };
+    }
+    if (!isEligibleCheckoutDate(booking.checkOut)) {
+      return { allowed: false as const, reason: 'bookings.review.afterCheckout' };
+    }
+    return { allowed: true as const };
+  },
   getByOfferId: async (offerId: string) => {
     if (USE_MOCKS) {
       return mockReviews.filter((review) => review.offerId === offerId);
@@ -40,16 +71,30 @@ export const reviewService = {
   },
   create: async (payload: ReviewPayload) => {
     if (USE_MOCKS) {
-      return {
+      const eligibility = await reviewService.canLeaveReview(payload.bookingId);
+      if (!eligibility.allowed) {
+        throw new Error(eligibility.reason);
+      }
+
+      const authUser = getAuthState().user;
+      const review: Review = {
         id: `mock-review-${Date.now()}`,
         offerId: payload.offerId,
         bookingId: payload.bookingId,
-        userName: 'Guest',
+        userName: authUser?.name ?? 'Guest',
         rating: payload.rating,
         comment: payload.comment,
         createdAt: new Date().toISOString(),
         status: 'published',
       };
+      mockReviews.unshift(review);
+
+      const offer = mockOffers.find((item) => item.id === payload.offerId);
+      if (offer) {
+        offer.reviews = [review, ...(offer.reviews ?? [])];
+      }
+
+      return review;
     }
     const lang = getApiLang();
     const rating = payload.rating;

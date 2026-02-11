@@ -15,6 +15,7 @@ export { getColorTokens, getThemeColors } from './tokens';
 
 // theme runtime
 export { ThemeProvider } from './ThemeProvider';
+export { AdminLightThemeProvider } from './AdminLightThemeProvider';
 export { useTheme } from './useTheme';
 
 // motion

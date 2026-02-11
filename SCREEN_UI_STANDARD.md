@@ -116,12 +116,14 @@ If a ScreenView does not clearly fit either type, the layout must be redesigned 
 ## Forbidden patterns
 - `useSafeAreaInsets` or hardcoded system paddings inside ScreenViews.
 - Inline hardcoded colors, font sizes, or radii (use theme tokens: `tokens`, `spacing`, `radius`, `typography`).
+- Любые текстовые литералы в UI. Вся строка должна приходить из i18n (`t(...)`), без хардкодов.
 - Creating buttons with `Pressable/TouchableOpacity` in screens; use `ui/Button` or `ui/IconButton` instead.
 - Navigation logic inside ScreenViews.
 - StatusBar changes outside `AppLayout`.
 - Absolute positioning for headers/footers inside `ScreenViews` that replicate navigator UI.
 - Any “magic” vertical offsets to compensate tab bar or status bar.
 - Duplicated headers/footers per screen instead of shared primitives (`ui/HeaderBar`, `HomeFooter`, etc.).
+- Прямая работа UI с моками или API. Любые данные/действия идут через сервис-слой (`/src/services/**`), где переключается mock/API. UI не знает про флаги mock/real.
 
 ### Theme access rules
 - Screens must not branch on theme mode (light/dark).

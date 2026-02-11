@@ -2,12 +2,16 @@
 import React, { useMemo, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Button, Modal, Typography } from '@/ui';
-import { radius } from '@/theme';
+import { radius, withOpacity } from '@/theme';
 import { useTheme } from '@/theme';
 import { s, SCREEN_WIDTH } from '@/utils/scale';
 import type { MenuItem } from './types';
+import type { RootStackParamList } from '@/navigation/RootNavigator';
+import { Routes } from '@/navigation/routes';
 
 type HomeMenuSheetProps = {
   visible: boolean;
@@ -22,6 +26,7 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
   animatedStyle,
   items,
 }) => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { colors, mode, setMode } = useTheme();
   const palette = useMemo(() => getPalette(colors, mode === 'dark'), [colors, mode]);
   const styles = useMemo(() => getStyles(palette), [palette]);
@@ -57,6 +62,10 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
             const isLanguage = item.id === 'language';
             const isCurrency = item.id === 'currency';
             const isTheme = item.id === 'theme';
+            const isMessages = item.id === 'messages';
+            const isBookings = item.id === 'bookings';
+            const isAbout = item.id === 'about';
+            const isSaved = item.id === 'saved';
 
             return (
               <View key={item.id} style={styles.menuItemWrap}>
@@ -72,6 +81,18 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                       setLanguageOpen(false);
                     } else if (isTheme) {
                       setMode(mode === 'dark' ? 'light' : 'dark');
+                    } else if (isMessages) {
+                      handleClose();
+                      (navigation as any).navigate(Routes.Main, { screen: 'Notifications' });
+                    } else if (isBookings) {
+                      handleClose();
+                      (navigation as any).navigate(Routes.Main, { screen: 'Bookings' });
+                    } else if (isAbout) {
+                      handleClose();
+                      navigation.navigate(Routes.AboutCenter);
+                    } else if (isSaved) {
+                      handleClose();
+                      navigation.navigate(Routes.Saved);
                     }
                   }}
                 >
@@ -115,7 +136,11 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                         ]}
                         onPress={() => setSelectedLanguage(label)}
                       >
-                        <Typography variant="menuOption" tone="primary" numberOfLines={1}>
+                        <Typography
+                          variant="menuOption"
+                          style={label === selectedLanguage ? styles.dropdownItemTextActive : styles.dropdownItemText}
+                          numberOfLines={1}
+                        >
                           {label}
                         </Typography>
                       </Button>
@@ -136,7 +161,11 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                         ]}
                         onPress={() => setSelectedCurrency(label)}
                       >
-                        <Typography variant="caption" tone="primary" numberOfLines={1}>
+                        <Typography
+                          variant="caption"
+                          style={label === selectedCurrency ? styles.dropdownItemTextActive : styles.dropdownItemText}
+                          numberOfLines={1}
+                        >
                           {label}
                         </Typography>
                       </Button>
@@ -169,6 +198,7 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
 
   return {
     text,
+    accent: colors.primary,
     overlay,
     overlayOpacity: isDark ? 0.7 : 0.5,
     menuSheetBg: isDark ? (colors.bgDark ?? surface) : sheetLight,
@@ -320,10 +350,18 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
       borderWidth: 0,
     },
     dropdownItemActive: {
-      backgroundColor: palette.dropdownActiveBg,
+      backgroundColor: withOpacity(palette.accent, 0.18),
+      borderColor: palette.accent,
+      borderWidth: 1,
     },
     dropdownItemInactive: {
       backgroundColor: palette.transparent,
+    },
+    dropdownItemTextActive: {
+      color: palette.text,
+    },
+    dropdownItemText: {
+      color: palette.text,
     },
     menuHandle: {
       position: 'absolute',

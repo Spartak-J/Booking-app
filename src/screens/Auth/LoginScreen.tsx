@@ -1,12 +1,12 @@
 // Screen: LoginScreen. Used in: RootNavigator.
 import React from 'react';
 
-import LoginScreenView from '@/components/Auth/LoginScreenView';
+import AuthScreenView from '@/components/Auth/AuthScreenView';
 import { AppLayout } from '@/layout/AppLayout';
 
 export const LoginScreen = () => (
   <AppLayout variant="stack">
-    <LoginScreenView />
+    <AuthScreenView mode="login" />
   </AppLayout>
 );
 

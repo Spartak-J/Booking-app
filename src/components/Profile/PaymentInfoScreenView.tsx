@@ -2,24 +2,25 @@
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Button, Card, HeaderBar, Typography } from '@/ui';
+import { Button, Card, ScreenShell, Typography } from '@/ui';
 import { useTheme } from '@/theme';
 import { spacing, typography } from '@/theme';
 import { useTranslation } from '@/i18n';
 import type { PaymentCard } from '@/data/payment/types';
-import KeysBackground from '@/components/layout/KeysBackground';
 import { s } from '@/utils/scale';
 
 type PaymentInfoScreenViewProps = {
   cards: PaymentCard[];
   onBack: () => void;
   onAddCard: () => void;
+  footer?: React.ReactNode;
 };
 
 export const PaymentInfoScreenView: React.FC<PaymentInfoScreenViewProps> = ({
   cards,
   onBack,
   onAddCard,
+  footer,
 }) => {
   const { tokens } = useTheme();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -27,9 +28,12 @@ export const PaymentInfoScreenView: React.FC<PaymentInfoScreenViewProps> = ({
   const contentStyle = useMemo(() => [styles.content], [styles.content]);
 
   return (
-    <View style={styles.root}>
-      <HeaderBar title={t('profile.payment.title')} onBack={onBack} />
-
+    <ScreenShell
+      title={t('profile.payment.title')}
+      onBack={onBack}
+      showKeys
+      footerSlot={footer}
+    >
       <ScrollView contentContainerStyle={contentStyle} showsVerticalScrollIndicator={false}>
         <Typography variant="subtitle" tone="primary" style={styles.sectionTitle}>
           {t('profile.payment.yourCard')}
@@ -57,21 +61,19 @@ export const PaymentInfoScreenView: React.FC<PaymentInfoScreenViewProps> = ({
           </View>
         )}
 
-        <Button title={t('profile.payment.addCard')} onPress={onAddCard} style={styles.addButton} />
+        <Button
+          title={t('profile.payment.addCard')}
+          onPress={onAddCard}
+          style={styles.addButton}
+        />
       </ScrollView>
-
-      <KeysBackground variant="yellow" />
-    </View>
+    </ScreenShell>
   );
 };
 
 const getStyles = (tokens: Record<string, string>) =>
   // LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
-    root: {
-      flex: 1,
-      backgroundColor: tokens.bgScreen,
-    },
     content: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,

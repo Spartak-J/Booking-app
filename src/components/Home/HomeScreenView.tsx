@@ -1,7 +1,7 @@
 // Component: HomeScreenView. Used in: HomeScreen.
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
-import { Animated, Easing, ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Easing, ImageBackground, StyleSheet, View } from 'react-native';
 import { FiltersModal } from '@/components/FiltersModal';
 import { PopularCities } from '@/components/Home/PopularCities';
 import HomeCountries from '@/components/Home/HomeCountries';
@@ -27,25 +27,7 @@ import HomeGuestsModal from '@/components/Home/HomeGuestsModal';
 import { useHomeLabels } from '@/components/Home/useHomeLabels';
 import entertainmentImage from '@/assets/images/entertainment.png';
 import { useTranslation } from '@/i18n';
-
-// TODO: move month labels to i18n resources.
-const MONTH_LABELS = [
-  'Січень',
-  'Лютий',
-  'Березень',
-  'Квітень',
-  'Травень',
-  'Червень',
-  'Липень',
-  'Серпень',
-  'Вересень',
-  'Жовтень',
-  'Листопад',
-  'Грудень',
-];
-
-// TODO: move week labels to i18n resources.
-const WEEK_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+import { ScreenContainer } from '@/ui';
 
 const OVERLAY_ANIMATION_DURATION = 250;
 
@@ -60,10 +42,17 @@ const animateOverlay = (anim: Animated.Value, open: boolean, onComplete?: () => 
 
 type HomeScreenViewProps = {
   onSearch: (filters: OfferFilters) => void;
+  onOpenCity: (cityName: string) => void;
   onOpenLandmarks: () => void;
+  onOpenOffer: (offerId: string) => void;
 };
 
-export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpenLandmarks }) => {
+export const HomeScreenView: React.FC<HomeScreenViewProps> = ({
+  onSearch,
+  onOpenCity,
+  onOpenLandmarks,
+  onOpenOffer,
+}) => {
   const [filters, setFilters] = useState<OfferFilters>({ onlyActive: true });
   // TODO: move default city label to i18n or data source.
   const [keyword, setKeyword] = useState('Львів');
@@ -129,7 +118,7 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
   );
   const isDark = colors.background === colors.bgDark;
   const palette = useMemo(() => getPalette(colors, isDark), [colors, isDark]);
-  const styles = useMemo(() => getStyles(palette), [palette]);
+  const styles = useMemo(() => getStyles(), []);
   const contentStyle = useMemo(() => [styles.content], [styles.content]);
   const { data: cities } = useQuery({ queryKey: ['cities'], queryFn: cityService.getAll });
 
@@ -274,6 +263,9 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
   }, [displayMonth]);
 
   const handleSelectDay = (day: number) => {
+    if (isCalendarDayDisabled(day)) {
+      return;
+    }
     if (!calendarStart || (calendarStart && calendarEnd)) {
       setCalendarStart(day);
       setCalendarEnd(null);
@@ -282,26 +274,37 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
     }
   };
 
+  const isCalendarDayDisabled = (day: number) => {
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const candidate = new Date(displayMonth.year, displayMonth.month, day);
+    return candidate < todayStart;
+  };
+
+  const monthLabels = useMemo(() => t('calendar.months').split(','), [t]);
+  const weekLabels = useMemo(() => t('calendar.weekdays').split(','), [t]);
+
   const { heroDateLabel, heroGuestLabel, guestBorderColor, currentMonthLabel } = useHomeLabels({
     filters,
     keyword,
     displayMonth,
-    monthLabels: MONTH_LABELS,
+    monthLabels,
   });
 
   return (
     <View style={styles.screen}>
-      <View style={styles.background}>
+      <ScreenContainer
+        scroll
+        style={styles.scroll}
+        contentContainerStyle={contentStyle}
+        edges={['left', 'right']}
+      >
         <ImageBackground
           source={entertainmentImage}
           style={styles.backgroundImage}
           resizeMode="cover"
         />
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={contentStyle}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.contentWrapper}>
           <HomeHeader
             heroCityLabel={keyword}
             heroCityPlaceholder={t('home.placeholder')}
@@ -316,8 +319,8 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
 
           {guestMode && <GuestBanner onPress={leaveGuestMode} />}
 
-          <PopularCities data={CITY_CARDS} />
-          <Recommendations data={RECOMMENDATIONS} />
+          <PopularCities data={CITY_CARDS} onOpenCity={onOpenCity} />
+          <Recommendations data={RECOMMENDATIONS} onOpenOffer={onOpenOffer} />
           <SpecialOffers
             data={OFFER_PROMOS}
             onPress={(id) => {
@@ -328,8 +331,8 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
           />
 
           <HomeCountries data={COUNTRY_BUBBLES} />
-        </ScrollView>
-      </View>
+        </View>
+      </ScreenContainer>
 
       <HomeDatePickerModal
         visible={datePickerVisible}
@@ -337,10 +340,11 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
         overlayOpacity={palette.overlayOpacity}
         sheetAnimatedStyle={dateSheetAnimatedStyle}
         monthLabel={currentMonthLabel}
-        weekLabels={WEEK_LABELS}
+        weekLabels={weekLabels}
         calendarDays={calendarDays}
         calendarStart={calendarStart}
         calendarEnd={calendarEnd}
+        isDayDisabled={isCalendarDayDisabled}
         onPrevMonth={() => changeMonth(-1)}
         onNextMonth={() => changeMonth(1)}
         onSelectDay={handleSelectDay}
@@ -371,7 +375,6 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
         onApply={(next) => setFilters((prev) => ({ ...prev, ...next }))}
         cities={cities}
       />
-
       <HomeMenuSheet
         visible={menuOpen}
         onClose={closeMenu}
@@ -383,31 +386,27 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({ onSearch, onOpen
 };
 
 const getPalette = (colors: any, isDark: boolean) => ({
-  background: isDark
-    ? (colors.bgDark ?? colors.background)
-    : (colors.surfaceLightDarker ?? colors.background),
   transparent: colors.transparent,
   overlayOpacity: isDark ? 0.7 : 0.5,
-  debugBg: colors.primary,
-  debugText: colors.onPrimary ?? colors.surfaceLight,
 });
 
-const getStyles = (palette: ReturnType<typeof getPalette>) =>
+const getStyles = () =>
   StyleSheet.create({
+    // Корневой слой
     screen: {
       flex: 1,
-      backgroundColor: palette.background,
     },
-    background: {
-      flex: 1,
-      backgroundColor: palette.background,
-      width: '100%',
-      height: '100%',
-      position: 'relative',
+    // Абсолютный фон-картинка
+    backgroundImageWrap: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: 0,
     },
     backgroundImage: {
-      ...StyleSheet.absoluteFillObject,
+      flex: 1,
+      width: '100%',
+      height: '100%',
     },
+    // Контент в Scroll
     content: {
       gap: s(18),
       flexGrow: 1,
@@ -416,6 +415,11 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
       flex: 1,
       zIndex: 1,
       position: 'relative',
+    },
+    // Обертка контента поверх фона
+    contentWrapper: {
+      flex: 1,
+      zIndex: 1,
     },
   });
 

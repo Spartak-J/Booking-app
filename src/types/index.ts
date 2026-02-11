@@ -38,7 +38,12 @@ export interface User {
   avatarUrl?: string;
   phone?: string;
   role: Role;
+  city?: string;
+  rating?: number;
   isBlocked?: boolean;
+  birthDate?: string;
+  country?: string;
+  ownerDescription?: string;
 }
 
 export interface City {
@@ -56,6 +61,8 @@ export interface Offer {
   pricePerNight: number;
   rating?: number;
   guests: number;
+  maxGuests?: number;
+  stock?: number;
   bedrooms: number;
   amenities: string[];
   images: string[];

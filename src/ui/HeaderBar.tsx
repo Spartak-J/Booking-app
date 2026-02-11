@@ -15,9 +15,11 @@ type HeaderBarProps = {
   onBack?: () => void;
   onSearch?: () => void;
   onMenu?: () => void;
+  avatarInitial?: string;
   showBack?: boolean;
   showSearch?: boolean;
   showMenu?: boolean;
+  showAvatar?: boolean;
   backIconName?: IconName;
   backIconSize?: number;
   searchIconSize?: number;
@@ -36,9 +38,11 @@ const HeaderBar = ({
   onBack,
   onSearch,
   onMenu,
+  avatarInitial,
   showBack,
   showSearch,
   showMenu,
+  showAvatar,
   backIconName = DEFAULT_BACK_ICON,
   backIconSize,
   searchIconSize,
@@ -55,6 +59,8 @@ const HeaderBar = ({
       background: tokens.bgHeader,
       icon: tokens.iconPrimary,
       text: tokens.textPrimary,
+      avatarBg: tokens.success,
+      avatarText: tokens.textOnAccent,
     }),
     [tokens],
   );
@@ -63,6 +69,7 @@ const HeaderBar = ({
   const renderBack = showBack ?? Boolean(onBack);
   const renderSearch = showSearch ?? Boolean(onSearch);
   const renderMenu = showMenu ?? Boolean(onMenu);
+  const renderAvatar = showAvatar ?? Boolean(avatarInitial);
 
   return (
     <View style={[styles.container, style]}>
@@ -96,7 +103,7 @@ const HeaderBar = ({
       {renderSearch && (
         <Pressable
           onPress={onSearch}
-          style={[styles.searchButton, searchStyle]}
+          style={[styles.searchButton, renderAvatar ? styles.searchButtonWithAvatar : null, searchStyle]}
           accessibilityRole="button"
         >
           <MaterialCommunityIcons
@@ -106,6 +113,14 @@ const HeaderBar = ({
           />
         </Pressable>
       )}
+
+      {renderAvatar && avatarInitial ? (
+        <View style={[styles.avatarBubble, !renderMenu ? styles.avatarBubbleNoMenu : null]}>
+          <Typography variant="subtitle" style={styles.avatarText}>
+            {avatarInitial}
+          </Typography>
+        </View>
+      ) : null}
 
       {renderMenu && (
         <Pressable
@@ -124,6 +139,8 @@ type Palette = {
   background: string;
   icon: string;
   text: string;
+  avatarBg: string;
+  avatarText: string;
 };
 
 const getStyles = (palette: Palette) =>
@@ -138,7 +155,7 @@ const getStyles = (palette: Palette) =>
     backButton: {
       position: 'absolute',
       left: s(19),
-      top: s(6),
+      top: s(3),
       width: s(24),
       height: s(24),
       alignItems: 'center',
@@ -147,11 +164,31 @@ const getStyles = (palette: Palette) =>
     searchButton: {
       position: 'absolute',
       right: s(52),
-      top: s(6),
+      top: s(3),
       width: s(24),
       height: s(24),
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    searchButtonWithAvatar: {
+      right: s(92),
+    },
+    avatarBubble: {
+      position: 'absolute',
+      right: s(52),
+      top: s(2),
+      width: s(32),
+      height: s(32),
+      borderRadius: radius.round,
+      backgroundColor: palette.avatarBg,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    avatarBubbleNoMenu: {
+      right: s(11),
+    },
+    avatarText: {
+      color: palette.avatarText,
     },
     menuButton: {
       position: 'absolute',

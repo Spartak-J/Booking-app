@@ -95,7 +95,7 @@ export const AuthTabsView = () => {
   );
 
   return (
-    <ScreenContainer style={styles.screen}>
+    <ScreenContainer style={styles.screen} edges={['left', 'right']}>
       <View style={styles.container}>
         <Typography variant="h1" tone="accent">
           OSELYA

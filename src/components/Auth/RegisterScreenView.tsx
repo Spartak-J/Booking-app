@@ -55,6 +55,7 @@ export const RegisterScreenView = () => {
       contentContainerStyle={styles.screenContent}
       scroll
       withKeyboardAvoiding
+      edges={['left', 'right']}
     >
       <View style={styles.formWrapper}>
         <View style={styles.headerBlock}>

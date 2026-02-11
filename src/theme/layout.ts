@@ -1,3 +1,7 @@
+import { TextStyle } from 'react-native';
+
+import { s } from '@/utils/scale';
+
 export const fonts = {
   Cagliostro: 'Cagliostro-Regular',
   MontserratAlternates: 'MontserratAlternates-Regular',
@@ -131,6 +135,18 @@ export const typography = {
     fontFamily: fonts.MontserratAlternatesBold,
     fontSize: 20,
     lineHeight: 24,
+  },
+  optionLg: {
+    fontFamily: fonts.MontserratAlternatesBold,
+    fontSize: s(22),
+    lineHeight: s(28),
+    fontWeight: '700' as TextStyle['fontWeight'],
+  },
+  buttonMd: {
+    fontFamily: fonts.MontserratAlternatesBold,
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: '700' as TextStyle['fontWeight'],
   },
   searchChip: {
     fontFamily: fonts.MontserratAlternatesBold,

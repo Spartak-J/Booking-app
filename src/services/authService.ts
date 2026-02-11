@@ -6,8 +6,17 @@ import { getApiLang, mapUser } from '@/utils/apiAdapters';
 import { mockUser, mockUsers } from '@/utils/mockData';
 
 type LoginPayload = { email: string; password: string };
-type RegisterPayload = { email: string; password: string; name: string };
+type RegisterPayload = { email: string; password: string; name: string; role?: User['role'] };
 const MOCK_PASSWORD = 'password';
+const OWNER_EMAIL = 'owner@oselya.app';
+const ADMIN_EMAIL = 'admin@oselya.app';
+
+const resolveRoleByEmail = (email: string): User['role'] | null => {
+  const normalized = email.trim().toLowerCase();
+  if (normalized === OWNER_EMAIL) return 'owner';
+  if (normalized === ADMIN_EMAIL) return 'admin';
+  return null;
+};
 
 const fetchProfile = async (token: string): Promise<User> => {
   const { data } = await apiClient.get<any>(ENDPOINTS.user.me(getApiLang()), {
@@ -25,9 +34,23 @@ export const authService = {
       if (payload.password !== MOCK_PASSWORD) {
         throw new Error('Невірний пароль (mock)');
       }
-      const user =
+      const baseUser =
         mockUsers.find((item) => item.email.toLowerCase() === payload.email.toLowerCase()) ??
         mockUser;
+      const forcedRole = resolveRoleByEmail(payload.email);
+      const user: User = forcedRole
+        ? {
+            ...baseUser,
+            email: payload.email,
+            role: forcedRole,
+            name:
+              forcedRole === 'admin'
+                ? 'Admin'
+                : forcedRole === 'owner'
+                  ? 'Owner'
+                  : baseUser.name,
+          }
+        : baseUser;
       return { token: `mock-token-${user.id}`, user };
     }
     const { data } = await apiClient.post<any>(ENDPOINTS.auth.login, {
@@ -46,15 +69,17 @@ export const authService = {
       if (payload.password !== MOCK_PASSWORD) {
         throw new Error('Невірний пароль (mock)');
       }
+      const resolvedRole: User['role'] = payload.role === 'owner' ? 'owner' : 'user';
       const user: User = {
         id: `mock-user-${Date.now()}`,
         email: payload.email,
         name: payload.name || payload.email,
-        role: 'user',
+        role: resolvedRole,
         phone: '',
       };
       return { token: `mock-token-${user.id}`, user };
     }
+    const resolvedRole = payload.role === 'owner' ? 'owner' : 'user';
     const { data } = await apiClient.post<any>(ENDPOINTS.auth.register, {
       username: payload.name || payload.email,
       password: payload.password,
@@ -62,7 +87,7 @@ export const authService = {
       phoneNumber: '',
       countryId: 1,
       discount: 0,
-      roleName: 'Client',
+      roleName: resolvedRole === 'owner' ? 'Owner' : 'Client',
     });
     const token: string =
       data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
@@ -79,31 +104,5 @@ export const authService = {
       return { token: `mock-token-${mockUser.id}`, user: mockUser };
     }
     throw new Error('Google Login не реализован для боевого API');
-  },
-  getProfile: async (id: string) => {
-    if (USE_MOCKS) {
-      return mockUsers.find((item) => item.id === id) ?? mockUser;
-    }
-    const { data } = await apiClient.get<any>(ENDPOINTS.user.byId(id));
-    const payload = data?.data ?? data;
-    return mapUser(payload);
-  },
-  updateProfile: async (id: string, payload: Partial<User>) => {
-    if (USE_MOCKS) {
-      const base = mockUsers.find((item) => item.id === id) ?? mockUser;
-      return { ...base, ...payload };
-    }
-    const request = {
-      id: Number(id),
-      username: payload.email ?? payload.name,
-      email: payload.email,
-      phoneNumber: payload.phone,
-      countryId: 1,
-      discount: 0,
-      roleName: payload.role === 'owner' ? 'Owner' : payload.role === 'admin' ? 'Admin' : 'Client',
-    };
-    const { data } = await apiClient.put<any>(ENDPOINTS.user.update, request);
-    const payloadData = data?.data ?? data;
-    return mapUser(payloadData);
   },
 };

@@ -13,10 +13,11 @@ import { HomeScreen } from '@/screens/Home/HomeScreen';
 import { BookingsScreen } from '@/screens/Bookings/BookingsScreen';
 import { ProfileScreen } from '@/screens/Profile/ProfileScreen';
 import { MessagesScreen } from '@/screens/Messages/MessagesScreen';
+import { OwnerBookingsScreen } from '@/screens/Owner/OwnerBookingsScreen';
 
 import { useAuthStore } from '@/store/authStore';
 import { navigationRef } from '@/navigation/navigationRef';
-import { useTheme } from '@/theme';
+import { AdminLightThemeProvider, getThemeColors, useTheme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { OfferDetailsScreen } from '@/screens/Offer/OfferDetailsScreen';
 import { OfferGalleryScreen } from '@/screens/Offer/OfferGalleryScreen';
@@ -25,18 +26,33 @@ import { BookingDetailsScreen } from '@/screens/Bookings/BookingDetailsScreen';
 import { BookingSuccessScreen } from '@/screens/Bookings/BookingSuccessScreen';
 import { PastBookingDetailsScreen } from '@/screens/Bookings/PastBookingDetailsScreen';
 import { SearchResultsScreen } from '@/screens/Home/SearchResultsScreen';
+import { SavedScreen } from '@/screens/Saved/SavedScreen';
 import { LandmarksScreen } from '@/screens/Landmarks/LandmarksScreen';
 import { LandmarksSearchResultsScreen } from '@/screens/Landmarks/LandmarksSearchResultsScreen';
+import { LandmarkDetailScreen } from '@/screens/Landmarks/LandmarkDetailScreen';
+import { LandmarksCityScreen } from '@/screens/Landmarks/LandmarksCityScreen';
 import { EditProfileScreen } from '@/screens/Profile/EditProfileScreen';
 import { PaymentInfoScreen } from '@/screens/Profile/PaymentInfoScreen';
 import { AddCardScreen } from '@/screens/Profile/AddCardScreen';
+import { HelpScreen } from '@/screens/Profile/HelpScreen';
+import { AboutScreen } from '@/screens/Profile/AboutScreen';
+import { PrivacyScreen } from '@/screens/Profile/PrivacyScreen';
+import { SettingsScreen } from '@/screens/Profile/SettingsScreen';
+import { OwnerAddHomeScreen } from '@/screens/Owner/OwnerAddHomeScreen';
+import { OwnerReviewsScreen } from '@/screens/Owner/OwnerReviewsScreen';
+import AdminEntryScreen from '@/screens/Admin/AdminEntryScreen';
+import AdminMenuScreen from '@/screens/Admin/AdminMenuScreen';
+import AdminUsersScreen from '@/screens/Admin/AdminUsersScreen';
+import AdminOffersScreen from '@/screens/Admin/AdminOffersScreen';
+import AdminOfferDetailsScreen from '@/screens/Admin/AdminOfferDetailsScreen';
+import { OwnerHomesScreen } from '@/screens/Owner/OwnerHomesScreen';
 import HomeFooter from '@/components/Home/HomeFooter';
 import { BOTTOM_NAV_ITEMS } from '@/components/Home/homeNavigationData';
 
 export type MainTabParamList = {
   Home: undefined;
   Notifications: undefined;
-  Bookings: undefined;
+  Bookings: { offerId?: string } | undefined;
   Profile: undefined;
 };
 
@@ -48,7 +64,10 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList>;
   SearchResults: { filters?: any } | undefined;
   Landmarks: undefined;
-  LandmarksSearchResults: undefined;
+  LandmarksCity: { cityId?: string; cityName?: string } | undefined;
+  LandmarksSearchResults: { cityId?: string; cityName?: string } | undefined;
+  LandmarkDetail: { landmarkId: string } | undefined;
+  Saved: undefined;
   OfferDetails: { offerId: string };
   OfferGallery: { offerId: string };
   Booking: { offerId: string };
@@ -57,6 +76,7 @@ export type RootStackParamList = {
   PastBookingDetails: {
     booking: {
       id: string;
+      bookingId?: string;
       hotelId?: string;
       title: string;
       image: number;
@@ -71,10 +91,20 @@ export type RootStackParamList = {
   AdminPanel: undefined;
   AdminUserDetails: { userId: string };
   AdminOfferDetails: { offerId: string };
-  OwnerObjectForm: { offerId?: string };
+  AdminEntry: undefined;
+  AdminMenu: undefined;
+  AdminUsers: undefined;
+  AdminOffers: undefined;
+  OwnerHomes: undefined;
+  OwnerAddHome: { offerId?: string } | undefined;
+  OwnerReviews: { offerId?: string } | undefined;
   EditProfile: undefined;
   PaymentInfo: undefined;
   AddCard: undefined;
+  HelpCenter: undefined;
+  AboutCenter: undefined;
+  PrivacyCenter: undefined;
+  SettingsCenter: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -90,6 +120,7 @@ const getFooterIdByRoute = (routeName: string) => {
 
 const MainTabs = () => {
   const { t } = useTranslation();
+  const role = useAuthStore((state) => state.role);
 
   return (
     <Tab.Navigator
@@ -97,11 +128,12 @@ const MainTabs = () => {
         headerShown: false,
         tabBarStyle: { display: 'none' },
       }}
-      tabBar={({ state, navigation }) => {
+      tabBar={({ state, navigation, insets }) => {
         const activeRoute = state.routes[state.index];
         const activeId = getFooterIdByRoute(activeRoute.name);
         const items = BOTTOM_NAV_ITEMS.map((item) => ({
           ...item,
+          label: item.id === 'bookings' && role === 'owner' ? t('owner.tabs.bookings') : item.label,
           onPress: () =>
             navigation.navigate(
               item.id === 'home'
@@ -113,7 +145,7 @@ const MainTabs = () => {
                     : 'Profile',
             ),
         }));
-        return <HomeFooter items={items} activeId={activeId} />;
+        return <HomeFooter items={items} activeId={activeId} bottomInset={insets.bottom} />;
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: t('tabs.home') }} />
@@ -124,8 +156,8 @@ const MainTabs = () => {
       />
       <Tab.Screen
         name="Bookings"
-        component={BookingsScreen}
-        options={{ tabBarLabel: t('tabs.bookings') }}
+        component={role === 'owner' ? OwnerBookingsScreen : BookingsScreen}
+        options={{ tabBarLabel: role === 'owner' ? t('owner.tabs.bookings') : t('tabs.bookings') }}
       />
       <Tab.Screen
         name="Profile"
@@ -139,24 +171,27 @@ const MainTabs = () => {
 export const RootNavigator = () => {
   const token = useAuthStore((state) => state.token);
   const guestMode = useAuthStore((state) => state.guestMode);
+  const role = useAuthStore((state) => state.role);
   const { colors } = useTheme();
+  const isAdmin = role === 'admin';
+  const navColors = isAdmin ? getThemeColors('light') : colors;
 
   const navTheme = useMemo(
     () => ({
       ...DefaultTheme,
       colors: {
         ...DefaultTheme.colors,
-        primary: colors.primary,
-        background: colors.bgDark, // Use dark background
-        card: colors.bgCard, // Use card background
-        text: colors.surface, // Light text for dark theme
-        border: colors.border,
+        primary: navColors.primary,
+        background: navColors.background,
+        card: navColors.surface,
+        text: navColors.text,
+        border: navColors.border,
       },
     }),
-    [colors],
+    [navColors],
   );
 
-  return (
+  const navigationTree = (
     <NavigationContainer theme={navTheme} ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
@@ -172,10 +207,22 @@ export const RootNavigator = () => {
             </>
           ) : (
             <>
-              <Stack.Screen name="Main" component={MainTabs} />
+              {role === 'admin' ? (
+                <Stack.Screen name="AdminMenu" component={AdminMenuScreen} />
+              ) : (
+                <Stack.Screen name="Main" component={MainTabs} />
+              )}
+              {role === 'admin' ? (
+                <Stack.Screen name="Main" component={MainTabs} />
+              ) : (
+                <Stack.Screen name="AdminMenu" component={AdminMenuScreen} />
+              )}
               <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
+              <Stack.Screen name="Saved" component={SavedScreen} />
               <Stack.Screen name="Landmarks" component={LandmarksScreen} />
+              <Stack.Screen name="LandmarksCity" component={LandmarksCityScreen} />
               <Stack.Screen name="LandmarksSearchResults" component={LandmarksSearchResultsScreen} />
+              <Stack.Screen name="LandmarkDetail" component={LandmarkDetailScreen} />
               <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} />
               <Stack.Screen name="OfferGallery" component={OfferGalleryScreen} />
               <Stack.Screen name="Booking" component={BookingScreen} />
@@ -185,9 +232,26 @@ export const RootNavigator = () => {
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
               <Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />
               <Stack.Screen name="AddCard" component={AddCardScreen} />
+              <Stack.Screen name="HelpCenter" component={HelpScreen} />
+              <Stack.Screen name="AboutCenter" component={AboutScreen} />
+              <Stack.Screen name="PrivacyCenter" component={PrivacyScreen} />
+              <Stack.Screen name="SettingsCenter" component={SettingsScreen} />
+              <Stack.Screen name="AdminEntry" component={AdminEntryScreen} />
+              <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
+              <Stack.Screen name="AdminOffers" component={AdminOffersScreen} />
+              <Stack.Screen name="AdminOfferDetails" component={AdminOfferDetailsScreen} />
+              <Stack.Screen name="OwnerHomes" component={OwnerHomesScreen} />
+              <Stack.Screen name="OwnerAddHome" component={OwnerAddHomeScreen} />
+              <Stack.Screen name="OwnerReviews" component={OwnerReviewsScreen} />
             </>
           )}
       </Stack.Navigator>
     </NavigationContainer>
   );
+
+  if (isAdmin) {
+    return <AdminLightThemeProvider>{navigationTree}</AdminLightThemeProvider>;
+  }
+
+  return navigationTree;
 };

@@ -19,6 +19,7 @@ type Props = {
   contentContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   withKeyboardAvoiding?: boolean;
+  withBackground?: boolean;
 } & SafeAreaViewProps;
 
 export const ScreenContainer: React.FC<Props> = ({
@@ -27,6 +28,7 @@ export const ScreenContainer: React.FC<Props> = ({
   contentContainerStyle,
   style,
   withKeyboardAvoiding = true,
+  withBackground = true,
   ...rest
 }) => {
   const { tokens } = useTheme();
@@ -57,7 +59,7 @@ export const ScreenContainer: React.FC<Props> = ({
 
   return (
     <SafeAreaView
-      style={[{ flex: 1, backgroundColor: tokens.bgScreen }, safeStyle]}
+      style={[{ flex: 1, backgroundColor: withBackground ? tokens.bgScreen : 'transparent' }, safeStyle]}
       {...safeAreaProps}
       edges={resolvedEdges}
     >

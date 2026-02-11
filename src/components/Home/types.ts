@@ -9,8 +9,10 @@ export type CityCard = {
 
 export type RecommendationCard = {
   id: string;
+  offerId: string;
   name: string;
   rating: string;
+  maxGuests?: number;
   image: ImageSourcePropType;
 };
 

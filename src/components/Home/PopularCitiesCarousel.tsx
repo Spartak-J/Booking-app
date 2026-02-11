@@ -3,12 +3,13 @@ import React, { useMemo, useRef, useCallback } from 'react';
 import { Animated, Image, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { useTheme, withOpacity } from '@/theme';
-import { Typography } from '@/ui';
+import { Button, Typography } from '@/ui';
 import { s, SCREEN_WIDTH } from '@/utils/scale';
 import type { CityCard } from './types';
 
 type PopularCitiesCarouselProps = {
   data: CityCard[];
+  onOpenCity: (cityName: string) => void;
   style?: ViewStyle;
 };
 
@@ -19,7 +20,11 @@ const SNAP_INTERVAL = CARD_WIDTH + SPACING;
 const SIDE_SCALE_X = 0.8;
 const SIDE_SCALE_Y = 0.8;
 
-export const PopularCitiesCarousel: React.FC<PopularCitiesCarouselProps> = ({ data, style }) => {
+export const PopularCitiesCarousel: React.FC<PopularCitiesCarouselProps> = ({
+  data,
+  onOpenCity,
+  style,
+}) => {
   const { colors } = useTheme();
   const scrollXValue = useMemo(() => new Animated.Value(0), []);
   const listRef = useRef<Animated.FlatList<CityCard>>(null);
@@ -71,15 +76,15 @@ export const PopularCitiesCarousel: React.FC<PopularCitiesCarouselProps> = ({ da
     });
 
     return (
-      <Animated.View
-        style={[styles.cardWrapper, { transform: [{ scaleX }, { scaleY }, { translateY }] }]}
-      >
-        <Image source={item.image} style={styles.cardImage} />
-        <View style={styles.cardLabel}>
-          <Typography variant="subtitle" tone="onAccent" style={styles.cardLabelText}>
-            {item.name}
-          </Typography>
-        </View>
+      <Animated.View style={[styles.cardWrapper, { transform: [{ scaleX }, { scaleY }, { translateY }] }]}>
+        <Button variant="ghost" onPress={() => onOpenCity(item.name)} style={styles.cardButton}>
+          <Image source={item.image} style={styles.cardImage} />
+          <View style={styles.cardLabel}>
+            <Typography variant="subtitle" style={styles.cardLabelText}>
+              {item.name}
+            </Typography>
+          </View>
+        </Button>
       </Animated.View>
     );
   };
@@ -145,6 +150,16 @@ const getStyles = (colors: any) =>
       overflow: 'hidden',
       backgroundColor: colors.black,
     },
+    cardButton: {
+      width: '100%',
+      height: '100%',
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+      borderWidth: 0,
+      borderRadius: s(20),
+      overflow: 'hidden',
+      backgroundColor: 'transparent',
+    },
     cardImage: {
       width: '100%',
       height: '100%',
@@ -156,13 +171,14 @@ const getStyles = (colors: any) =>
       right: 0,
       bottom: 0,
       paddingVertical: s(8),
-      backgroundColor: withOpacity(colors.white, 0.12),
+      backgroundColor: withOpacity(colors.black, 0.45),
     },
     cardLabelText: {
       textAlign: 'center',
       fontSize: s(20),
       lineHeight: s(24),
       fontWeight: '500',
+      color: colors.white,
     },
   });
 

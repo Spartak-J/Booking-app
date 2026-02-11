@@ -1,12 +1,12 @@
 // Screen: RegisterScreen. Used in: RootNavigator.
 import React from 'react';
 
-import RegisterScreenView from '@/components/Auth/RegisterScreenView';
+import AuthScreenView from '@/components/Auth/AuthScreenView';
 import { AppLayout } from '@/layout/AppLayout';
 
 export const RegisterScreen = () => (
   <AppLayout variant="stack">
-    <RegisterScreenView />
+    <AuthScreenView mode="register" />
   </AppLayout>
 );
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 import { radius, spacing } from '@/theme';
 import { useTheme } from '@/theme';
@@ -11,6 +11,7 @@ export type CardProps = {
   variant?: Variant;
   style?: StyleProp<ViewStyle>;
   padding?: keyof typeof spacing;
+  onPress?: () => void;
 };
 
 export const Card: React.FC<CardProps> = ({
@@ -18,9 +19,18 @@ export const Card: React.FC<CardProps> = ({
   variant = 'outlined',
   style,
   padding = 'md',
+  onPress,
 }) => {
   const { tokens } = useTheme();
   const styles = getStyles(tokens, padding, variant);
+
+  if (onPress) {
+    return (
+      <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, style]}>
+        {children}
+      </TouchableOpacity>
+    );
+  }
 
   return <View style={[styles.card, style]}>{children}</View>;
 };

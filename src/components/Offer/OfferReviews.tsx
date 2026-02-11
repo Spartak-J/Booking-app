@@ -7,6 +7,7 @@ import { useTheme } from '@/theme';
 import { Review } from '@/types';
 import { Typography } from '@/ui';
 import { getColorTokens, radius, typography } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -19,58 +20,53 @@ type OfferReviewsProps = {
 
 export const OfferReviews = ({ reviews = [] }: OfferReviewsProps) => {
   const { colors, mode } = useTheme();
+  const { t } = useTranslation();
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
   const isDark = mode === 'dark' || colors.background === colors.bgDark;
   const styles = useMemo(() => getStyles(colors, tokens, isDark), [colors, tokens, isDark]);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
-  const fallbackReviews: Review[] = [
-    {
-      id: 'mock-review-1',
-      userName: 'Олена',
-      rating: 5,
-      comment:
-        'Все супер, не вистачало за цю ціну одноразових щіток почистити зуби, і одноразових тапок, а так все чисто постіль без плям і приємно пахне, бонусом нам написали, що ми можемо заселитися на годину раніше, рекомендую!',
-      createdAt: '',
-      offerId: '',
-    },
-  ];
-
-  const sourceReviews = reviews.length ? reviews : fallbackReviews;
+  const sourceReviews: Review[] = reviews;
   const visibleReviews = showAllReviews ? sourceReviews : sourceReviews.slice(0, 1);
 
   return (
     <View style={styles.reviewSection}>
       <Typography variant="h2" style={styles.reviewTitle}>
-        Відгуки
+        {t('offer.reviews')}
       </Typography>
-      <View style={styles.reviewContainer}>
-        {visibleReviews.map((review, index) => (
-          <View key={`${review.id ?? index}`} style={styles.reviewCard}>
-            <View style={styles.reviewHeader}>
-              <View style={[styles.avatar, styles.avatarColor]} />
-              <View style={styles.headerMeta}>
-                <Typography variant="caption" style={styles.userName}>
-                  {review.userName}
-                </Typography>
-                <View style={styles.stars}>
-                  {Array.from({ length: 5 }).map((_, starIndex) => (
-                    <MaterialCommunityIcons
-                      key={`${review.id}-star-${starIndex}`}
-                      name="star"
-                      size={s(10)}
-                      color={colors.primary}
-                    />
-                  ))}
+      {sourceReviews.length === 0 ? (
+        <Typography variant="caption" style={styles.emptyText}>
+          {t('offer.reviews.empty')}
+        </Typography>
+      ) : (
+        <View style={styles.reviewContainer}>
+          {visibleReviews.map((review, index) => (
+            <View key={`${review.id ?? index}`} style={styles.reviewCard}>
+              <View style={styles.reviewHeader}>
+                <View style={[styles.avatar, styles.avatarColor]} />
+                <View style={styles.headerMeta}>
+                  <Typography variant="caption" style={styles.userName}>
+                    {review.userName}
+                  </Typography>
+                  <View style={styles.stars}>
+                    {Array.from({ length: 5 }).map((_, starIndex) => (
+                      <MaterialCommunityIcons
+                        key={`${review.id}-star-${starIndex}`}
+                        name="star"
+                        size={s(10)}
+                        color={colors.primary}
+                      />
+                    ))}
+                  </View>
                 </View>
               </View>
+              <Typography variant="caption" style={styles.reviewText}>
+                {review.comment}
+              </Typography>
             </View>
-            <Typography variant="caption" style={styles.reviewText}>
-              {review.comment}
-            </Typography>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      )}
       {sourceReviews.length > 1 && (
         <Pressable onPress={() => setShowAllReviews((prev) => !prev)} style={styles.expandControl}>
           <View style={styles.expandLine} />
@@ -96,6 +92,9 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
     },
     reviewContainer: {
       gap: s(12),
+    },
+    emptyText: {
+      color: colors.textSecondary,
     },
     reviewCard: {
       height: s(150),

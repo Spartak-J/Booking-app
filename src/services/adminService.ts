@@ -1,20 +1,14 @@
 import apiClient from '@/api/client';
 import { ENDPOINTS } from '@/config/endpoints';
-import { Booking, Offer, Payment, User } from '@/types';
-import { mapBooking, mapOfferFull, mapUser } from '@/utils/apiAdapters';
+import { Booking, Offer, Payment } from '@/types';
+import { mapBooking, mapOfferFull } from '@/utils/apiAdapters';
 import { offerService } from '@/services/offerService';
+import { usersAdminService } from '@/services/admin';
 
 export const adminService = {
-  getUsers: async (): Promise<User[]> => {
-    const { data } = await apiClient.get<any>(ENDPOINTS.user.all);
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    return list.map(mapUser);
-  },
-  getUserById: async (id: string): Promise<User | null> => {
-    const { data } = await apiClient.get<any>(ENDPOINTS.user.byId(id));
-    const payload = Array.isArray(data) ? data[0] : (data?.data ?? data);
-    return payload ? mapUser(payload) : null;
-  },
+  getUsers: usersAdminService.getUsers,
+  getUserById: usersAdminService.getUserById,
+  toggleUserBlocked: usersAdminService.toggleUserBlocked,
   getOffers: async (): Promise<Offer[]> => {
     const { data } = await apiClient.get<any>(ENDPOINTS.offers.allRaw);
     const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);

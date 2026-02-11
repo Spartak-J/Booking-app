@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, LayoutChangeEvent } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets, type SafeAreaViewProps } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 import { useTheme } from '@/theme';
 
@@ -11,27 +10,40 @@ type AppLayoutProps = {
   variant?: 'tab' | 'stack';
   header?: boolean;
   footer?: React.ReactNode;
+  edges?: SafeAreaViewProps['edges'];
 };
 
 type LayoutBaseProps = Omit<AppLayoutProps, 'variant'> & {
-  tabBarHeight?: number;
+  tabMode?: boolean;
 };
 
-const AppLayoutBase: React.FC<LayoutBaseProps> = ({ children, tabBarHeight, footer }) => {
+const AppLayoutBase: React.FC<LayoutBaseProps> = ({ children, tabMode = false, footer, edges }) => {
   const { tokens, mode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const [footerHeight, setFooterHeight] = useState(0);
+  const hasFooter = Boolean(footer);
 
   const paddingTop = 0;
-  const baseBottom = tabBarHeight ?? insets.bottom;
-  const paddingBottom = baseBottom + footerHeight;
+  // For screens with footer, keep content flush and let footer occupy its own row.
+  // Without footer, preserve bottom inset on content.
+  const insets = useSafeAreaInsets();
+  const baseBottom = tabMode ? 0 : hasFooter ? 0 : insets.bottom;
+  const paddingBottom = baseBottom;
+  let footerPaddingBottom = insets.bottom;
+  let resolvedFooter = footer;
 
-  const handleFooterLayout = (event: LayoutChangeEvent) => {
-    const nextHeight = event.nativeEvent.layout.height;
-    if (nextHeight !== footerHeight) {
-      setFooterHeight(nextHeight);
+  if (footer && React.isValidElement(footer)) {
+    const footerElement = footer as React.ReactElement<any>;
+    const footerProps = (footerElement.props ?? {}) as Record<string, any>;
+    const isNativeElement = typeof footerElement.type === 'string';
+    if (!isNativeElement) {
+      resolvedFooter = React.cloneElement(footerElement, {
+        ...footerProps,
+        bottomInset: Number(footerProps.bottomInset ?? 0) + insets.bottom,
+      });
+      footerPaddingBottom = 0;
     }
-  };
+  }
+
+  const safeEdges = edges ?? (['top', 'left', 'right'] as SafeAreaViewProps['edges']);
 
   return (
     <>
@@ -40,22 +52,17 @@ const AppLayoutBase: React.FC<LayoutBaseProps> = ({ children, tabBarHeight, foot
         translucent={false}
         backgroundColor={tokens.bgScreen}
       />
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: tokens.bgScreen }]} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: tokens.bgScreen }]} edges={safeEdges}>
         <View style={[styles.inner, { paddingTop, paddingBottom }]}>{children}</View>
-        {footer ? (
-          <View onLayout={handleFooterLayout} style={styles.footer}>
-            {footer}
-          </View>
-        ) : null}
+        {resolvedFooter ? <View style={[styles.footer, { paddingBottom: footerPaddingBottom }]}>{resolvedFooter}</View> : null}
       </SafeAreaView>
     </>
   );
 };
 
-const AppLayoutTab: React.FC<Omit<AppLayoutProps, 'variant'>> = (props) => {
-  const tabBarHeight = useBottomTabBarHeight();
-  return <AppLayoutBase {...props} tabBarHeight={tabBarHeight} />;
-};
+const AppLayoutTab: React.FC<Omit<AppLayoutProps, 'variant'>> = (props) => (
+  <AppLayoutBase {...props} tabMode />
+);
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ variant = 'stack', ...rest }) => {
   if (variant === 'tab') {
@@ -70,9 +77,12 @@ const styles = StyleSheet.create({
   },
   inner: {
     flex: 1,
+    overflow: 'hidden',
   },
   footer: {
     width: '100%',
+    zIndex: 50,
+    elevation: 50,
   },
 });
 

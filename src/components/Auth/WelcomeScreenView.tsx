@@ -1,13 +1,17 @@
 // Component: WelcomeScreenView. Used in: WelcomeScreen.
+// Файл-часть для WelcomeScreen. Содержит весь UI и логику выбора роли. Не содержит навигации и обёрток.
+// Файл полностью отредактирован. Больше не править без крайней необходимости. --- LEGACY SCREEN, планируется к замене на ui/components/Auth/WelcomeScreenView.tsx
+
 import React, { useMemo, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 import { useTranslation } from '@/i18n';
 import { useAuthStore } from '@/store/authStore';
-import { useTheme, withOpacity } from '@/theme';
+import { getColorTokens, getThemeColors, withOpacity } from '@/theme';
 import { Button, DecorativeBubble, Typography } from '@/ui';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
@@ -45,7 +49,8 @@ const propertyImages: PropertyImage[] = [
 
 export const WelcomeScreenView = () => {
   const navigation = useNavigation<Navigation>();
-  const { colors, tokens } = useTheme();
+  const colors = useMemo(() => getThemeColors('light'), []);
+  const tokens = useMemo(() => getColorTokens('light'), []);
   const styles = useMemo(() => getStyles(colors, tokens), [colors, tokens]);
   const [role, setRole] = useState<RoleOption | null>(null);
   const switchRole = useAuthStore((state) => state.switchRole);
@@ -68,7 +73,9 @@ export const WelcomeScreenView = () => {
   const renderRoleOption = (value: RoleOption, label: string) => (
     <Button variant="ghost" size="large" onPress={() => setRole(value)} style={styles.roleButton}>
       <View style={styles.radioCircle}>{role === value && <View style={styles.radioDot} />}</View>
-      <Typography style={styles.radioLabel}>{label}</Typography>
+      <Typography variant="optionLg" tone="primary">
+        {label}
+      </Typography>
     </Button>
   );
 
@@ -78,27 +85,14 @@ export const WelcomeScreenView = () => {
         <Image source={backgroundImageSource} style={styles.backgroundImage} resizeMode="cover" />
       </View>
 
-      <LinearGradient
-        pointerEvents="none"
-        colors={[
-          withOpacity(colors.surfaceLight, 0),
-          withOpacity(colors.surfaceLight, 0.7),
-          withOpacity(colors.surfaceLight, 0.08),
+    <LinearGradient
+       pointerEvents="none"
+       colors={[
+          withOpacity(colors.surfaceLight, 0.05),
+          withOpacity(colors.surfaceLight, 0.75),
+          withOpacity(colors.surfaceLight, 0.95),
         ]}
-        locations={[0, 0.65, 1]}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        style={styles.titleOverlay}
-      />
-
-      <LinearGradient
-        pointerEvents="none"
-        colors={[
-          withOpacity(colors.surfaceLight, 0),
-          withOpacity(colors.surfaceLight, 0.35),
-          withOpacity(colors.surfaceLight, 0.85),
-        ]}
-        locations={[0, 0.55, 1]}
+        locations={[0, 0.35, 1]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={styles.bottomGradient}
@@ -118,26 +112,40 @@ export const WelcomeScreenView = () => {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.topSection}>
-          <View style={styles.titleWrapper}>
-            <Typography variant="h1" tone="primary" style={styles.title}>
-              {`${titleLine1}\n${titleLine2}`}
-            </Typography>
+        <View style={styles.titleWrapper}>
+          <View style={styles.titleCircle}>
+            <BlurView intensity={75} tint="light" style={StyleSheet.absoluteFillObject} />
+            <LinearGradient
+              pointerEvents="none"
+              colors={[
+                withOpacity(colors.surfaceLight, 0.96),
+                withOpacity(colors.surfaceLight, 0.45),
+                withOpacity(colors.surfaceLight, 0.18),
+              ]}
+              locations={[0, 0.45, 1]}
+              start={{ x: 0.1, y: 0.5 }}
+              end={{ x: 0.9, y: 0.5 }}
+              style={StyleSheet.absoluteFillObject}
+            />
           </View>
+          <Typography variant="h1" tone="primary" style={styles.title}>
+            {`${titleLine1}\n${titleLine2}`}
+          </Typography>
         </View>
 
+        {/* Остальной контент */}
         <View style={styles.bottomSection}>
-          <View style={styles.selector}>
-            {renderRoleOption('user', t('welcome.role.user'))}
-            {renderRoleOption('owner', t('welcome.role.owner'))}
+          <View style={styles.selectorCard}>
+            <View style={styles.selector}>
+              {renderRoleOption('user', t('welcome.role.user'))}
+              {renderRoleOption('owner', t('welcome.role.owner'))}
+            </View>
           </View>
-          <Button
-            title={t('welcome.cta')}
-            onPress={handleContinue}
-            disabled={!role}
-            style={styles.cta}
-            textStyle={styles.ctaText}
-          />
+          <Button onPress={handleContinue} disabled={!role} style={styles.cta}>
+            <Typography variant="optionLg" tone="onAccent" numberOfLines={1}>
+              {t('welcome.cta')}
+            </Typography>
+          </Button>
         </View>
       </View>
     </View>
@@ -146,93 +154,116 @@ export const WelcomeScreenView = () => {
 
 const getStyles = (colors: Record<string, string>, tokens: Record<string, string>) =>
   StyleSheet.create({
+    // Базовый контейнер экрана (fixed layout, без SafeArea)
     screen: {
       flex: 1,
       backgroundColor: colors.transparent,
     },
+    // Абсолютный слой фона (фото на весь экран)
     backgroundLayer: {
       ...StyleSheet.absoluteFillObject,
-      top: -spacing.xl * 2,
-      left: 0,
-      right: 0,
-      bottom: 0,
       zIndex: 0,
     },
     backgroundImage: {
       width: '100%',
       height: '100%',
     },
+    // Декоративные круги под контентом, над фоном
     decorLayer: {
       ...StyleSheet.absoluteFillObject,
-      zIndex: 2,
+      zIndex: 5,
     },
     fullImage: {
       width: '100%',
       height: '100%',
     },
+    // Контентный столбец
     content: {
       flex: 1,
       paddingHorizontal: spacing.xl,
-      paddingTop: spacing.xl * 9.3,
+      paddingTop: spacing.xl * 2,
       paddingBottom: spacing.xl,
       justifyContent: 'flex-start',
       gap: spacing.lg * 1.2,
       zIndex: 3,
     },
+    // Верхний блок с заголовком
     topSection: {
       gap: spacing.lg,
       alignItems: 'flex-start',
-      width: '80%',
+      width: '75%',
+      marginTop: vs(64),
     },
+    // Обёртка заголовка и локального круга-вуа̂ли
     titleWrapper: {
-      position: 'relative',
-      paddingLeft: spacing.lg,
-      paddingTop: spacing.xl * 3.3,
+      position: 'absolute',
+      top: vs(300),
+      left: spacing.xl,
+      zIndex: 20,
     },
+    // Круглая вуаль (Ellipse 91) под текстом
+    titleCircle: {
+      position: 'absolute',
+      width: s(314),
+      height: s(314),
+      borderRadius: s(360),
+      top: -s(130),
+      left: -s(120), // центр относительно текстового блока
+      overflow: 'hidden',
+      opacity: 1,
+      zIndex: 1, // слой сразу после фона
+    },
+    // Текст заголовка
     title: {
       textAlign: 'left',
-      paddingHorizontal: spacing.sm,
-      maxWidth: '80%',
+      maxWidth: s(220),
+      zIndex: 2,
     },
+    // Список радио-опций
     selector: {
       width: '100%',
       gap: spacing.md * 1.2,
-      paddingHorizontal: spacing.sm,
       alignItems: 'flex-start',
       zIndex: 3,
     },
+    // Обёртка для радио-группы (в макете без подложки)
+    selectorCard: {
+      backgroundColor: colors.transparent,
+      borderRadius: radius.lg,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      zIndex: 3,
+    },
+    // Кнопка роли
     roleButton: {
       width: '100%',
-      minHeight: vs(44),
+      minHeight: vs(52),
       borderRadius: radius.lg,
       justifyContent: 'flex-start',
       alignItems: 'center',
       flexDirection: 'row',
       gap: spacing.md,
-      paddingVertical: spacing.sm,
+      paddingVertical: spacing.xs,
       paddingHorizontal: spacing.md,
       borderWidth: 0,
     },
     radioCircle: {
-      width: s(32),
-      height: s(32),
-      borderRadius: s(16),
+      width: s(24),
+      height: s(24),
+      borderRadius: s(13),
       borderWidth: 2,
       borderColor: tokens.borderStrong,
       justifyContent: 'center',
       alignItems: 'center',
-      marginLeft: s(6),
+      marginLeft: s(-40),
     },
     radioDot: {
-      width: s(20),
-      height: s(20),
-      borderRadius: s(10),
+      width: s(14),
+      height: s(14),
+      borderRadius: s(7),
       backgroundColor: tokens.textPrimary,
     },
-    radioLabel: {
-      color: tokens.textPrimary,
-      fontWeight: '700',
-    },
+    // Нижний блок с градиентом и CTA
     bottomSection: {
       paddingTop: spacing.xl,
       paddingBottom: spacing.xl,
@@ -240,40 +271,34 @@ const getStyles = (colors: Record<string, string>, tokens: Record<string, string
       justifyContent: 'flex-end',
       marginTop: 'auto',
       width: '100%',
-      gap: spacing.lg * 1.5,
+      gap: spacing.lg,
       zIndex: 3,
-      alignItems: 'center',
+      alignItems: 'flex-start',
     },
-    titleOverlay: {
-      position: 'absolute',
-      left: -spacing.xl * 2,
-      top: spacing.xl * 1.2,
-      width: '95%',
-      height: vs(320),
-      borderTopRightRadius: radius.xl * 2,
-      borderBottomRightRadius: radius.xl * 2.4,
-      opacity: 0.9,
-      zIndex: 1,
-    },
+    // Нижний полноширинный градиент-подвал
     bottomGradient: {
       position: 'absolute',
       left: 0,
       right: 0,
       bottom: 0,
-      height: vs(360),
-      zIndex: 1,
+      height: vs(300),
+      zIndex: 3,
     },
+    // CTA-кнопка
     cta: {
-      width: '72%',
-      minHeight: vs(44),
+      width: '82%',
+      minHeight: vs(48),
+      marginBottom: vs(12),
       backgroundColor: tokens.accent,
       borderRadius: radius.lg,
       alignSelf: 'center',
       justifyContent: 'center',
     },
+    // Текст CTA
     ctaText: {
       color: tokens.textOnAccent,
       textAlign: 'center',
+      fontWeight: '700',
     },
   });
 

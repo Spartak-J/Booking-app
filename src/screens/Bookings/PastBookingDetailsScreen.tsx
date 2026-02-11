@@ -9,6 +9,7 @@ import { Hotel, Owner, Review } from '@/data/types';
 import { AppLayout } from '@/layout/AppLayout';
 import { Routes } from '@/navigation/routes';
 import { RootStackParamList } from '@/navigation/RootNavigator';
+import { reviewService } from '@/services/reviewService';
 
 type Route = RouteProp<RootStackParamList, Routes.PastBookingDetails>;
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
@@ -20,6 +21,7 @@ export const PastBookingDetailsScreen = () => {
   const [hotel, setHotel] = useState<Hotel | undefined>(undefined);
   const [owner, setOwner] = useState<Owner | undefined>(undefined);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [canLeaveReview, setCanLeaveReview] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -42,21 +44,29 @@ export const PastBookingDetailsScreen = () => {
       setHotel(foundHotel);
       setOwner(foundOwner);
       setReviews(foundReviews);
+
+      if (booking?.bookingId) {
+        const eligibility = await reviewService.canLeaveReview(booking.bookingId);
+        if (!active) return;
+        setCanLeaveReview(eligibility.allowed);
+      } else {
+        setCanLeaveReview(false);
+      }
     };
 
     load();
     return () => {
       active = false;
     };
-  }, [booking?.hotelId, booking?.id, booking?.title]);
+  }, [booking?.hotelId, booking?.id, booking?.title, booking?.bookingId]);
 
   return (
     <AppLayout variant="stack">
       <PastBookingDetailsScreenView
         onBack={() => navigation.goBack()}
-        onLeaveReview={() => {
+        onLeaveReview={canLeaveReview ? () => {
           /* TODO: navigate to review flow */
-        }}
+        } : undefined}
         booking={booking}
         hotel={hotel}
         owner={owner}

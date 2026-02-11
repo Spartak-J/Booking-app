@@ -3,11 +3,10 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Button, Card, HeaderBar, Input, Typography } from '@/ui';
+import { Button, Card, Input, Typography, ScreenShell } from '@/ui';
 import { useTheme } from '@/theme';
 import { spacing, radius, typography } from '@/theme';
 import { useTranslation } from '@/i18n';
-import KeysBackground from '@/components/layout/KeysBackground';
 import { s } from '@/utils/scale';
 
 type AddCardValues = {
@@ -38,9 +37,7 @@ export const AddCardScreenView: React.FC<AddCardScreenViewProps> = ({ onBack, on
   });
 
   return (
-    <View style={styles.root}>
-      <HeaderBar title={t('profile.addCard.title')} onBack={onBack} />
-
+    <ScreenShell title={t('profile.addCard.title')} onBack={onBack} showKeys contentStyle={styles.content}>
       <ScrollView contentContainerStyle={contentStyle} showsVerticalScrollIndicator={false}>
         <Typography variant="subtitle" tone="primary" style={styles.subtitle}>
           {t('profile.addCard.subtitle')}
@@ -120,21 +117,15 @@ export const AddCardScreenView: React.FC<AddCardScreenViewProps> = ({ onBack, on
           style={styles.saveButton}
         />
       </ScrollView>
-
-      <KeysBackground variant="yellow" />
-    </View>
+    </ScreenShell>
   );
 };
 
 const getStyles = (tokens: Record<string, string>) =>
   // LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
-    root: {
-      flex: 1,
-      backgroundColor: tokens.bgScreen,
-    },
     content: {
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: spacing.md,
       paddingTop: spacing.lg,
       gap: spacing.md,
     },

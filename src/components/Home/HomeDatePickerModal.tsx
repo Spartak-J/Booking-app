@@ -17,6 +17,7 @@ export type HomeDatePickerModalProps = {
   calendarDays: Array<number | null>;
   calendarStart: number | null;
   calendarEnd: number | null;
+  isDayDisabled?: (day: number) => boolean;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onSelectDay: (day: number) => void;
@@ -33,6 +34,7 @@ export const HomeDatePickerModal: React.FC<HomeDatePickerModalProps> = ({
   calendarDays,
   calendarStart,
   calendarEnd,
+  isDayDisabled,
   onPrevMonth,
   onNextMonth,
   onSelectDay,
@@ -94,28 +96,35 @@ export const HomeDatePickerModal: React.FC<HomeDatePickerModalProps> = ({
             }
             const hasStart = calendarStart !== null;
             const hasEnd = calendarEnd !== null;
+            const dayDisabled = isDayDisabled?.(day) ?? false;
             const rangeStart =
               hasStart && hasEnd ? Math.min(calendarStart!, calendarEnd!) : calendarStart;
             const rangeEnd =
               hasStart && hasEnd ? Math.max(calendarStart!, calendarEnd!) : calendarStart;
             const isSelected =
-              (hasStart && hasEnd && day >= (rangeStart ?? 0) && day <= (rangeEnd ?? 0)) ||
-              (hasStart && !hasEnd && day === calendarStart);
+              !dayDisabled &&
+              ((hasStart && hasEnd && day >= (rangeStart ?? 0) && day <= (rangeEnd ?? 0)) ||
+                (hasStart && !hasEnd && day === calendarStart));
             const isEdge = (hasStart && day === calendarStart) || (hasEnd && day === calendarEnd);
 
             return (
               <Button
                 key={`${day}-${index}`}
                 variant="ghost"
-                style={[styles.dayCell, index % 7 !== 6 ? styles.cellSpacer : undefined]}
+                style={[
+                  styles.dayCell,
+                  dayDisabled ? styles.dayCellDisabled : undefined,
+                  index % 7 !== 6 ? styles.cellSpacer : undefined,
+                ]}
                 onPress={() => onSelectDay(day)}
+                disabled={dayDisabled}
               >
                 {isSelected && (
                   <View
                     style={[styles.dayHighlight, isEdge ? styles.dayHighlightEdge : undefined]}
                   />
                 )}
-                <Typography variant="calendarDay" tone="primary">
+                <Typography variant="calendarDay" tone={dayDisabled ? 'secondary' : 'primary'}>
                   {day}
                 </Typography>
               </Button>
@@ -227,6 +236,9 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
       borderWidth: 0,
       borderColor: palette.transparent,
       backgroundColor: palette.transparent,
+    },
+    dayCellDisabled: {
+      opacity: 0.45,
     },
     cellSpacer: {
       marginRight: s(11.1),

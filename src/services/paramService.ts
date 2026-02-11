@@ -2,7 +2,7 @@ import apiClient from '@/api/client';
 import { ENDPOINTS } from '@/config/endpoints';
 import { getApiLang } from '@/utils/apiAdapters';
 import { USE_MOCKS } from '@/config/constants';
-import { mockOffers } from '@/utils/mockData';
+import { OWNER_AMENITIES_MOCK } from '@/data/hotels/amenities.mock';
 
 export type Category = { id: string; name: string };
 export type Amenity = { id: string; name: string };
@@ -20,9 +20,7 @@ export const paramService = {
   },
   getAmenities: async (): Promise<Amenity[]> => {
     if (USE_MOCKS) {
-      const unique = new Set<string>();
-      mockOffers.forEach((offer) => offer.amenities.forEach((item) => unique.add(item)));
-      return Array.from(unique).map((name, idx) => ({ id: String(idx + 1), name }));
+      return OWNER_AMENITIES_MOCK.map((name, idx) => ({ id: String(idx + 1), name }));
     }
     const lang = getApiLang();
     const { data } = await apiClient.get<any>(ENDPOINTS.params.items(lang));

@@ -1,32 +1,31 @@
 // Component: ProfileScreenView. Used in: ProfileScreen.
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { HeaderBar, Button, ListItem, Typography } from '@/ui';
+import { ListItem, ScreenShell, Typography } from '@/ui';
 import { useTheme } from '@/theme';
 import { spacing, radius, typography } from '@/theme';
 import { useTranslation } from '@/i18n';
-import KeysBackground from '@/components/layout/KeysBackground';
 import { s } from '@/utils/scale';
 
 type ProfileScreenViewProps = {
   userName?: string;
   userInitial: string;
   onBack: () => void;
-  onOpenAccount: () => void;
-  onOpenPayment: () => void;
-  onOpenTrips: () => void;
-  onLogout: () => void;
+  menuItems: Array<{
+    id: string;
+    title: string;
+    icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+    onPress?: () => void;
+  }>;
 };
 
 export const ProfileScreenView: React.FC<ProfileScreenViewProps> = ({
   userName,
   userInitial,
   onBack,
-  onOpenAccount,
-  onOpenPayment,
-  onOpenTrips,
-  onLogout,
+  menuItems,
 }) => {
   const { tokens } = useTheme();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -37,9 +36,7 @@ export const ProfileScreenView: React.FC<ProfileScreenViewProps> = ({
   const initial = userInitial || (userName ? userName.charAt(0).toUpperCase() : '');
 
   return (
-    <View style={styles.root}>
-      <HeaderBar title={t('profile.title')} onBack={onBack} />
-
+    <ScreenShell title={t('profile.title')} onBack={onBack} showKeys contentStyle={styles.content}>
       <ScrollView contentContainerStyle={contentStyle} showsVerticalScrollIndicator={false}>
         <View style={styles.greetingRow}>
           <View style={styles.avatar}>
@@ -61,36 +58,26 @@ export const ProfileScreenView: React.FC<ProfileScreenViewProps> = ({
         </View>
 
         <View style={styles.section}>
-          <ListItem title={t('profile.menu.account')} onPress={onOpenAccount} />
-          <ListItem title={t('profile.menu.payment')} onPress={onOpenPayment} />
-          <ListItem title={t('profile.menu.trips')} onPress={onOpenTrips} />
-          <ListItem title={t('profile.menu.help')} />
-          <ListItem title={t('profile.menu.privacy')} />
+          {menuItems.map((item) => (
+            <ListItem
+              key={item.id}
+              title={item.title}
+              onPress={item.onPress}
+              left={<MaterialCommunityIcons name={item.icon} size={s(18)} color={tokens.textPrimary} />}
+            />
+          ))}
         </View>
-
-        <Button
-          title={t('profile.logout')}
-          onPress={onLogout}
-          variant="ghost"
-          style={styles.logoutButton}
-        />
       </ScrollView>
-
-      <KeysBackground />
-    </View>
+    </ScreenShell>
   );
 };
 
 const getStyles = (tokens: Record<string, string>) =>
   // LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
-    root: {
-      flex: 1,
-      backgroundColor: tokens.bgScreen,
-    },
     content: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.sm,
       gap: spacing.lg,
     },
     greetingRow: {

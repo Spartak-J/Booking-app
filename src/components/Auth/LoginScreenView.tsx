@@ -57,6 +57,7 @@ export const LoginScreenView = () => {
       contentContainerStyle={styles.screenContent}
       scroll
       withKeyboardAvoiding
+      edges={['left', 'right']}
     >
       <View style={styles.root}>
         <View style={styles.topSection}>

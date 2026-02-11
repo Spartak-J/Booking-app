@@ -10,16 +10,17 @@ import type { CityCard } from './types';
 
 type PopularCitiesProps = {
   data: CityCard[];
+  onOpenCity: (cityName: string) => void;
 };
 
-export const PopularCities: React.FC<PopularCitiesProps> = ({ data }) => {
+export const PopularCities: React.FC<PopularCitiesProps> = ({ data, onOpenCity }) => {
   const { t } = useTranslation();
   return (
     <View style={styles.block}>
       <Typography variant="h2" tone="primary">
         {t('home.popularCities')}
       </Typography>
-      <PopularCitiesCarousel data={data} />
+      <PopularCitiesCarousel data={data} onOpenCity={onOpenCity} />
     </View>
   );
 };
