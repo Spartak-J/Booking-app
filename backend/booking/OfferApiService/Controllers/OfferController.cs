@@ -183,7 +183,7 @@ namespace OfferApiService.Controllers
                 offer,
                 _baseUrl);
 
-            response.GuestCount = request.Guests;
+           
             decimal? orderPrice;
             if (daysCount < 7)
                 orderPrice = daysCount * response.PricePerDay;
@@ -201,7 +201,9 @@ namespace OfferApiService.Controllers
             // Налог на аренду
             var taxAmount = (response.OrderPrice - discountAmount) * response.Tax / 100;
             response.TaxAmount = (decimal)taxAmount;
-            response.GuestCount = request.Guests;
+             response.GuestCount = request.Adults+request.Children;
+            response.Adults = request.Adults;
+            response.Children = request.Children;
             response.DaysCount = daysCount;
 
             var totalPrice = orderPrice - discountAmount  + taxAmount;

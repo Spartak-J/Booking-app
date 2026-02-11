@@ -17,7 +17,8 @@ export const Hotel_info_card = ({
     offer,
     startDate,
     endDate,
-    guests
+    adults,
+    children
 }) => {
     const { t } = useTranslation();
     if (!hotel || !offer) return null;
@@ -47,14 +48,16 @@ export const Hotel_info_card = ({
                         offer={offer}
                         startDate={startDate}
                         endDate={endDate}
-                        guests={guests}
+                        adults={adults}
+                        children={children}
                     />
                         <Hotel_info_card_row
                         hotel={hotel}
                         offer={offer}
                         startDate={startDate}
                         endDate={endDate}
-                        guests={guests}
+                         adults={adults}
+                        children={children}
                     />
 
                 </div>

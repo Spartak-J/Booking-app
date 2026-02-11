@@ -75,7 +75,6 @@ namespace OfferApiService.Services
         {
             using var db = new OfferContext();
 
-            // 1. Загружаем существующий граф
             var existingOffer = await db.Offers
                 .Include(o => o.RentObj)
                     .ThenInclude(r => r.ParamValues)
@@ -86,13 +85,10 @@ namespace OfferApiService.Services
             if (existingOffer == null)
                 throw new Exception($"Offer with id={offer.id} not found");
 
-            // 2. Обновляем простые поля Offer
             db.Entry(existingOffer).CurrentValues.SetValues(offer);
 
-            // 3. Обновляем простые поля RentObject
             if (existingOffer.RentObj == null)
             {
-                // на случай, если раньше RentObject не существовал
                 existingOffer.RentObj = offer.RentObj;
             }
             else
@@ -109,7 +105,6 @@ namespace OfferApiService.Services
             var existingParams = existingOffer.RentObj.ParamValues;
             var newParams = offer.RentObj.ParamValues ?? new List<RentObjParamValue>();
 
-            // удалённые
             foreach (var existing in existingParams.ToList())
             {
                 if (!newParams.Any(p => p.id == existing.id))
@@ -118,19 +113,16 @@ namespace OfferApiService.Services
                 }
             }
 
-            // добавленные и обновлённые
             foreach (var param in newParams)
             {
                 var existing = existingParams.FirstOrDefault(p => p.id == param.id);
 
                 if (existing == null)
                 {
-                    // новый
                     existingParams.Add(param);
                 }
                 else
                 {
-                    // обновление
                     db.Entry(existing).CurrentValues.SetValues(param);
                 }
             }
@@ -142,7 +134,6 @@ namespace OfferApiService.Services
             var existingImages = existingOffer.RentObj.Images;
             var newImages = offer.RentObj.Images ?? new List<RentObjImage>();
 
-            // удалённые
             foreach (var existing in existingImages.ToList())
             {
                 if (!newImages.Any(i => i.id == existing.id))
@@ -151,7 +142,6 @@ namespace OfferApiService.Services
                 }
             }
 
-            // добавленные и обновлённые
             foreach (var img in newImages)
             {
                 var existing = existingImages.FirstOrDefault(i => i.id == img.id);
@@ -166,7 +156,6 @@ namespace OfferApiService.Services
                 }
             }
 
-            // 6. Сохраняем всё одной транзакцией
             await db.SaveChangesAsync();
             return offer.id;
         }
@@ -226,6 +215,7 @@ namespace OfferApiService.Services
         public async Task<List<Offer>> SearchOffersAsync([FromQuery] OfferSearchRequestByCityAndCountGuest request)
         {
             var fitOffers = new List<Offer>();
+            var totalGuests = request.Adults + request.Children;
             try
             {
                 using var db = new OfferContext();
@@ -237,7 +227,7 @@ namespace OfferApiService.Services
                         .ThenInclude(ro => ro.ParamValues)
                     .Where(o => o.RentObj != null &&
                                 o.RentObj.CityId == request.CityId &&
-                                o.MaxGuests >= request.Guests)
+                                o.MaxGuests >= totalGuests)
                     .ToListAsync();
             }
             catch (Exception ex)

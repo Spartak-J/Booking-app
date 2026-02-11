@@ -244,7 +244,7 @@ export const HomePage = () => {
         <BunnerHotel />
         <div className="btn-w-full p-t-24 flex-center mb-30">
           <SearchBar_Main
-            onSearch={handleSearchResults}
+            // onSearch={handleSearchResults}
             defaultCity={city}
             defaultGuests={guests}
             defaultStartDate={startDate}

@@ -4,7 +4,8 @@ import styles from "./HotelCardList.module.css";
 
 export const HotelCardList = ({
   hotels = [],
-  guests = "1",
+  adults = "1",
+  children="0",
   startDate = "2026-01-22",
   endDate = "2026-01-24",
   onCardClick,
@@ -62,7 +63,8 @@ useEffect(()=>{
           rating={hotel.rating}
           reviews={hotel.reviews}
           price={hotel.totalPrice}
-          guests={guests}
+           adults ={adults}
+              children={children}
           startDate={startDate}
           endDate={endDate}
           onClick={() => {

@@ -16,7 +16,7 @@
       "owner": "Власник житла",
       "client": "Користувач",
       "password": "Пароль",
-      "confirmPassword": "Підтвердіть пароль",
+      "confirm_password": "Підтвердіть пароль",
       "registerButton": "Зареєструватись"
     },
     "login": {
@@ -391,6 +391,7 @@
         "country": "Країна",
         "region":"Область/регіон",
         "city":"Місто",
+         "district":"Район",
         "Postcode":"Поштовий код",
         "address": "Адреса",
         "street": "Вулиця",

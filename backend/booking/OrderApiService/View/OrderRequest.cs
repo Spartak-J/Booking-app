@@ -13,6 +13,11 @@ namespace OrderApiService.View
         // Количество гостей
         public int Guests { get; set; }
 
+        public int Adults { get; set; }
+        public int Children { get; set; }
+        public string? MainGuestFirstName { get; set; }
+        public string? MainGuestLastName { get; set; }
+
         // Даты проживания
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -22,7 +27,6 @@ namespace OrderApiService.View
         public decimal OrderPrice { get; set; }        // Цена без скидок и налогов
         public decimal DiscountPercent { get; set; }  // Процент скидки
         public decimal DiscountAmount { get; set; }   // Сумма скидки в валюте
-        //public decimal? DepositAmount { get; set; }   // Сумма депозита (если есть)
         public decimal TaxAmount { get; set; }        // Налог в валюте
         public decimal TotalPrice { get; set; }       // Итоговая стоимость с учётом всех скидок и налогов
 
@@ -38,9 +42,12 @@ namespace OrderApiService.View
         public string? ClientNote { get; set; }
         // ===== Статус заказа =====
         public OrderStatus Status { get; set; }          // Текущий статус заказа (новый, подтверждён, отменён и т.д.)
-        //public string PaymentMethod { get; set; }
+                                                         //public string PaymentMethod { get; set; }
 
 
+        public bool? isBusinessTrip { get; set; } = false;
+
+        public string? PaymentMethod { get; set; }
 
 
         // ===== Метод для конвертации в модель Order =====
@@ -51,6 +58,10 @@ namespace OrderApiService.View
                 OfferId = request.OfferId,
                 ClientId = request.ClientId,
                 Guests = request.Guests,
+                Adults = request.Adults,
+                Children = request.Children,
+                MainGuestFirstName = request.MainGuestFirstName,
+                MainGuestLastName = request.MainGuestLastName,
 
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
@@ -78,6 +89,9 @@ namespace OrderApiService.View
                 Status = request.Status == 0
                     ? OrderStatus.Pending
                     : request.Status,
+
+                isBusinessTrip = request.isBusinessTrip,
+                PaymentMethod = request.PaymentMethod,
 
                // PaymentMethod = request.PaymentMethod,
 

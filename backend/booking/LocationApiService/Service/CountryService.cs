@@ -18,6 +18,15 @@ namespace LocationApiService.Services
                     .ToListAsync();
             }
         }
+        public  async Task<List<Country>> GetEntitiesWithCodeAsync(params string[] includeProperties)
+        {
+            using (var db = (LocationContext)Activator.CreateInstance(typeof(LocationContext)))
+            {
+                return await db.Countries
+                    .ToListAsync();
+            }
+        }
+
 
         public override async Task<Country> GetEntityAsync(int id, params string[] includeProperties)
         {

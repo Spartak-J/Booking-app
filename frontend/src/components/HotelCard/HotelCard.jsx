@@ -21,12 +21,13 @@ export const HotelCard = ({
     price,
     startDate,
     endDate,
-    guests
+    adults,
+    children
 }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/hotel/${id}?cityId=${cityId}&checkin=${startDate}&checkout=${endDate}&guests=${guests}`);
+        navigate(`/hotel/${id}?cityId=${cityId}&checkin=${startDate}&checkout=${endDate}&adults=${adults}&children=${children}`);
     };
   const { t } = useTranslation();
   
@@ -73,7 +74,7 @@ export const HotelCard = ({
 
                     </div>
                     <div className={styles.card__details_column}>
-                        <Text text={`${guests} ${t("hotel.guestCount")}`} type="m_400_s_14" />
+                        <Text text={`${adults+children} ${t("hotel.guestCount")}`} type="m_400_s_14" />
                         <div className="flex-left">
                             <div className={styles.right_margin}>
                                 <Text text={t("hotel.from")} type="m_400_s_14" />

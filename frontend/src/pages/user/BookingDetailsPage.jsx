@@ -40,14 +40,16 @@ export const BookingDetailsPage = () => {
 
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
-  const guests = Number(searchParams.get("guests"));
+  const adults = Number(searchParams.get("adults"));
+  const children = Number(searchParams.get("children"));
   const price = Number(searchParams.get("price"));
 
   console.log({
     user,
     startDate,
     endDate,
-    guests,
+    adults,
+    children,
     price,
   });
 
@@ -127,11 +129,7 @@ const { id } = useParams();
         {bookingStep === "details" && (
           <div className="booking-details__container">
             <BookingForm
-            offerId ={id}
               setBookingStep={setBookingStep}
-             startDate={startDate}
-            endDate={endDate}
-            guests={guests}
             />
           </div>
         )}

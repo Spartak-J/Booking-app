@@ -18,7 +18,8 @@ export const Hotel_info_card_row = ({
     offer,
     startDate,
     endDate,
-    guests
+    adults,
+    children
 }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -86,7 +87,7 @@ export const Hotel_info_card_row = ({
                         className="btn-w-385 btn-h-70 btn-br-r-10"
                         onClick={() =>
                             navigate(
-                                `/booking/${hotel.id}?startDate=${startDate}&endDate=${endDate}&guests=${guests}&price=${hotel.totalPrice}`
+                                `/booking/${hotel.id}?startDate=${startDate}&endDate=${endDate}&adults=${adults}&children=${children}&price=${hotel.totalPrice}`
                             )
                         }
                     />

@@ -23,10 +23,12 @@ import styles from './Header.module.css';
 
 export const Header_Full = ({
   showLogBtn = true,
-  city = "Львів",
+  city = "",
   title = "",
   titleBtn,
-  guests,
+  adults,
+  children,
+  rooms,
   startDate,
   endDate,
   showFilterBtn = true,
@@ -40,8 +42,8 @@ export const Header_Full = ({
   const [openMenu, setOpenMenu] = useState(false);
   const [openSortMenu, setOpenSortMenu] = useState(false);
   const [isModalLanguageOpen, setIsModalLanguageOpen] = useState(false);
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [currency, setCurrency] = useState("");
 
   const { t } = useTranslation();
@@ -70,17 +72,17 @@ export const Header_Full = ({
           </div>
           <div className={`${styles.searchBar} ${styles.searchBar_order}`}>
             <SearchBar
-              onSearch={handleSearchResults}
               defaultCity={city}
-              defaultGuests={guests}
+              defaultGuests={{ adults, children, rooms }}
               defaultStartDate={startDate}
               defaultEndDate={endDate}
+              onSearch={handleSearchResults}
             />
           </div>
           <div className={`${styles.headerMain__logo__actions_container} ${styles.headerMain__logo__actions_container_order} flex-center gap-20`}>
             <IconButton__50
               icon_name="user-home"
-                onClick={() => navigate("/")}
+              onClick={() => navigate("/")}
               title="User"
             />
 
@@ -121,22 +123,22 @@ export const Header_Full = ({
                 />
               </div>
             )}
-             {isLoginModalOpen && (
-                <div className="modalOverlay">
-                  <LoginModal
-                    setIsModalOpen={setIsLoginModalOpen}
-                    setIsRegisterModalOpen={setIsRegisterModalOpen} />
-                </div>
-              )}
-              {isRegisterModalOpen && (
-                <div className="modalOverlay">
-                  <RegisterModal setIsModalOpen={setIsRegisterModalOpen} />
-                </div>
-              )}
+            {isLoginModalOpen && (
+              <div className="modalOverlay">
+                <LoginModal
+                  setIsModalOpen={setIsLoginModalOpen}
+                  setIsRegisterModalOpen={setIsRegisterModalOpen} />
+              </div>
+            )}
+            {isRegisterModalOpen && (
+              <div className="modalOverlay">
+                <RegisterModal setIsModalOpen={setIsRegisterModalOpen} />
+              </div>
+            )}
           </div>
         </div>
         <div className={`${styles.headerMain_breadcrumbs__container} flex-left`} >
-          <Breadcrumbs city={city} hotelTitle  ={title }/>
+          <Breadcrumbs city={city} hotelTitle={title} />
         </div>
         <div className={`${styles.headerMain_cityTitle__container} flex-center`} >
           <Text text={title} type="m_700_s_40" />
@@ -155,7 +157,7 @@ export const Header_Full = ({
                   <SortMenuModal />
                 </div>
               )}
-             
+
               <ActionButton__Primary
                 text={titleBtn || t('sort.sort_btn')}
                 className="btn-w-148 btn-h-35 btn-br-r-10"

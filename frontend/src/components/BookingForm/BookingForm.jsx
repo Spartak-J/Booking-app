@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useParams, useLocation, useSearchParams  } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext.jsx";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
@@ -11,18 +12,26 @@ import { ActionButton__Primary } from "../UI/Button/ActionButton_Primary.jsx";
 import styles from "./BookingForm.module.css";
 
 export const BookingForm = ({
-  price = "7 568",
-  offerId,
-  setBookingStep,
-  startDate,
-  endDate,
-  guests
+  // price = "7 568",
+  setBookingStep
 }) => {
   const { token, getMe } = useContext(AuthContext);
   const { t } = useTranslation();
-  const { locationApi } = useContext(ApiContext);
+  const { locationApi, orderApi } = useContext(ApiContext);
   const navigate = useNavigate();
   const { language } = useLanguage();
+
+
+  
+   const { offerId } = useParams();
+    // query-параметры (?startDate=...&endDate=...)
+    const [searchParams] = useSearchParams();
+  
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+    const adults = Number(searchParams.get("adults"));
+    const children = Number(searchParams.get("children"));
+    const price = Number(searchParams.get("price"));
 
   const [user, setUser] = useState(null);
   useEffect(() => {
@@ -74,7 +83,6 @@ export const BookingForm = ({
     clientNote: "",
     cardNum: "",
     businessTravel: false,
-    wishes: "",
     saveData: false
   });
 
@@ -86,7 +94,6 @@ export const BookingForm = ({
     console.log(offerId);
     setFormData(prev => ({
       ...prev,
-      id: user.id,
       firstName: user.username || "",
       lastName: user.lastName || "",
       offerId: offerId > 0 ? offerId : 0,
@@ -96,16 +103,13 @@ export const BookingForm = ({
       arrivalDate: toInputDate(startDate),
       departureDate: toInputDate(endDate),
 
-      adults: guests,
-      children: guests,
+      adults: adults,
+      children: children,
       clientNote: "",
       phonePrefix: country?.phonePrefix || "",
       phoneNumber: user.phoneNumber || "",
-      birthDate: user.birthDate
-        ? toInputDate(user.birthDate)
-        : ""
     }));
-  }, [user, countries, startDate, endDate, guests]);
+  }, [user, countries, startDate, endDate, adults, children]);
 
 
 
@@ -148,39 +152,55 @@ export const BookingForm = ({
 
 
 
-  const buildOfferBooking = () => {
-
-    return {
-      OfferId: formData.offerId > 0 ? formData.OfferId : 0,
-      Guests: formData.fuests ?? "",
-      StartDate: formData.arrivalDate ?? "",
-      EndDate: formData.departureDate ?? "",
-      ClientNote: formData.clientNote || "0"
-
-    };
+const buildOfferBooking = () => {
+  return {
+    OfferId: formData.offerId > 0 ? formData.offerId : 0,
+    Guests: (formData.adults ?? 0) + (formData.children ?? 0),
+    Adults: formData.adults ?? 0,
+    Children: formData.children ?? 0,
+    MainGuestFirstName: formData.firstName ?? "",
+    MainGuestLastName: formData.lastName ?? "",
+    StartDate: formData.arrivalDate ?? "",
+    EndDate: formData.departureDate ?? "",
+    ClientNote: formData.clientNote || "",
+    isBusinessTrip: formData.businessTravel ?? false,
+    PaymentMethod: activePaymentButton || ""
   };
-
+};
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setBookingStep("loading");
+  e.preventDefault();
+  setBookingStep("loading");
 
+  try {
+    // Формируем объект для отправки
     const booking = buildOfferBooking();
     console.log("Попытка отправки данных на бек:", JSON.stringify(booking, null, 2));
 
+    // Отправляем на сервер через orderApi
+    const result = await orderApi.createOrder({
+      formData: booking,
+      lang: language
+    });
 
-    //     console.log("Sending to server:", formData);
-    //     const result = await updateMe(payload);
-    //     if (result.success) {
-    //         alert("Данные обновлены");
-    //     } else {
-    //         alert(result.message);
-    //     }
-    // };
+    console.log("Ответ от сервера:", result.data);
 
-    console.log("Отправка формы:", booking);
-  };
+    // Проверяем успех
+    if (result?.data?.success) {
+      setBookingStep("success");
+    } else {
+      setBookingStep("error");
+      alert(result?.data?.message || "Ошибка при бронировании");
+    }
+
+  } catch (err) {
+    console.error("Ошибка при создании заказа:", err);
+    setBookingStep("error");
+    alert("Произошла ошибка при отправке формы");
+  }
+};
+
 
   const phonePrefixes = ["UA +380", "RU +7", "US +1", "DE +49"];
 
@@ -532,8 +552,8 @@ export const BookingForm = ({
             <Text text={t("Booking.wishes_label")} type="m_400_s_24 " />
           </legend>
           <textarea
-            name="wishes"
-            value={formData.wishes}
+            name="clientNote"
+            value={formData.clientNote}
             onChange={handleChange}
             placeholder=""
             className={`${styles.input} ${styles.textarea} btn-br-r-20 p-10`}

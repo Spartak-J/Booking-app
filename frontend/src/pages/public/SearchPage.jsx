@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { useLocation } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+
 import { offerApi } from "../../api/offer.js";
 import { Header_Full } from "../../components/Header/Header_Full.jsx";
 
@@ -11,7 +13,7 @@ import { HotelCardList } from "../../components/HotelCard/HotelCardList.jsx";
 import { HotelCardList_Recomented } from "../../components/HotelCard/HotelCardList_Recomented.jsx";
 import { MoreTourWrapper } from "../../components/Info_Components/MoreTourWrapper";
 import { CityCard_carousel } from "../../components/CityCard/CityCard_carousel.jsx";
-
+import { Spinner } from "../../components/UI/Spinner.jsx";
 import { Text } from "../../components/UI/Text/Text.jsx";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -176,155 +178,143 @@ const mockHotels = [
 ];
 
 
-
-export const SearchPage = () => {
-  const { paramsCategoryApi } = useContext(ApiContext);
+export const SearchPage = ({ defaultCityId }) => {
+  const { offerApi, paramsCategoryApi } = useContext(ApiContext);
   const { language } = useLanguage();
-  const { state } = useLocation();
+  const [searchParams] = useSearchParams();
 
-  const [openFilterMenu, setOpenFilterMenu] = useState(false);
-  const [hotels, setHotels] = useState(mockHotels);
-  const [city, setCity] = useState("");
-  const [guests, setGuests] = useState(1);
-  const [startDate, setStartDate] = useState(null); // хранить как Date для DatePicker
-  const [endDate, setEndDate] = useState(null);
+  const cityId = searchParams.get("cityId") || localStorage.getItem("locationId") || null;
+  const cityName = localStorage.getItem("city") || "Львів";
+
+  const startDateStr = searchParams.get("startDate") || localStorage.getItem("startDate") || new Date().toISOString();
+  const endDateStr = searchParams.get("endDate") || localStorage.getItem("endDate") || new Date(Date.now() + 86400000).toISOString(); // завтра
+
+  const adults = Number(searchParams.get("adults") || localStorage.getItem("adults") || 1);
+  const children = Number(searchParams.get("children") || localStorage.getItem("children") || 0);
+  const rooms = Number(searchParams.get("rooms") || localStorage.getItem("rooms") || 1);
+
+  const [hotels, setHotels] = useState([]);
   const [filtersData, setFiltersData] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState({});
-  const [locationId, setLocationId] = useState(null);
+  const [openFilterMenu, setOpenFilterMenu] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const startDate = useMemo(() => new Date(startDateStr), [startDateStr]);
+  const endDate = useMemo(() => new Date(endDateStr), [endDateStr]);
 
 
   useEffect(() => {
-    const savedCity = localStorage.getItem("city");
-    const savedGuests = localStorage.getItem("guests");
-    const savedStart = localStorage.getItem("startDate");
-    const savedEnd = localStorage.getItem("endDate");
-    const savedHotels = localStorage.getItem("hotels");
+    if (!cityId || !startDate || !endDate) return;
 
-    if (savedCity) setCity(savedCity);
-    if (savedGuests) setGuests(Number(savedGuests));
-    if (savedStart) setStartDate(new Date(savedStart));
-    if (savedEnd) setEndDate(new Date(savedEnd));
-    if (savedHotels) setHotels(JSON.parse(savedHotels));
-  }, []);
+    const fetchHotels = async () => {
+      setLoading(true);
+
+      try {
+        const response = await offerApi.searchOffers({
+          cityId,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          adults,
+          children,
+          rooms,
+          userDiscountPercent: 5,
+          lang: language,
+          paramItemFilters: selectedFilters,
+        });
+
+        setHotels(response.data);
+      } catch (error) {
+        console.error("Ошибка загрузки:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotels();
+  }, [cityId, startDate, endDate, adults, children, rooms, language, selectedFilters]);
+
 
   useEffect(() => {
-    if (!state) return;
-
-    setCity(state.city || "");
-    setLocationId(state.locationId || null);
-    setGuests(state.guests || 1);
-    setStartDate(state.startDate ? new Date(state.startDate) : null);
-    setEndDate(state.endDate ? new Date(state.endDate) : null);
-
-
-    localStorage.setItem("city", state.city || "");
-    localStorage.setItem("guests", state.guests || 1);
-    if (state.startDate) localStorage.setItem("startDate", new Date(state.startDate).toISOString());
-    if (state.endDate) localStorage.setItem("endDate", new Date(state.endDate).toISOString());
-  }, [state]);
-
-
-  useEffect(() => {
-    paramsCategoryApi.getAllCategories(language)
+    paramsCategoryApi
+      .getAllCategories(language)
       .then((res) => setFiltersData(res.data))
-      .catch(() => {
-        console.warn("API недоступен, используется mock");
-        setFiltersData(mockFiltersData);
-      });
+      .catch(() => console.warn("Ошибка загрузки фильтров"));
   }, [paramsCategoryApi, language]);
 
-
-  const handleFilterChange = (category, option) => {
-    setSelectedFilters(prev => {
-      const selected = prev[category] || [];
-      if (selected.includes(option)) {
-        return { ...prev, [category]: selected.filter(v => v !== option) };
-      } else {
-        return { ...prev, [category]: [...selected, option] };
-      }
-    });
-  };
-
-
-  useEffect(() => {
-    if (!state || !state.startDate || !state.endDate || !locationId) return;
-
-    const startIso = new Date(state.startDate).toISOString();
-    const endIso = new Date(state.endDate).toISOString();
-
-    offerApi.searchOffers({
-      startDate: startIso,
-      endDate: endIso,
-      guests: state.guests,
-      userDiscountPercent: 5,
-      lang: language,
-      cityId: locationId,
-      paramItemFilters: {}
-    }).then(res => setHotels(res.data))
-      .catch(err => console.error("Ошибка поиска предложений:", err));
-  }, [state, locationId, language]);
-
-
-
-  const handleSearchResults = (foundHotels, onSearchCity, guestCount, start, end, locId) => {
-    setCity(onSearchCity);
+  const handleSearchResults = (foundHotels, newCity, adultsVal, childrenVal, roomsVal, start, end, locId) => {
     setHotels(foundHotels);
-    setGuests(guestCount);
-    setStartDate(new Date(start));
-    setEndDate(new Date(end));
-    setLocationId(locId);
-
-    localStorage.setItem("city", onSearchCity);
-    localStorage.setItem("guests", guestCount);
+    localStorage.setItem("city", newCity);
+    localStorage.setItem("locationId", locId);
+    localStorage.setItem("adults", adultsVal);
+    localStorage.setItem("children", childrenVal);
+    localStorage.setItem("rooms", roomsVal);
     localStorage.setItem("startDate", start);
     localStorage.setItem("endDate", end);
     localStorage.setItem("hotels", JSON.stringify(foundHotels));
-
     setSelectedFilters({});
+  };
+
+  const handleFilterChange = (category, option) => {
+    setSelectedFilters((prev) => {
+      const selected = prev[category] || [];
+
+      return selected.includes(option)
+        ? { ...prev, [category]: selected.filter((v) => v !== option) }
+        : { ...prev, [category]: [...selected, option] };
+    });
   };
 
   return (
     <div className={styles.searchPage}>
-
       <Header_Full
-        city={city}
-        title={city}
-        guests={guests}
+        city={cityName}
+        adults={adults}
+        rooms={rooms}
+        children={children}
         startDate={startDate}
         endDate={endDate}
         openFilterMenu={openFilterMenu}
         setOpenFilterMenu={setOpenFilterMenu}
-
         handleSearchResults={handleSearchResults}
       />
 
       <main>
-        <div className={styles.searchPage__container}>
-          <div
-            className={styles.searchPage__container__list}
-            style={{
-              width: openFilterMenu ? `calc(100% - 424px - 20px)` : "100%",
-              transition: "width 0.2s ease",
-            }}
-          >
-            <HotelCardList
-              hotels={hotels}
-              guests={guests}
-              startDate={startDate}
-              endDate={endDate}
-            />
-          </div>
+        {loading ? (
+          <Spinner loading={true} />
+        ) : (
+          <>
+            <div className={styles.searchPage__container}>
 
-          {openFilterMenu && (
-            <aside className={styles.searchPage__filters}>
-              <FilterSidebar
-                filtersData={filtersData}
-                selectedFilters={selectedFilters}
-                onFilterChange={handleFilterChange}
-              />
-            </aside>
-          )}
-        </div>
+              <div
+                className={styles.searchPage__container__list}
+                style={{
+                  width: openFilterMenu
+                    ? `calc(100% - 424px - 20px)`
+                    : "100%",
+                  transition: "width 0.2s ease",
+                }}
+              >
+                <HotelCardList
+                  hotels={hotels}
+                  adults={adults}
+                  children={children}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+              </div>
+
+              {openFilterMenu && (
+                <aside className={styles.searchPage__filters}>
+                  <FilterSidebar
+                    filtersData={filtersData}
+                    selectedFilters={selectedFilters}
+                    onFilterChange={handleFilterChange}
+                  />
+                </aside>
+              )}
+            </div>
+          </>
+        )}
       </main>
 
       <Footer />

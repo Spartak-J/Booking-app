@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { useLanguage } from "../../contexts/LanguageContext.jsx";
 import { AddGuestModal } from "../modals/AddGuestModal.jsx";
@@ -19,6 +20,7 @@ export const SearchBar = ({
   const { t } = useTranslation();
   const { offerApi } = useContext(ApiContext);
   const { language } = useLanguage();
+    const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [locationId, setLocationId] = useState(null);
   const [hotels, setHotels] = useState([]);
@@ -26,57 +28,35 @@ export const SearchBar = ({
 
   const [guests, setGuests] = useState({
     rooms: 1,
-    adults: 2,
+    adults: 0,
     children: 0,
   });
 
   const [isGuestOpen, setIsGuestOpen] = useState(false);
 
-  const handleSearch = async () => {
-    if (!locationId) return alert("Пожалуйста, выберите город");
-    if (!dateRange.start || !dateRange.end)
-      return alert("Пожалуйста, выберите даты");
+  const handleSearch = () => {
+    if (!locationId) {
+      alert("Пожалуйста, выберите город");
+      return;
+    }
 
-    const totalGuests = guests.adults + guests.children;
+    if (!dateRange.start || !dateRange.end) {
+      alert("Пожалуйста, выберите даты");
+      return;
+    }
 
-    console.log("Initiating search with parameters:", {
-      locationId,
-      dateRange,
-      guests,
-      totalGuests,
-      language,
-    paramItemFilters: {}
+    const params = new URLSearchParams({
+      cityId: locationId,
+      startDate: dateRange.start.toISOString(),
+      endDate: dateRange.end.toISOString(),
+      adults: guests.adults,
+      children: guests.children,
+      rooms: guests.rooms,
     });
 
-    try {
-      const response = await offerApi.searchOffers({
-       startDate: dateRange.start.toISOString(),
-    endDate: dateRange.end.toISOString(),
-        guests: totalGuests,
-        userDiscountPercent: 5,
-        lang: language,
-        cityId: locationId,
-        paramItemFilters: {} 
-      });
-
-      const foundHotels = response.data;
-      setHotels(foundHotels);
-
-      if (onSearch) {
-        onSearch(
-          foundHotels,
-          location,
-          totalGuests,
-          dateRange.start,
-          dateRange.end
-        );
-      }
-
-      console.log("Результаты поиска:", foundHotels);
-    } catch (error) {
-      console.error("Ошибка поиска предложений:", error);
-    }
+    navigate(`/search?${params.toString()}`);
   };
+
 
   const setLocationInfo = (cityName, cityId) => {
     setLocation(cityName);

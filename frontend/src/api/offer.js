@@ -23,16 +23,18 @@ export const offerApi = {
     });
   },
 
-  searchOffers: ({ startDate, endDate, guests, userDiscountPercent, lang, cityId, paramItemFilters }) => {
+  searchOffers: ({ startDate, endDate, adults, children, rooms,  userDiscountPercent, lang, cityId, paramItemFilters }) => {
 
     const startIso = new Date(startDate).toISOString();
     const endIso = new Date(endDate).toISOString();
 
     const params = new URLSearchParams({
-      CityId: cityId.toString(),
+      CityId: cityId ? cityId.toString() : "",
       StartDate: startIso,
       EndDate: endIso,
-      Guests: guests.toString(),
+      Adults: adults? adults.toString() : "",
+      Children: children ? children.toString() :"0",
+      Rooms:rooms? rooms.toString() :"",
       userDiscountPercent: (userDiscountPercent || 0).toString(),
       paramItemFilters: JSON.stringify(paramItemFilters || {}) // всегда передаём строку
     });
@@ -41,11 +43,12 @@ export const offerApi = {
   },
 
 
-  searchId: ({ id, startDate, endDate, guests, userDiscountPercent, lang }) => {
+  searchId: ({ id, startDate, endDate, adults, children, userDiscountPercent, lang }) => {
     const params = new URLSearchParams({
       StartDate: startDate,   // ВАЖНО: PascalCase
       EndDate: endDate,
-      Guests: guests.toString(),
+       Adults: adults? adults.toString() : "",
+      Children: children ? children.toString() :"0",
       userDiscountPercent: userDiscountPercent.toString(),
     });
 

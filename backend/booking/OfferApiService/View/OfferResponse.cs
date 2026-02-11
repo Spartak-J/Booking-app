@@ -22,6 +22,10 @@ namespace OfferApiService.View
         public int DistanceToCenter { get; set; } // расстояние до центра
 
         public int GuestCount { get; set; }
+        public int? Adults { get; set; }
+        public int? Children { get; set; }
+
+       
         public int DaysCount { get; set; }
 
 
