@@ -6,7 +6,9 @@
   height: 442.8px;
   gap: 5px;
   background: var(--color-secondary);
+  position: relative;
 }
+
 
 .card__imageWrapper img {
   width: 100%;

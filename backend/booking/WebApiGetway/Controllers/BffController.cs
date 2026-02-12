@@ -388,12 +388,111 @@ namespace WebApiGetway.Controllers
 
         }
 
+        // =======================================================================================
+        //                          CLIENT:  получить все заказы из истории и из избранное
+        // =======================================================================================
+
+        [Authorize]
+        [HttpGet("me/history/get/offers/{lang}")]
+        public async Task<IActionResult> GetOffersToClientHistory(string lang)
+        {
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            var historyResult = await _gateway.ForwardRequestAsync<object>(
+                "UserApiService",
+                $"/api/User/me/history/get/offers",
+                HttpMethod.Get,
+                null
+            );
+
+            if (historyResult is not OkObjectResult okHistory)
+                return historyResult;
+
+            var historyDictList = BffHelper.ConvertActionResultToDict(okHistory);
+            if (historyDictList == null || !historyDictList.Any())
+                return Ok(new List<HistoryOfferLinkResponse>());
+
+
+            var historyResponseList = new List<HistoryOfferLinkResponse>();
+
+            foreach (var historyOf in historyDictList)
+            {
+                if (!historyOf.TryGetValue("offerId", out var offerIdRaw) ||
+                     !int.TryParse(offerIdRaw?.ToString(), out var idOffer))
+                {
+                    continue; 
+                }
+
+
+                var offerObjResult = await _gateway.ForwardRequestAsync<object>(
+                      "OfferApiService",
+                      $"/api/offer/get/{idOffer}",
+                      HttpMethod.Get,
+                      null
+                  );
+
+                if (offerObjResult is not OkObjectResult okOffer)
+                    continue;
+
+                var offerDictList = BffHelper.ConvertActionResultToDict(okOffer);
+                if (offerDictList == null || !offerDictList.Any())
+                    continue;
+
+                var offer = offerDictList.FirstOrDefault();
+                if (offer == null)
+                    continue;
+
+                if (!offer.TryGetValue("rentObj", out var rentObjRaw))
+                    continue;
+
+                var rentList = rentObjRaw as List<Dictionary<string, object>>;
+                var rentObj = rentList?.FirstOrDefault();
+                if (rentObj == null)
+                    continue;
+
+                var imageList = rentObj["images"] as List<Dictionary<string, object>>;
+                var mainImgUrl = imageList?.FirstOrDefault()?["url"]?.ToString() ?? "";
+
+
+                var countryId = int.Parse(rentObj["countryId"].ToString());
+                var cityId = int.Parse(rentObj["cityId"].ToString());
+
+                var translateOffer = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Offer/get-translations/{idOffer}/{lang}", HttpMethod.Get, null);
+                string? titleOffer = null;
+
+                if (translateOffer is OkObjectResult okOfferTr)
+                {
+                    var offerTranslateDictList = BffHelper.ConvertActionResultToDict(okOfferTr);
+                    titleOffer = offerTranslateDictList?.FirstOrDefault()?["title"]?.ToString()
+                                 ?? titleOffer;
+                }
+
+
+                historyOf.TryGetValue("isFavorites", out var favoriteRaw);
+                var isFavorite = favoriteRaw != null && bool.TryParse(favoriteRaw.ToString(), out var fav) && fav;
+
+                var historyResponse = new HistoryOfferLinkResponse
+                {
+                    OfferId = idOffer,
+                    ClientId = userId,
+                    Title = titleOffer ?? "Без названия",
+                    IsFavorites = isFavorite,
+                    MainImageUrl = mainImgUrl
+                };
+
+                historyResponseList.Add(historyResponse);
+            }
+
+            return Ok(historyResponseList);
+        }
 
         //============================================================================================
         //                           ближайшие  достопримечательности
         //============================================================================================
 
-            [HttpGet("search/booking-offer/attractions/{id}/{distance}/{lang}")]
+        [HttpGet("search/booking-offer/attractions/{id}/{distance}/{lang}")]
         public async Task<IActionResult> GetNearSttractionsByIdWithDistance(int id,
         decimal distance,
         string lang)
@@ -985,7 +1084,7 @@ namespace WebApiGetway.Controllers
       
             var rentObj = (offer["rentObj"] as List<Dictionary<string, object>>)[0];
 
-
+            var mainImg = (rentObj["images?[0]"].ToString());
             var countryId = int.Parse(rentObj["countryId"].ToString());
             var cityId = int.Parse(rentObj["cityId"].ToString());
             var street = rentObj["street"].ToString();

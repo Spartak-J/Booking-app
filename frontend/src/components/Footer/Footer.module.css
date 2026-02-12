@@ -11,6 +11,41 @@ justify-content: center;
   padding-bottom: 20px;
 }
 
+
+
+.footer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;   
+  height: 927px;
+  background-image:  url('data:image/svg+xml,<svg width="1760" height="927" viewBox="0 0 1760 927" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 155.773C0 148.19 4.16282 141.323 10.9595 137.962C63.8849 111.786 291.803 0 324.25 0C361 0 581 131.772 648.5 143.399C710.514 154.081 1596.76 145.135 1740.4 143.61C1751.53 143.492 1760 152.49 1760 163.623V907C1760 918.046 1751.05 927 1740 927H20C8.95429 927 0 918.046 0 907V155.773Z" fill="%23EDE5D1"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+   z-index: -2;
+}
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 143px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: var(--color-bg__2);
+  z-index: -1;
+  border-radius: 20px;
+}
+
+.logo{
+  position: absolute;
+  top: 45px;
+  left: 253px;
+}
+
+
+
 .footer__svg {
   position: absolute;
   top: 0;

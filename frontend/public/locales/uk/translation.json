@@ -281,11 +281,16 @@
     "menu_btn_help": "Допомога",
     "menu_btn_logout": "Вихід",
     "menu_btn_privacy": "Конфеденційність",
+    "menu_btn_history": "Збережене",
     "menu_btn_message": "Повідомлення",
     "my_travel": {
       "active": "Активні",
       "past": "Минулі",
       "cancelled": "Скасовані"
+    },
+     "my_history": {
+     "all": "Усі готелі",
+     "favorites": "Обране"
     },
     "AccountPanel": {
       "name": "Ім’я",
@@ -317,7 +322,9 @@
       "menu_btn_add_housing": "Додати своє житло"
     },
     "Reservation_management": "Управління  бронюванням",
-    "no_travel": "У вас немає скасованих поїздок",
+    "no_active_travel": "У вас немає активних поїздок",
+     "no_past_travel": "У вас немає минулих поїздок",
+      "no_cancelled_travel": "У вас немає скасованих поїздок",
     "PastHotel": {
       "title_page": "Реалізовано",
       "price": "Ціна",
