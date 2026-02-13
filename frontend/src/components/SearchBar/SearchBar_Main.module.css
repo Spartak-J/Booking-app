@@ -3,23 +3,12 @@
 
 }
 
-.searchBar_txt,
-.input_city_txt,
-.input_guest_txt,
-.input_date_title_txt {
+.searchBar,
+.input_city,
+.input_guest,
+.input_date_title {
   font-size: 16px;
   line-height: 20px;
-  font-family: 'Montserrat Alternates';
-  font-style: normal;
-  font-weight: 400;
-}
-
-.searchBar_Main_txt,
-.input_city_Main_txt,
-.input_guest_Main_txt,
-.input_date_title_Main_txt {
- font-size: 32px ;
-line-height: 39px ;
   font-family: 'Montserrat Alternates';
   font-style: normal;
   font-weight: 400;

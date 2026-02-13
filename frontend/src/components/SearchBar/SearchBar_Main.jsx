@@ -65,14 +65,14 @@ export const SearchBar_Main = () => {
   };
 
   return (
-    <div className={`${styles.searchBar} ${styles.searchBar_bg_color_dark} flex-left btn-w-1451 btn-h-106 btn-br-r-20 gap-20 `}>
+    <div className={`${styles.searchBar} ${styles.searchBar_bg_color_dark}  ${styles.searchBar_Main_txt} flex-left btn-w-1451 btn-h-106 btn-br-r-20 gap-20 `}>
       <Spinner loading={loading} />
       <div className={`${styles.searchBar__container} ${styles.searchBar__container_main} gap-20 `}>
         <div className={`${styles.searchBar__wrapper} btn-br-r-10 btn-h-72 flex-center`}>
           <CitySelector
             value={location}
-            classTitle="btn-h-70 btn-w-425"
-            input_classTitle=""
+            classTitle="btn-h-70 btn-w-425 "
+            input_classTitle={`${styles.input_city_Main_txt}`}
             icon_title="city_big"
             icon_size="48"
             placeholder={t("Search.city")}
@@ -84,6 +84,7 @@ export const SearchBar_Main = () => {
           icon_title="calendar_big"
           icon_size="50"
           classTitle={`btn-h-70 `}
+           input_className={`${styles.input_date_title_Main_txt}`}
           setDateRange={setDateRange}
         />
 
@@ -95,7 +96,7 @@ export const SearchBar_Main = () => {
           />
           <button
             onClick={() => setIsGuestOpen(!isGuestOpen)}
-            className={styles.input_guest}
+            className= {`${styles.input_guest} ${styles.input_guest_Main_txt}`}
           >
             {`${guests.adults + guests.children} ${t("Search.guests")}`}
           </button>

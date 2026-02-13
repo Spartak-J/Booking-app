@@ -275,7 +275,7 @@ namespace OfferApiService.Controllers
                 });
             }
 
-            rentObjRequest.DistanceToCenter = (int)(rentObjRequest.DistanceToCenter / 1000.0);
+            rentObjRequest.DistanceToCenter = (int)(rentObjRequest.DistanceToCenter);
 
 
             var rentObjModel = RentObjRequest.MapToModel(rentObjRequest);

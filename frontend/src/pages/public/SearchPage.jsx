@@ -20,162 +20,6 @@ import { useLanguage } from "../../contexts/LanguageContext";
 
 import styles from "./SearchPage.module.css";
 
-const mockFiltersData = [
-  {
-    id: "accommodation_type",
-    title: "filters.accommodation_type.title",
-    items: [
-      { id: "type_hotel", title: "filters.accommodation_type.hotel", value: "hotel" },
-      { id: "type_hostel", title: "filters.accommodation_type.hostel", value: "hostel" },
-      { id: "type_studio", title: "filters.accommodation_type.studio", value: "studio" },
-      { id: "type_apartment", title: "filters.accommodation_type.apartment", value: "apartment" },
-      { id: "type_house", title: "filters.accommodation_type.house", value: "house" },
-      { id: "type_room", title: "filters.accommodation_type.room", value: "room" }
-    ]
-  },
-  {
-    id: "price",
-    title: "filters.price.title",
-    items: [
-      { id: "from", title: "filters.price.from", value: "wifi" },
-      { id: "to", title: "filters.price.to", value: "to" },
-    ]
-  },
-  {
-    id: "amenities",
-    title: "filters.amenities.title",
-    items: [
-      { id: "amenity_wifi", title: "filters.amenities.wifi", value: "wifi" },
-      { id: "amenity_ac", title: "filters.amenities.air_conditioner", value: "air_conditioner" },
-      { id: "amenity_tv", title: "filters.amenities.tv", value: "tv" },
-      { id: "amenity_workspace", title: "filters.amenities.workspace", value: "workspace" },
-      { id: "amenity_pets", title: "filters.amenities.pets", value: "pets" },
-      { id: "amenity_parking", title: "filters.amenities.parking", value: "parking" },
-      { id: "amenity_washer", title: "filters.amenities.washer", value: "washer" },
-      { id: "amenity_iron", title: "filters.amenities.iron", value: "iron" },
-      { id: "amenity_kettle", title: "filters.amenities.kettle", value: "kettle" }
-    ]
-  },
-  {
-    id: "housing_features",
-    title: "filters.housing_features.title",
-    items: [
-      { id: "feature_balcony", title: "filters.housing_features.balcony", value: "balcony" },
-      { id: "feature_terrace", title: "filters.housing_features.terrace", value: "terrace" },
-      { id: "feature_kitchen", title: "filters.housing_features.kitchen", value: "kitchen" },
-      { id: "feature_single_bed", title: "filters.housing_features.single_bed", value: "single_bed" },
-      { id: "feature_double_bed", title: "filters.housing_features.double_bed", value: "double_bed" }
-    ]
-  },
-  {
-    id: "rating",
-    title: "filters.rating.title",
-    items: [
-      { id: "rating_5", title: "filters.rating.5", value: "5" },
-      { id: "rating_7", title: "filters.rating.7", value: "7" },
-      { id: "rating_9", title: "filters.rating.9", value: "9" },
-      { id: "rating_8", title: "filters.rating.8", value: "8" }
-    ]
-  },
-  {
-    id: "distance_center",
-    title: "filters.distance_center.title",
-    items: [
-      { id: "distance_1", title: "filters.distance_center.<1km", value: "<1km" },
-      { id: "distance_3", title: "filters.distance_center.<3km", value: "<3km" },
-      { id: "distance_5", title: "filters.distance_center.<5km", value: "<5km" }
-    ]
-  },
-  {
-    id: "booking_rules",
-    title: "filters.booking_rules.title",
-    items: [
-      { id: "rule_free_cancel", title: "filters.booking_rules.free_cancel", value: "free_cancel" },
-      { id: "rule_pay_now", title: "filters.booking_rules.pay_now", value: "pay_now" },
-      { id: "rule_pay_before", title: "filters.booking_rules.pay_before", value: "pay_before" },
-      { id: "rule_pay_place", title: "filters.booking_rules.pay_on_place", value: "pay_on_place" }
-    ]
-  },
-  {
-    id: "district",
-    title: "filters.district.title",
-    items: [
-      { id: "district_center", title: "filters.district.center", value: "center" },
-      { id: "district_favorite", title: "filters.district.favorite", value: "favorite" },
-      { id: "district_market", title: "filters.district.market_square", value: "market_square" },
-      { id: "district_svobody", title: "filters.district.svobody_avenue", value: "svobody_avenue" }
-    ]
-  }
-];
-
-const mockHotels = [
-  {
-    id: 1,
-    title: "Готель Київ Центр",
-    rentObj: [{ mainImageUrl: "https://picsum.photos/300/200?random=1" }],
-    city: "Київ",
-    country: "Україна",
-    distanceToCenter: 1.2,
-    rating: 4.8,
-    reviews: 234,
-    totalPrice: 2500,
-  },
-  {
-    id: 2,
-    title: "Апартаменти Львів Старе Місто",
-    rentObj: [{ mainImageUrl: "https://picsum.photos/300/200?random=2" }],
-    city: "Львів",
-    country: "Україна",
-    distanceToCenter: 0.5,
-    rating: 4.6,
-    reviews: 180,
-    totalPrice: 1800,
-  },
-  {
-    id: 3,
-    title: "Хостел Одеса Морський",
-    rentObj: [{ mainImageUrl: "https://picsum.photos/300/200?random=3" }],
-    city: "Одеса",
-    country: "Україна",
-    distanceToCenter: 2.0,
-    rating: 4.2,
-    reviews: 95,
-    totalPrice: 900,
-  },
-  {
-    id: 4,
-    title: "Спа-готель Карпати",
-    rentObj: [{ mainImageUrl: "https://picsum.photos/300/200?random=4" }],
-    city: "Яремче",
-    country: "Україна",
-    distanceToCenter: 3.5,
-    rating: 4.9,
-    reviews: 112,
-    totalPrice: 3200,
-  },
-  {
-    id: 5,
-    title: "Стильні апартаменти Харків",
-    rentObj: [{ mainImageUrl: "https://picsum.photos/300/200?random=5" }],
-    city: "Харків",
-    country: "Україна",
-    distanceToCenter: 1.0,
-    rating: 4.5,
-    reviews: 140,
-    totalPrice: 2000,
-  },
-  {
-    id: 6,
-    title: "Затишний будинок у Чернівцях",
-    rentObj: [{ mainImageUrl: "https://picsum.photos/300/200?random=6" }],
-    city: "Чернівці",
-    country: "Україна",
-    distanceToCenter: 0.8,
-    rating: 4.7,
-    reviews: 87,
-    totalPrice: 1500,
-  },
-];
 
 
 export const SearchPage = ({ defaultCityId }) => {
@@ -184,7 +28,7 @@ export const SearchPage = ({ defaultCityId }) => {
   const [searchParams] = useSearchParams();
 
   const cityId = searchParams.get("cityId") || localStorage.getItem("locationId") || null;
-  const cityName = localStorage.getItem("city") || "Львів";
+  const cityName = localStorage.getItem("city") || "";
 
   const startDateStr = searchParams.get("startDate") || localStorage.getItem("startDate") || new Date().toISOString();
   const endDateStr = searchParams.get("endDate") || localStorage.getItem("endDate") || new Date(Date.now() + 86400000).toISOString(); // завтра
@@ -193,14 +37,40 @@ export const SearchPage = ({ defaultCityId }) => {
   const children = Number(searchParams.get("children") || localStorage.getItem("children") || 0);
   const rooms = Number(searchParams.get("rooms") || localStorage.getItem("rooms") || 1);
 
+  const paramsStr = searchParams.get("params") || "";
+
+  const paramsFromUrl = {};
+
+  if (paramsStr) {
+    paramsStr.split(",").forEach(pair => {
+      const [key, value] = pair.split(":");
+      if (!isNaN(value)) {
+        paramsFromUrl[key] = Number(value);
+      } else if (value === "true") {
+        paramsFromUrl[key] = true;
+      } else if (value === "false") {
+        paramsFromUrl[key] = false;
+      } else {
+        paramsFromUrl[key] = value;
+      }
+    });
+  }
+
+  console.log("paramsFromUrl:", paramsFromUrl);
+
+
+
   const [hotels, setHotels] = useState([]);
   const [filtersData, setFiltersData] = useState([]);
-  const [selectedFilters, setSelectedFilters] = useState({});
   const [openFilterMenu, setOpenFilterMenu] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const startDate = useMemo(() => new Date(startDateStr), [startDateStr]);
   const endDate = useMemo(() => new Date(endDateStr), [endDateStr]);
+  const [paramsString, setParamsString] = useState("");
+  const [params, setParams] = useState(paramsFromUrl);
+
+  const [sortType, setSortType] = useState("recommended");
 
 
   useEffect(() => {
@@ -219,7 +89,7 @@ export const SearchPage = ({ defaultCityId }) => {
           rooms,
           userDiscountPercent: 5,
           lang: language,
-          paramItemFilters: selectedFilters,
+          paramItemFilters: paramsString,
         });
 
         setHotels(response.data);
@@ -231,15 +101,22 @@ export const SearchPage = ({ defaultCityId }) => {
     };
 
     fetchHotels();
-  }, [cityId, startDate, endDate, adults, children, rooms, language, selectedFilters]);
+  }, [cityId, startDate, endDate, adults, children, rooms, language, paramsString]);
 
 
   useEffect(() => {
     paramsCategoryApi
       .getAllCategories(language)
-      .then((res) => setFiltersData(res.data))
-      .catch(() => console.warn("Ошибка загрузки фильтров"));
+      .then((res) => {
+        console.log("Ответ API:", res);
+        console.log("Данные:", res.data);
+        setFiltersData(res.data);
+      })
+      .catch((err) => {
+        console.warn("Ошибка загрузки фильтров", err);
+      });
   }, [paramsCategoryApi, language]);
+
 
   const handleSearchResults = (foundHotels, newCity, adultsVal, childrenVal, roomsVal, start, end, locId) => {
     setHotels(foundHotels);
@@ -251,18 +128,34 @@ export const SearchPage = ({ defaultCityId }) => {
     localStorage.setItem("startDate", start);
     localStorage.setItem("endDate", end);
     localStorage.setItem("hotels", JSON.stringify(foundHotels));
-    setSelectedFilters({});
   };
 
-  const handleFilterChange = (category, option) => {
-    setSelectedFilters((prev) => {
-      const selected = prev[category] || [];
-
-      return selected.includes(option)
-        ? { ...prev, [category]: selected.filter((v) => v !== option) }
-        : { ...prev, [category]: [...selected, option] };
-    });
+  const handleSortChange = (type) => {
+    setSortType(type);
   };
+
+
+  const sortedHotels = useMemo(() => {
+    const sorted = [...hotels];
+
+    switch (sortType) {
+      case "priceAsc":
+        return sorted.sort((a, b) => a.price - b.price);
+
+      case "priceDesc":
+        return sorted.sort((a, b) => b.price - a.price);
+
+      case "ratingAsc":
+        return sorted.sort((a, b) => a.rating - b.rating);
+
+      case "ratingDesc":
+        return sorted.sort((a, b) => b.rating - a.rating);
+
+      default:
+        return sorted;
+    }
+  }, [hotels, sortType]);
+
 
   return (
     <div className={styles.searchPage}>
@@ -273,9 +166,11 @@ export const SearchPage = ({ defaultCityId }) => {
         children={children}
         startDate={startDate}
         endDate={endDate}
+        params={params}
         openFilterMenu={openFilterMenu}
         setOpenFilterMenu={setOpenFilterMenu}
         handleSearchResults={handleSearchResults}
+        handleSortChange={handleSortChange}
       />
 
       <main>
@@ -295,20 +190,21 @@ export const SearchPage = ({ defaultCityId }) => {
                 }}
               >
                 <HotelCardList
-                  hotels={hotels}
+                  hotels={sortedHotels}
                   adults={adults}
                   children={children}
                   startDate={startDate}
                   endDate={endDate}
                 />
               </div>
-
               {openFilterMenu && (
                 <aside className={styles.searchPage__filters}>
                   <FilterSidebar
+                    city={cityName}
+                    setParamsString={setParamsString}
+                    params={params}
+                    setParams={setParams}
                     filtersData={filtersData}
-                    selectedFilters={selectedFilters}
-                    onFilterChange={handleFilterChange}
                   />
                 </aside>
               )}

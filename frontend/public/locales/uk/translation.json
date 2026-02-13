@@ -119,6 +119,7 @@
   },
   "filters": {
     "filterTitle": "Фільтр",
+    "filterBtn": "Застосувати",
     "accommodation_type": {
       "title": "Тип розміщення",
       "hotel": "Готель",

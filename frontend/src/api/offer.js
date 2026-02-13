@@ -36,7 +36,7 @@ export const offerApi = {
       Children: children ? children.toString() :"0",
       Rooms:rooms? rooms.toString() :"",
       userDiscountPercent: (userDiscountPercent || 0).toString(),
-      paramItemFilters: JSON.stringify(paramItemFilters || {}) // всегда передаём строку
+      paramItemFilters: (paramItemFilters || "") 
     });
 
     return http.get(`/Bff/search/offers/${lang}?${params.toString()}`);

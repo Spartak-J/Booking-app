@@ -831,10 +831,11 @@ namespace WebApiGetway.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddImageOffer(
          [FromRoute] int offerId,
-         [FromForm] ImageOfferRequest request)
+       [FromForm] List<IFormFile> files
+            )
         {
-            var file = request.File;
-            if (file == null || file.Length == 0)
+            
+            if (files == null || files.Count == 0)
                 return BadRequest("Файл не передан");
 
            
@@ -868,12 +869,26 @@ namespace WebApiGetway.Controllers
 
             var rentObjId = int.Parse(RentObjIdObj["number"].ToString());
 
-            return await _gateway.ForwardFileAsync(
-                "OfferApiService",
-                $"/api/RentObjImage/upload/{rentObjId}",
-                HttpMethod.Post,
-                file
-            );
+            var results = new List<IActionResult>();
+            foreach (var file in files)
+            {
+                var curresult = await _gateway.ForwardFileAsync(
+                  "OfferApiService",
+                  $"/api/RentObjImage/upload/{rentObjId}",
+                  HttpMethod.Post,
+                  file
+              );
+                results.Add(curresult);
+            }
+            return Ok(results);
+
+
+            //return await _gateway.ForwardFileAsync(
+            //    "OfferApiService",
+            //    $"/api/RentObjImage/upload/{rentObjId}",
+            //    HttpMethod.Post,
+            //    file
+            //);
         }
 
         //============================================================================================
@@ -2116,9 +2131,17 @@ namespace WebApiGetway.Controllers
 
             var rentObj = rentObjList[0];
 
-            return rentObj.TryGetValue("paramValues", out var pvObj)
-                    && pvObj is List<Dictionary<string, object>> pvList
-                    && (paramValues = pvList) != null;
+            if (rentObj.TryGetValue("paramValues", out var pvObj))
+                if (pvObj is List<Dictionary<string, object>> pvList)
+                    if (pvList != null)
+                    {
+                        paramValues = pvList;
+                        return true;
+                    }
+            return false;
+            //return rentObj.TryGetValue("paramValues", out var pvObj)
+            //    && pvObj is List<Dictionary<string, object>> pvList
+            //    && (paramValues = pvList) != null;
         }
 
         //-----вычисление совпадения всех фильтров с параметрами обьявления-----
@@ -2129,7 +2152,7 @@ namespace WebApiGetway.Controllers
             var flag = true;
             foreach (var f in filters)
             {
-                if (!paramValues.Any(p => p["id"].ToString() == f["id"].ToString()
+                if (!paramValues.Any(p => p["paramItemId"].ToString() == f["id"].ToString()
                     && (p["valueBool"].ToString().ToLower() == f["value"].ToString().ToLower()
                     || p["valueInt"].ToString().ToLower() == f["value"].ToString().ToLower()
                     || p["valueString"].ToString().ToLower() == f["value"].ToString().ToLower())))

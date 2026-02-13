@@ -31,10 +31,12 @@ export const Header_Full = ({
   rooms,
   startDate,
   endDate,
+  params,
   showFilterBtn = true,
   openFilterMenu = true,
   setOpenFilterMenu,
-  handleSearchResults
+  handleSearchResults,
+  handleSortChange
 }) => {
   const navigate = useNavigate();
 
@@ -48,14 +50,19 @@ export const Header_Full = ({
 
   const { t } = useTranslation();
   const { language, setLanguage } = useLanguage();
-
+ 
   const handleLanguageToggle = () => {
     setIsModalLanguageOpen(true);
+    setOpenSortMenu(false);
+    setIsLoginModalOpen(false);
+    setOpenFilterMenu(false);
   };
 
   const handleMenuToggle = () => {
     setOpenMenu(true);
   };
+
+
 
 
   return (
@@ -76,6 +83,7 @@ export const Header_Full = ({
               defaultGuests={{ adults, children, rooms }}
               defaultStartDate={startDate}
               defaultEndDate={endDate}
+              params={params}
               onSearch={handleSearchResults}
             />
           </div>
@@ -95,6 +103,9 @@ export const Header_Full = ({
                   navigate("/profile");
                 } else {
                   setIsLoginModalOpen(true);
+                  setOpenSortMenu(false);
+                  setOpenFilterMenu(false);
+                  setIsModalLanguageOpen(false);
                 }
               }}
             />
@@ -150,11 +161,12 @@ export const Header_Full = ({
                 onClick={() => {
                   setOpenSortMenu((prev) => !prev);
                   setOpenFilterMenu(false);
+                  setIsModalLanguageOpen(false);
                 }}
               />
               {openSortMenu && (
                 <div className={styles.headerMain_sortBtn__dropdown}>
-                  <SortMenuModal />
+                  <SortMenuModal onSortChange={handleSortChange} />
                 </div>
               )}
 
@@ -164,6 +176,7 @@ export const Header_Full = ({
                 onClick={() => {
                   setOpenFilterMenu((prev) => !prev);
                   setOpenSortMenu(false);
+                  setIsModalLanguageOpen(false);
                 }}
               />
 

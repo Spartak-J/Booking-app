@@ -111,6 +111,7 @@ namespace WebApiGetway.Service
         {
             var client = _clientFactory.CreateClient(serviceName);
 
+
             using var content = new MultipartFormDataContent();
             var streamContent = new StreamContent(file.OpenReadStream());
             content.Add(streamContent, "file", file.FileName);

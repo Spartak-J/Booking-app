@@ -10,6 +10,7 @@
   overflow: hidden;
   border-radius: 20px;
   background-color: var(--color-input-form-bg);
+z-index: 100;
 }
 
 

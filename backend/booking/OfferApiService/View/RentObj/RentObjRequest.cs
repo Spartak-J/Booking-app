@@ -25,8 +25,8 @@ namespace OfferApiService.View.RentObj
         public double? CityLongitude { get; set; }
 
 
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public string Street { get; set; }        
         public string HouseNumber { get; set; }  
         public string Postcode { get; set; }
@@ -67,8 +67,8 @@ namespace OfferApiService.View.RentObj
                 HouseNumber = request.HouseNumber,
                 Postcode = request.Postcode,
                 DistanceToCenter = request.DistanceToCenter,
-                Latitude = 0,
-                Longitude = 0,
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
                 RoomCount = request.RoomCount,
                 LivingRoomCount = request.LivingRoomCount,
                 BathroomCount = request.BathroomCount,

@@ -105,27 +105,31 @@ namespace OfferApiService.Services
             var existingParams = existingOffer.RentObj.ParamValues;
             var newParams = offer.RentObj.ParamValues ?? new List<RentObjParamValue>();
 
+            // Удаляем старые
             foreach (var existing in existingParams.ToList())
             {
-                if (!newParams.Any(p => p.id == existing.id))
+                if (!newParams.Any(p => p.id != 0 && p.id == existing.id))
                 {
                     db.RentObjParamValues.Remove(existing);
                 }
             }
 
+            // Обновляем или добавляем новые
             foreach (var param in newParams)
             {
-                var existing = existingParams.FirstOrDefault(p => p.id == param.id);
-
-                if (existing == null)
+                if (param.id == 0)
                 {
+                    param.RentObjId = existingOffer.RentObj.id;
                     existingParams.Add(param);
                 }
                 else
                 {
-                    db.Entry(existing).CurrentValues.SetValues(param);
+                    var existing = existingParams.FirstOrDefault(p => p.id == param.id);
+                    if (existing != null)
+                        db.Entry(existing).CurrentValues.SetValues(param);
                 }
             }
+
 
             // =======================
             // 5. Images

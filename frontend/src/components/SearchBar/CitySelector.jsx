@@ -10,7 +10,7 @@ export const CitySelector = ({
   value,
   onChange,
   classTitle = "btn-h-35 btn-w-276",
-  input_classTitle = "",
+  input_classTitle = styles.input_city_txt,
   icon_title = "city",
   icon_size = "18",
   placeholder

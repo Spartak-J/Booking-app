@@ -119,6 +119,7 @@
   },
   "filters": {
     "filterTitle": "Filter",
+      "filterBtn": "Apply",
     "accommodation_type": {
       "title": "Accommodation type",
       "hotel": "Hotel",

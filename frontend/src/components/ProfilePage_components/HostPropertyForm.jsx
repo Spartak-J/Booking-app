@@ -354,13 +354,18 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
     const handleAddImages = (e) => {
         const files = Array.from(e.target.files);
 
+        const existingImages = form.offer.rentObj.images || [];
+
         setForm(prev => ({
             ...prev,
             offer: {
                 ...prev.offer,
                 rentObj: {
                     ...prev.offer.rentObj,
-                    images: [...prev.offer.rentObj.images, ...files]
+                    images: [
+                        ...existingImages,
+                        ...files
+                    ]
                 }
             }
         }));
@@ -373,524 +378,524 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
 
 
 
-const scrollToLast = () => {
-    if (!viewportRef.current) return;
+    const scrollToLast = () => {
+        if (!viewportRef.current) return;
 
-    viewportRef.current.scrollTo({
-        left: viewportRef.current.scrollWidth,
-        behavior: "smooth"
-    });
-};
+        viewportRef.current.scrollTo({
+            left: viewportRef.current.scrollWidth,
+            behavior: "smooth"
+        });
+    };
 
 
 
-const removeImage = (index) => {
-    setForm(prev => ({
-        ...prev,
-        offer: {
-            ...prev.offer,
-            rentObj: {
-                ...prev.offer.rentObj,
-                images: prev.offer.rentObj.images.filter((_, i) => i !== index)
+    const removeImage = (index) => {
+        setForm(prev => ({
+            ...prev,
+            offer: {
+                ...prev.offer,
+                rentObj: {
+                    ...prev.offer.rentObj,
+                    images: prev.offer.rentObj.images.filter((_, i) => i !== index)
+                }
             }
-        }
-    }));
-};
+        }));
+    };
 
-useEffect(() => {
-    return () => {
-        form.offer.rentObj.images.forEach(img => {
+    useEffect(() => {
+        return () => {
+            form.offer.rentObj.images.forEach(img => {
+                if (img instanceof File) {
+                    URL.revokeObjectURL(img);
+                }
+            });
+        };
+    }, [form.offer.rentObj.images]);
+
+
+
+    useEffect(() => {
+        const urls = form.offer.rentObj.images.map(img => {
             if (img instanceof File) {
-                URL.revokeObjectURL(img);
+                return URL.createObjectURL(img);
             }
+
+            if (typeof img === "string") {
+                return img;
+            }
+
+            if (img?.url) {
+                return img.url;
+            }
+
+            return "";
         });
-    };
-}, [form.offer.rentObj.images]);
 
+        setImagePreviews(urls);
 
-
-useEffect(() => {
-    const urls = form.offer.rentObj.images.map(img => {
-        if (img instanceof File) {
-            return URL.createObjectURL(img);
-        }
-
-        if (typeof img === "string") {
-            return img;
-        }
-
-        if (img?.url) {
-            return img.url;
-        }
-
-        return "";
-    });
-
-    setImagePreviews(urls);
-
-    return () => {
-        urls.forEach((url, index) => {
-            if (form.offer.rentObj.images[index] instanceof File) {
-                URL.revokeObjectURL(url);
-            }
-        });
-    };
-}, [form.offer.rentObj.images]);
-
-
-
-const removeExistingImage = (id) => {
-    setForm(prev => ({
-        ...prev,
-        offer: {
-            ...prev.offer,
-            rentObj: {
-                ...prev.offer.rentObj,
-                images: prev.offer.rentObj.images.filter(img => img.id !== id)
-            }
-        }
-    }));
-};
-
-
-
-const buildOfferPayload = () => {
-    const rentObj = form.offer.rentObj || {};
-    const paramValues = Array.isArray(rentObj.paramValues) ? rentObj.paramValues : [];
-
-    console.log("rentObj.id");
-    console.log(rentObj.id);
-
-    const normalizedParamValues = paramValues.map(p => ({
-        paramItemId: p.paramItemId ?? 0,
-        valueBool: Boolean(p.valueBool),
-        valueInt: Number(p.valueInt) || 0,
-        valueString: (p.valueString ?? "").toString()
-    }));
-
-    return {
-        id: form.offer.id > 0 ? form.offer.id : 0,
-        Title: form.offer.title ?? "",
-        Description: form.offer.description ?? "",
-        TitleInfo: form.offer.titleInfo ?? "",
-        PricePerDay: Number(form.offer.pricePerDay) || 0,
-        PricePerWeek: form.offer.pricePerWeek != null ? Number(form.offer.pricePerWeek) : null,
-        PricePerMonth: form.offer.pricePerMonth != null ? Number(form.offer.pricePerMonth) : null,
-        Tax: form.offer.tax != null ? Number(form.offer.tax) : null,
-        MinRentDays: Number(form.offer.minRentDays) || 1,
-        AllowPets: Boolean(form.offer.allowPets),
-        AllowSmoking: Boolean(form.offer.allowSmoking),
-        AllowChildren: Boolean(form.offer.allowChildren),
-        AllowParties: Boolean(form.offer.allowParties),
-        MaxGuests: Number(form.offer.maxGuests) || 1,
-        CheckInTime: form.offer.checkInTime ?? "11:00:00",
-        CheckOutTime: form.offer.checkOutTime ?? "15:00:00",
-        OwnerId: form.offer.ownerId ?? 1,
-        RentObj: {
-            id: rentObj.id > 0 ? rentObj.id : 0,
-            offerId: form.offer.id > 0 ? form.offer.id : 0,
-            countryId: Number(rentObj.countryId) || 0,
-            countryTitle: rentObj.countryTitle ?? "",
-            regionId: Number(rentObj.regionId) || 0,
-            cityId: Number(rentObj.cityId) || 0,
-            cityTitle: rentObj.cityTitle ?? "",
-            districtId: Number(rentObj.districtId) || 0,
-            street: rentObj.street ?? "",
-            houseNumber: rentObj.houseNumber ?? "",
-            postcode: rentObj.postcode ?? "",
-            latitude: Number(rentObj.latitude) || 0,
-            longitude: Number(rentObj.longitude) || 0,
-            roomCount: Number(rentObj.roomCount) || 0,
-            livingRoomCount: Number(rentObj.livingRoomCount) || 0,
-            bathroomCount: Number(rentObj.bathroomCount) || 0,
-            area: Number(rentObj.area) || 0,
-            totalBedsCount: Number(rentObj.totalBedsCount) || 0,
-            singleBedsCount: Number(rentObj.singleBedsCount) || 0,
-            doubleBedsCount: Number(rentObj.doubleBedsCount) || 0,
-            hasBabyCrib: Boolean(rentObj.hasBabyCrib),
-            images: [],
-            paramValues: normalizedParamValues
-        }
-    };
-};
-
-
-
-
-const [uploading, setUploading] = useState(false);
-
-
-const handleSave = async () => {
-    try {
-        setUploading(true);
-
-        const payload = buildOfferPayload();
-        console.log("Попытка отправки данных на бек:", JSON.stringify(payload, null, 2));
-
-        let offerId = form.offer.id;
-        if (!offerId || offerId === -1) {
-            const response = await offerApi.createOffer({ formData: buildOfferPayload(), lang: language });
-            offerId = response.data;
-        } else {
-            await offerApi.updateOffer({ formData: buildOfferPayload(), lang: language });
-        }
-
-        const files = form.offer.rentObj.images.filter(img => img instanceof File);
-
-        console.log("FILES:", files);
-
-
-
-        console.log("Файлы для отправки:", files);
-        console.log("offerId  отправки:", offerId);
-
-        if (files.length > 0) {
-            const imgFd = new FormData();
-
-            files.forEach(file => {
-                imgFd.append("File", file);
+        return () => {
+            urls.forEach((url, index) => {
+                if (form.offer.rentObj.images[index] instanceof File) {
+                    URL.revokeObjectURL(url);
+                }
             });
+        };
+    }, [form.offer.rentObj.images]);
 
-            console.log("FormData:");
-            console.log([...imgFd.entries()]);
 
-            await offerApi.createOfferImg({
-                formData: imgFd,
-                offerId
-            });
+
+    const removeExistingImage = (id) => {
+        setForm(prev => ({
+            ...prev,
+            offer: {
+                ...prev.offer,
+                rentObj: {
+                    ...prev.offer.rentObj,
+                    images: prev.offer.rentObj.images.filter(img => img.id !== id)
+                }
+            }
+        }));
+    };
+
+
+
+    const buildOfferPayload = () => {
+        const rentObj = form.offer.rentObj || {};
+        const paramValues = Array.isArray(rentObj.paramValues) ? rentObj.paramValues : [];
+
+        console.log("rentObj.id");
+        console.log(rentObj.id);
+
+        const normalizedParamValues = paramValues.map(p => ({
+            paramItemId: p.paramItemId ?? 0,
+            valueBool: Boolean(p.valueBool),
+            valueInt: Number(p.valueInt) || 0,
+            valueString: (p.valueString ?? "").toString()
+        }));
+
+        return {
+            id: form.offer.id > 0 ? form.offer.id : 0,
+            Title: form.offer.title ?? "",
+            Description: form.offer.description ?? "",
+            TitleInfo: form.offer.titleInfo ?? "",
+            PricePerDay: Number(form.offer.pricePerDay) || 0,
+            PricePerWeek: form.offer.pricePerWeek != null ? Number(form.offer.pricePerWeek) : null,
+            PricePerMonth: form.offer.pricePerMonth != null ? Number(form.offer.pricePerMonth) : null,
+            Tax: form.offer.tax != null ? Number(form.offer.tax) : null,
+            MinRentDays: Number(form.offer.minRentDays) || 1,
+            AllowPets: Boolean(form.offer.allowPets),
+            AllowSmoking: Boolean(form.offer.allowSmoking),
+            AllowChildren: Boolean(form.offer.allowChildren),
+            AllowParties: Boolean(form.offer.allowParties),
+            MaxGuests: Number(form.offer.maxGuests) || 1,
+            CheckInTime: form.offer.checkInTime ?? "11:00:00",
+            CheckOutTime: form.offer.checkOutTime ?? "15:00:00",
+            OwnerId: form.offer.ownerId ?? 1,
+            RentObj: {
+                id: rentObj.id > 0 ? rentObj.id : 0,
+                offerId: form.offer.id > 0 ? form.offer.id : 0,
+                countryId: Number(rentObj.countryId) || 0,
+                countryTitle: rentObj.countryTitle ?? "",
+                regionId: Number(rentObj.regionId) || 0,
+                cityId: Number(rentObj.cityId) || 0,
+                cityTitle: rentObj.cityTitle ?? "",
+                districtId: Number(rentObj.districtId) || 0,
+                street: rentObj.street ?? "",
+                houseNumber: rentObj.houseNumber ?? "",
+                postcode: rentObj.postcode ?? "",
+                latitude: Number(rentObj.latitude) || 0,
+                longitude: Number(rentObj.longitude) || 0,
+                roomCount: Number(rentObj.roomCount) || 0,
+                livingRoomCount: Number(rentObj.livingRoomCount) || 0,
+                bathroomCount: Number(rentObj.bathroomCount) || 0,
+                area: Number(rentObj.area) || 0,
+                totalBedsCount: Number(rentObj.totalBedsCount) || 0,
+                singleBedsCount: Number(rentObj.singleBedsCount) || 0,
+                doubleBedsCount: Number(rentObj.doubleBedsCount) || 0,
+                hasBabyCrib: Boolean(rentObj.hasBabyCrib),
+                images: [],
+                paramValues: normalizedParamValues
+            }
+        };
+    };
+
+
+
+
+    const [uploading, setUploading] = useState(false);
+
+
+    const handleSave = async () => {
+        try {
+            setUploading(true);
+
+            const payload = buildOfferPayload();
+            console.log("Попытка отправки данных на бек:", JSON.stringify(payload, null, 2));
+
+            let offerId = form.offer.id;
+            if (!offerId || offerId === -1) {
+                const response = await offerApi.createOffer({ formData: buildOfferPayload(), lang: language });
+                offerId = response.data;
+            } else {
+                await offerApi.updateOffer({ formData: buildOfferPayload(), lang: language });
+            }
+
+            const files = form.offer.rentObj.images.filter(img => img instanceof File);
+
+            console.log("FILES:", files);
+
+
+
+            console.log("Файлы для отправки:", files);
+            console.log("offerId  отправки:", offerId);
+
+            if (files.length > 0) {
+                const imgFd = new FormData();
+
+                files.forEach(file => {
+                    imgFd.append("files", file);
+                });
+
+                console.log("FormData:");
+                console.log([...imgFd.entries()]);
+
+                await offerApi.createOfferImg({
+                    formData: imgFd,
+                    offerId
+                });
+            }
+
+            alert("Объявление и фото успешно сохранены!");
+            setShowForm(false);
+            navigate("/profile");
+        } catch (error) {
+            console.error(error);
+            alert("Ошибка при сохранении");
+        } finally {
+            setUploading(false);
+            navigate("/profile");
         }
+    };
 
-        alert("Объявление и фото успешно сохранены!");
-        setShowForm(false);
-        navigate("/profile");
-    } catch (error) {
-        console.error(error);
-        alert("Ошибка при сохранении");
-    } finally {
-        setUploading(false);
-        navigate("/profile");
-    }
-};
+    return (
+        <section className={styles.container}>
 
-return (
-    <section className={styles.container}>
-
-        <div className={`${styles.title} flex-center btn-w-full`}>
-            <Text text={t("Host.propertyForm.title")} type="m_600_s_36" />
-        </div>
-
-        <div className="flex-left gap-5">
-            <span className={styles.required_fields}>*</span>
-            <Text text={t("Booking.required_fields_note")} type="m_400_s_14" />
-        </div>
-
-        <div className={styles.block}>
-            <div className={styles.block_title}>
-                <Text text={t("Host.aboutHousing.title")} type="m_600_s_32" />
+            <div className={`${styles.title} flex-center btn-w-full`}>
+                <Text text={t("Host.propertyForm.title")} type="m_600_s_36" />
             </div>
 
-            <fieldset className={styles.fieldset}>
-                <label className={styles.label}>
-                    <div className="flex-left gap-5">
-                        <Text text={t("Host.aboutHousing.housing.name")} type="m_400_s_16" />
+            <div className="flex-left gap-5">
+                <span className={styles.required_fields}>*</span>
+                <Text text={t("Booking.required_fields_note")} type="m_400_s_14" />
+            </div>
+
+            <div className={styles.block}>
+                <div className={styles.block_title}>
+                    <Text text={t("Host.aboutHousing.title")} type="m_600_s_32" />
+                </div>
+
+                <fieldset className={styles.fieldset}>
+                    <label className={styles.label}>
+                        <div className="flex-left gap-5">
+                            <Text text={t("Host.aboutHousing.housing.name")} type="m_400_s_16" />
+                            <span className={styles.required_fields}>*</span>
+                        </div>
+                    </label>
+                    <input
+                        className={styles.input}
+                        name="title"
+                        value={form.offer.title}
+                        onChange={handleOfferChange}
+                    />
+                </fieldset>
+
+                <fieldset className={styles.fieldset}>
+                    <label className={styles.label}>
+                        <Text text={t("Host.aboutHousing.housing.address")} type="m_400_s_16" />
                         <span className={styles.required_fields}>*</span>
-                    </div>
-                </label>
-                <input
-                    className={styles.input}
-                    name="title"
-                    value={form.offer.title}
-                    onChange={handleOfferChange}
-                />
-            </fieldset>
-
-            <fieldset className={styles.fieldset}>
-                <label className={styles.label}>
-                    <Text text={t("Host.aboutHousing.housing.address")} type="m_400_s_16" />
-                    <span className={styles.required_fields}>*</span>
-                </label>
+                    </label>
 
 
-                <select
-                    className={styles.input}
-                    value={form.offer.rentObj.countryId ?? ""}
-                    onChange={handleCountryChange}
-                >
-                    <option value="">
-                        {t("Host.aboutHousing.housing.country")}
-                    </option>
-
-                    {countries.map(c => (
-                        <option key={c.id} value={c.id}>
-                            {c.title}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    className={styles.input}
-                    value={form.offer.rentObj.regionId ?? ""}
-                    onChange={handleRegionChange}
-                    disabled={!form.offer.rentObj.countryId}
-                >
-                    <option value="">{t("Host.aboutHousing.housing.region")}</option>
-                    {regions.map(r => (
-                        <option key={r.id} value={r.id}>{r.title}</option>
-                    ))}
-                </select>
-
-            </fieldset>
-
-
-            <fieldset className={styles.fieldset}>
-                <label className={styles.label}>
-                    <Text text={t("Host.aboutHousing.housing.address")} type="m_400_s_16" />
-                    <span className={styles.required_fields}>*</span>
-                </label>
-
-                <div className={`${styles.input} flex-left ${styles.input_address}`}>
                     <select
-                        className={styles.input_street}
-                        value={form.offer.rentObj.cityId ?? ""}
-                        onChange={handleCityChange}
-                        disabled={!form.offer.rentObj.regionId}
+                        className={styles.input}
+                        value={form.offer.rentObj.countryId ?? ""}
+                        onChange={handleCountryChange}
                     >
-                        <option value="">{t("Host.aboutHousing.housing.city")}</option>
-                        {cities.map(c => (
-                            <option key={c.id} value={c.id}>{c.title}</option>
+                        <option value="">
+                            {t("Host.aboutHousing.housing.country")}
+                        </option>
+
+                        {countries.map(c => (
+                            <option key={c.id} value={c.id}>
+                                {c.title}
+                            </option>
                         ))}
                     </select>
 
-                    <input
-                        className={styles.input_house}
-                        value={form.offer.rentObj.postcode || ''}
-                        readOnly
-                    />
-                </div>
-            </fieldset>
+                    <select
+                        className={styles.input}
+                        value={form.offer.rentObj.regionId ?? ""}
+                        onChange={handleRegionChange}
+                        disabled={!form.offer.rentObj.countryId}
+                    >
+                        <option value="">{t("Host.aboutHousing.housing.region")}</option>
+                        {regions.map(r => (
+                            <option key={r.id} value={r.id}>{r.title}</option>
+                        ))}
+                    </select>
+
+                </fieldset>
 
 
-
-
-            <fieldset className={styles.fieldset}>
-                <label className={styles.label}>
-                    <div className="flex-left gap-5">
+                <fieldset className={styles.fieldset}>
+                    <label className={styles.label}>
                         <Text text={t("Host.aboutHousing.housing.address")} type="m_400_s_16" />
                         <span className={styles.required_fields}>*</span>
-                    </div>
-                </label>
+                    </label>
 
-                <div className={`${styles.input} flex-left ${styles.input_address}`}>
-                    <input
-                        className={styles.input_street}
-                        name="street"
-                        placeholder={t("Host.aboutHousing.housing.street")}
-                        value={form.offer.rentObj.street}
-                        onChange={handleRentObjChange}
-                    />
-                    <input
-                        className={styles.input_house}
-                        name="houseNumber"
-                        placeholder={t("Host.aboutHousing.housing.number")}
-                        value={form.offer.rentObj.houseNumber}
-                        onChange={handleRentObjChange}
-                    />
-                </div>
-            </fieldset>
+                    <div className={`${styles.input} flex-left ${styles.input_address}`}>
+                        <select
+                            className={styles.input_street}
+                            value={form.offer.rentObj.cityId ?? ""}
+                            onChange={handleCityChange}
+                            disabled={!form.offer.rentObj.regionId}
+                        >
+                            <option value="">{t("Host.aboutHousing.housing.city")}</option>
+                            {cities.map(c => (
+                                <option key={c.id} value={c.id}>{c.title}</option>
+                            ))}
+                        </select>
 
-            <fieldset className={styles.fieldset}>
-                <label className={styles.label}>
-                    <div className="flex-left gap-5">
-                        <Text text={t("Host.aboutHousing.housing.description")} type="m_400_s_16" />
-                        <span className={styles.required_fields}>*</span>
-                    </div>
-                </label>
-                <textarea
-                    className={styles.textarea}
-                    name="description"
-                    value={form.offer.description}
-                    onChange={handleOfferChange}
-                />
-            </fieldset>
-        </div>
-
-        {/* Фото */}
-        <div className={styles.block}>
-            <div className={styles.label}>
-                <Text text={t("Host.propertyForm.owner.photo")} type="m_400_s_16" />
-            </div>
-            <div className={styles.carousel}>
-                <div className={styles.photosViewport} ref={viewportRef}>
-
-                    <div className={styles.photos__container}
-                        style={{ transform: `translateX(${offset}px)` }}
-                    >
-                        {form.offer.rentObj.images.length > 0 ? (
-                            form.offer.rentObj.images.map((img, index) => {
-                                const key =
-                                    img instanceof File
-                                        ? `file-${img.name}-${index}`
-                                        : `server-${img.id}`;
-
-                                const src =
-                                    img instanceof File
-                                        ? URL.createObjectURL(img)
-                                        : img.url;
-
-                                return (
-                                    <div key={key} className={styles.previewWrapper}>
-                                        <img
-                                            src={src}
-                                            alt={`Preview ${index}`}
-                                            className={styles.previewImage}
-                                        />
-                                        <IconButtonClose
-                                            icon_name="close_red"
-                                            className={styles.btn_close}
-                                            onClick={() => removeImage(index)} />
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <div className={styles.emptyImages}>Нет изображений</div>
-                        )}
-                    </div>
-                </div>
-
-                <div className={styles.btn_container}>
-                    <IconButtonArrow
-                        onClick={handlePrev}
-                        className={classNameArrowLeft}
-                    />
-
-
-                    <div className={` ${styles.btn__wrapper} flex-center btn-w-full`}>
                         <input
-                            ref={fileRef}
-                            type="file"
-                            multiple
-                            hidden
-                            onChange={handleAddImages}
-                        />
-                        <ActionButton__Secondary
-                            onClick={() => fileRef.current.click()}
-                            className={`btn-br-r-20 ${styles.btn_add_photo}`}
-                            text={t("Prrofile.HousingPanel.menu_btn_add_housing")}
+                            className={styles.input_house}
+                            value={form.offer.rentObj.postcode || ''}
+                            readOnly
                         />
                     </div>
+                </fieldset>
 
-                    <IconButtonArrow
-                        onClick={handleNext}
-                        className={classNameArrowRight}
+
+
+
+                <fieldset className={styles.fieldset}>
+                    <label className={styles.label}>
+                        <div className="flex-left gap-5">
+                            <Text text={t("Host.aboutHousing.housing.address")} type="m_400_s_16" />
+                            <span className={styles.required_fields}>*</span>
+                        </div>
+                    </label>
+
+                    <div className={`${styles.input} flex-left ${styles.input_address}`}>
+                        <input
+                            className={styles.input_street}
+                            name="street"
+                            placeholder={t("Host.aboutHousing.housing.street")}
+                            value={form.offer.rentObj.street}
+                            onChange={handleRentObjChange}
+                        />
+                        <input
+                            className={styles.input_house}
+                            name="houseNumber"
+                            placeholder={t("Host.aboutHousing.housing.number")}
+                            value={form.offer.rentObj.houseNumber}
+                            onChange={handleRentObjChange}
+                        />
+                    </div>
+                </fieldset>
+
+                <fieldset className={styles.fieldset}>
+                    <label className={styles.label}>
+                        <div className="flex-left gap-5">
+                            <Text text={t("Host.aboutHousing.housing.description")} type="m_400_s_16" />
+                            <span className={styles.required_fields}>*</span>
+                        </div>
+                    </label>
+                    <textarea
+                        className={styles.textarea}
+                        name="description"
+                        value={form.offer.description}
+                        onChange={handleOfferChange}
+                    />
+                </fieldset>
+            </div>
+
+            {/* Фото */}
+            <div className={styles.block}>
+                <div className={styles.label}>
+                    <Text text={t("Host.propertyForm.owner.photo")} type="m_400_s_16" />
+                </div>
+                <div className={styles.carousel}>
+                    <div className={styles.photosViewport} ref={viewportRef}>
+
+                        <div className={styles.photos__container}
+                            style={{ transform: `translateX(${offset}px)` }}
+                        >
+                            {form.offer.rentObj.images.length > 0 ? (
+                                form.offer.rentObj.images.map((img, index) => {
+                                    const key =
+                                        img instanceof File
+                                            ? `file-${img.name}-${index}`
+                                            : `server-${img.id}`;
+
+                                    const src =
+                                        img instanceof File
+                                            ? URL.createObjectURL(img)
+                                            : img.url;
+
+                                    return (
+                                        <div key={key} className={styles.previewWrapper}>
+                                            <img
+                                                src={src}
+                                                alt={`Preview ${index}`}
+                                                className={styles.previewImage}
+                                            />
+                                            <IconButtonClose
+                                                icon_name="close_red"
+                                                className={styles.btn_close}
+                                                onClick={() => removeImage(index)} />
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className={styles.emptyImages}>Нет изображений</div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={styles.btn_container}>
+                        <IconButtonArrow
+                            onClick={handlePrev}
+                            className={classNameArrowLeft}
+                        />
+
+
+                        <div className={` ${styles.btn__wrapper} flex-center btn-w-full`}>
+                            <input
+                                ref={fileRef}
+                                type="file"
+                                multiple
+                                hidden
+                                onChange={handleAddImages}
+                            />
+                            <ActionButton__Secondary
+                                onClick={() => fileRef.current.click()}
+                                className={`btn-br-r-20 ${styles.btn_add_photo}`}
+                                text={t("Prrofile.HousingPanel.menu_btn_add_housing")}
+                            />
+                        </div>
+
+                        <IconButtonArrow
+                            onClick={handleNext}
+                            className={classNameArrowRight}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Параметры / Удобства */}
+            <div className={styles.block}>
+                <div className={styles.block_title}>
+                    <Text text={t("Host.amenities.title")} type="m_600_s_32" />
+                </div>
+                <div className={styles.fieldset}>
+                    {categoriesParams.map(category => {
+                        if (category.id === 2) return null;
+                        if (category.id === 5) return null;
+                        const visibleItems = category.items.filter(item => item.title && item.title.trim() !== "");
+                        if (!visibleItems.length) return null;
+
+                        return (
+                            <div key={category.id} className={styles.checkbox__container}>
+                                <div className={styles.block_title}>
+                                    <Text type="m_600_s_24" text={category.title} />
+                                </div>
+                                <div className={styles.checkboxGrid}>
+                                    {visibleItems.map(item => (
+                                        <label key={item.id} className={styles.checkbox}>
+                                            <Text type="m_400_s_16" text={item.title} />
+                                            <input
+                                                type="checkbox"
+                                                className={styles.checkboxInput}
+                                                checked={isChecked(item.id)}
+                                                onChange={() => toggleParamValue(item.id)}
+                                            />
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Данные об объекте */}
+            <div className={`${styles.block} ${styles.block_with_border}`}>
+                <div className={styles.block_with_border_title}>
+                    <Text text={t("Host.dataHousing.title")} type="m_600_s_32" />
+                </div>
+
+                <div className={styles.block_with_border__row}>
+                    <Text text={t("Host.dataHousing.guestCount")} type="m_700_s_20" />
+                    <CounterButton value={form.offer.maxGuests} onChange={val => setForm(prev => ({ ...prev, offer: { ...prev.offer, maxGuests: val } }))} />
+                </div>
+                <div className={styles.block_with_border__row}>
+                    <Text text={t("Host.dataHousing.roomCount")} type="m_700_s_20" />
+                    <CounterButton value={form.offer.rentObj.roomCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, roomCount: val } }))} />
+                </div>
+                <div className={styles.block_with_border__row}>
+                    <Text text={t("Host.dataHousing.singleBedsCount")} type="m_700_s_20" />
+                    <CounterButton value={form.offer.rentObj.singleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, singleBedsCount: val } }))} />
+                </div>
+                <div className={styles.block_with_border__row}>
+                    <Text text={t("Host.dataHousing.doubleBedsCount")} type="m_700_s_20" />
+                    <CounterButton value={form.offer.rentObj.doubleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, doubleBedsCount: val } }))} />
+                </div>
+            </div>
+
+            {/* Цена */}
+            <div className={styles.block_price}>
+                <div className={styles.block_price__row}>
+                    <div className={styles.block_with_border_title}>
+                        <Text text={t("Host.dataHousing.pricePerDay")} type="m_600_s_32" />
+                    </div>
+                    <input
+                        type="number"
+                        className={styles.input_price}
+                        name="pricePerDay"
+                        value={form.offer.pricePerDay}
+                        onChange={handleOfferChange}
                     />
                 </div>
-            </div>
-        </div>
-
-        {/* Параметры / Удобства */}
-        <div className={styles.block}>
-            <div className={styles.block_title}>
-                <Text text={t("Host.amenities.title")} type="m_600_s_32" />
-            </div>
-            <div className={styles.fieldset}>
-                {categoriesParams.map(category => {
-                    if (category.id === 2) return null;
-                    if (category.id === 5) return null;
-                    const visibleItems = category.items.filter(item => item.title && item.title.trim() !== "");
-                    if (!visibleItems.length) return null;
-
-                    return (
-                        <div key={category.id} className={styles.checkbox__container}>
-                            <div className={styles.block_title}>
-                                <Text type="m_600_s_24" text={category.title} />
-                            </div>
-                            <div className={styles.checkboxGrid}>
-                                {visibleItems.map(item => (
-                                    <label key={item.id} className={styles.checkbox}>
-                                        <Text type="m_400_s_16" text={item.title} />
-                                        <input
-                                            type="checkbox"
-                                            className={styles.checkboxInput}
-                                            checked={isChecked(item.id)}
-                                            onChange={() => toggleParamValue(item.id)}
-                                        />
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
-
-        {/* Данные об объекте */}
-        <div className={`${styles.block} ${styles.block_with_border}`}>
-            <div className={styles.block_with_border_title}>
-                <Text text={t("Host.dataHousing.title")} type="m_600_s_32" />
-            </div>
-
-            <div className={styles.block_with_border__row}>
-                <Text text={t("Host.dataHousing.guestCount")} type="m_700_s_20" />
-                <CounterButton value={form.offer.maxGuests} onChange={val => setForm(prev => ({ ...prev, offer: { ...prev.offer, maxGuests: val } }))} />
-            </div>
-            <div className={styles.block_with_border__row}>
-                <Text text={t("Host.dataHousing.roomCount")} type="m_700_s_20" />
-                <CounterButton value={form.offer.rentObj.roomCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, roomCount: val } }))} />
-            </div>
-            <div className={styles.block_with_border__row}>
-                <Text text={t("Host.dataHousing.singleBedsCount")} type="m_700_s_20" />
-                <CounterButton value={form.offer.rentObj.singleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, singleBedsCount: val } }))} />
-            </div>
-            <div className={styles.block_with_border__row}>
-                <Text text={t("Host.dataHousing.doubleBedsCount")} type="m_700_s_20" />
-                <CounterButton value={form.offer.rentObj.doubleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, doubleBedsCount: val } }))} />
-            </div>
-        </div>
-
-        {/* Цена */}
-        <div className={styles.block_price}>
-            <div className={styles.block_price__row}>
-                <div className={styles.block_with_border_title}>
-                    <Text text={t("Host.dataHousing.pricePerDay")} type="m_600_s_32" />
+                <div className={styles.block_price__row}>
+                    <div className={styles.block_price_title}>
+                        <Text text={t("Host.dataHousing.pricePerWeek")} type="m_600_s_32" />
+                    </div>
+                    <input
+                        type="number"
+                        className={styles.input_price}
+                        name="pricePerWeek"
+                        value={form.offer.pricePerWeek}
+                        onChange={handleOfferChange}
+                    />
                 </div>
-                <input
-                    type="number"
-                    className={styles.input_price}
-                    name="pricePerDay"
-                    value={form.offer.pricePerDay}
-                    onChange={handleOfferChange}
-                />
-            </div>
-            <div className={styles.block_price__row}>
-                <div className={styles.block_price_title}>
-                    <Text text={t("Host.dataHousing.pricePerWeek")} type="m_600_s_32" />
-                </div>
-                <input
-                    type="number"
-                    className={styles.input_price}
-                    name="pricePerWeek"
-                    value={form.offer.pricePerWeek}
-                    onChange={handleOfferChange}
-                />
+
+
             </div>
 
-
-        </div>
-
-        {/* Actions */}
-        <div className={styles.actions}>
-            {/* <ActionButton__Secondary
+            {/* Actions */}
+            <div className={styles.actions}>
+                {/* <ActionButton__Secondary
                     className="btn-br-r-20 btn-w-340 btn-h-60"
                     text={t("Host.btn_add")}
                     type="m_500"
                 /> */}
-            <ActionButton__Primary
-                className="btn-br-r-20 btn-w-340 btn-h-60"
-                text={t("Host.btn_save")}
-                type="m_500"
-                onClick={handleSave}
-            />
-        </div>
-    </section>
-);
+                <ActionButton__Primary
+                    className="btn-br-r-20 btn-w-340 btn-h-60"
+                    text={t("Host.btn_save")}
+                    type="m_500"
+                    onClick={handleSave}
+                />
+            </div>
+        </section>
+    );
 };
