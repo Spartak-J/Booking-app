@@ -21,11 +21,11 @@ export const ENDPOINTS = {
     items: (lang: string) => `/Bff/paramitem/${lang}`,
   },
   locations: {
-    cities: '/Location/get-all-cities',
+    cities: (lang: string) => `/get/cities/${lang}`,
     cityTranslations: (lang: string) => `/Bff/city/get-all-translations/${lang}`,
   },
   booking: {
-    create: '/Bff/create/booking-order',
+    create: (lang: string) => `/Bff/create/booking-order/${lang}`,
     updateStatus: (orderId: string | number) => `/Bff/update_status/booking/${orderId}`,
     all: '/Order/get-all',
     byId: (id: string | number) => `/Order/get/${id}`,
@@ -44,7 +44,11 @@ export const ENDPOINTS = {
     register: '/notifications/register',
   },
   payment: {
-    create: '/payments/create',
-    confirmHold: '/payments/confirm-hold',
+    create: '/Bff/payments/create',
+    confirmHold: '/Bff/payments/confirm-hold',
+    status: (paymentId: string) => `/Bff/payments/status/${paymentId}`,
+    tokenize: '/Bff/payments/tokenize',
+    cards: (userId: string) => `/Bff/payments/cards/${userId}`,
+    chargeSavedCard: '/Bff/payments/charge-saved-card',
   },
 };

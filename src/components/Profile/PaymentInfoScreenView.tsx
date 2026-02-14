@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Button, Card, ScreenShell, Typography } from '@/ui';
 import { useTheme } from '@/theme';
-import { spacing, typography } from '@/theme';
+import { spacing, typography, radius } from '@/theme';
 import { useTranslation } from '@/i18n';
 import type { PaymentCard } from '@/data/payment/types';
 import { s } from '@/utils/scale';
@@ -28,44 +28,43 @@ export const PaymentInfoScreenView: React.FC<PaymentInfoScreenViewProps> = ({
   const contentStyle = useMemo(() => [styles.content], [styles.content]);
 
   return (
-    <ScreenShell
-      title={t('profile.payment.title')}
-      onBack={onBack}
-      showKeys
-      footerSlot={footer}
-    >
+    <ScreenShell title={t('profile.payment.title')} onBack={onBack} showKeys footerSlot={footer}>
       <ScrollView contentContainerStyle={contentStyle} showsVerticalScrollIndicator={false}>
         <Typography variant="subtitle" tone="primary" style={styles.sectionTitle}>
           {t('profile.payment.yourCard')}
         </Typography>
 
-        {cards.length === 0 ? (
-          <Typography variant="body" tone="secondary" style={styles.emptyText}>
-            {t('profile.payment.noCard')}
-          </Typography>
-        ) : (
-          <View style={styles.cards}>
-            {cards.map((card) => (
-              <Card key={card.id} variant="filled" style={styles.card}>
-                <Typography variant="menu" tone="primary" style={styles.cardTitle}>
-                  {card.holderName}
-                </Typography>
-                <Typography variant="body" tone="primary" style={styles.cardNumber}>
-                  {card.numberMasked}
-                </Typography>
-                <Typography variant="caption" tone="secondary">
-                  {card.expiry}
-                </Typography>
-              </Card>
-            ))}
+        <View style={styles.cardFrame}>
+          <View style={styles.cardFrameContent}>
+            {cards.length === 0 ? (
+              <Typography variant="body" tone="secondary" style={styles.emptyText}>
+                {t('profile.payment.noCard')}
+              </Typography>
+            ) : (
+              <View style={styles.cards}>
+                {cards.map((card) => (
+                  <Card key={card.id} variant="filled" style={styles.card}>
+                    <Typography variant="menu" tone="primary" style={styles.cardTitle}>
+                      {card.holderName}
+                    </Typography>
+                    <Typography variant="body" tone="primary" style={styles.cardNumber}>
+                      {card.numberMasked}
+                    </Typography>
+                    <Typography variant="caption" tone="secondary">
+                      {card.expiry}
+                    </Typography>
+                  </Card>
+                ))}
+              </View>
+            )}
           </View>
-        )}
-
-        <Button
-          title={t('profile.payment.addCard')}
-          onPress={onAddCard}
-          style={styles.addButton}
-        />
+          <Button
+            title={t('profile.payment.addCard')}
+            onPress={onAddCard}
+            size="small"
+            style={styles.addButton}
+          />
+        </View>
       </ScrollView>
     </ScreenShell>
   );
@@ -82,6 +81,22 @@ const getStyles = (tokens: Record<string, string>) =>
     sectionTitle: {
       ...(typography.subtitle as object),
       color: tokens.textPrimary,
+    },
+    cardFrame: {
+      width: s(220),
+      aspectRatio: 1,
+      alignSelf: 'center',
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: tokens.border,
+      backgroundColor: tokens.bgField,
+      padding: spacing.sm,
+      gap: spacing.sm,
+    },
+    cardFrameContent: {
+      flex: 1,
+      gap: spacing.md,
+      justifyContent: 'center',
     },
     emptyText: {
       color: tokens.textSecondary,
@@ -102,7 +117,8 @@ const getStyles = (tokens: Record<string, string>) =>
     },
     addButton: {
       alignSelf: 'center',
-      minWidth: s(180),
+      borderRadius: radius.round,
+      minWidth: s(132),
     },
   });
 

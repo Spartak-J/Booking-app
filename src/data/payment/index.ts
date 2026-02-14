@@ -1,53 +1,83 @@
-// Repository: PaymentRepository. Replace with API calls later without changing UI consumers.
-import { PAYMENT_CARDS } from './payment.mock';
+// Repository: PaymentRepository for tokenized card operations via BFF payment endpoints.
 import type { PaymentCard } from './types';
-
-let cards = [...PAYMENT_CARDS];
-
-const normalizeNumber = (raw: string) => raw.replace(/\D/g, '');
-
-const maskNumber = (raw: string) => {
-  const digits = normalizeNumber(raw);
-  if (!digits) return '';
-  const groups = digits.match(/.{1,4}/g) ?? [];
-  return groups.join(' ');
-};
-
-const detectBrand = (raw: string): PaymentCard['brand'] => {
-  const digits = normalizeNumber(raw);
-  if (digits.startsWith('4')) return 'visa';
-  if (digits.startsWith('5')) return 'mastercard';
-  if (digits.startsWith('3')) return 'amex';
-  return 'unknown';
-};
+import apiClient from '@/api/client';
+import { ENDPOINTS } from '@/config/endpoints';
 
 export const PaymentRepository = {
-  async getCards(): Promise<PaymentCard[]> {
-    return Promise.resolve(cards);
+  async getCards(userId = 'guest'): Promise<PaymentCard[]> {
+    const { data } = await apiClient.get<any>(ENDPOINTS.payment.cards(userId));
+    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+    return list.map((item) => ({
+      id: String(item?.id ?? ''),
+      holderName: item?.holderName ?? '—',
+      numberMasked: item?.numberMasked ?? '',
+      last4: item?.last4 ?? '',
+      expiry: item?.expiry ?? '',
+      brand: (item?.brand ?? 'unknown') as PaymentCard['brand'],
+      isDefault: Boolean(item?.isDefault),
+      createdAt: item?.createdAt ?? new Date().toISOString(),
+      token: item?.token,
+    }));
   },
 
   async addCard(input: {
+    userId?: string;
     holderName: string;
     number: string;
     expiry: string;
+    cvv: string;
+    saveCard?: boolean;
   }): Promise<PaymentCard> {
-    const numberMasked = maskNumber(input.number);
-    const last4 = normalizeNumber(input.number).slice(-4);
-    const card: PaymentCard = {
-      id: `card_${Date.now()}`,
-      holderName: input.holderName.trim() || '—',
-      numberMasked,
-      last4,
-      expiry: input.expiry.trim(),
-      brand: detectBrand(input.number),
-      createdAt: new Date().toISOString(),
+    const { data } = await apiClient.post<any>(ENDPOINTS.payment.tokenize, {
+      userId: input.userId ?? 'guest',
+      holderName: input.holderName,
+      cardNumber: input.number,
+      expiry: input.expiry,
+      cvv: input.cvv,
+      saveCard: input.saveCard ?? true,
+    });
+
+    const card = data?.card ?? data?.data?.card;
+    if (!card) {
+      throw new Error('Не вдалося токенізувати карту.');
+    }
+
+    return {
+      id: String(card?.id ?? ''),
+      holderName: card?.holderName ?? '—',
+      numberMasked: card?.numberMasked ?? '',
+      last4: card?.last4 ?? '',
+      expiry: card?.expiry ?? '',
+      brand: (card?.brand ?? 'unknown') as PaymentCard['brand'],
+      isDefault: Boolean(card?.isDefault),
+      createdAt: card?.createdAt ?? new Date().toISOString(),
+      token: card?.token,
     };
-    cards = [card, ...cards];
-    return Promise.resolve(card);
   },
 
   async setDefault(cardId: string): Promise<void> {
-    cards = cards.map((card) => ({ ...card, isDefault: card.id === cardId }));
-    return Promise.resolve();
+    // Current BFF contract has no dedicated endpoint; keep API-compatible no-op.
+    void cardId;
+  },
+
+  async chargeSavedCard(input: {
+    userId?: string;
+    cardId: string;
+    bookingId: string;
+    amount: number;
+    currency: 'UAH';
+  }) {
+    const { data } = await apiClient.post<any>(ENDPOINTS.payment.chargeSavedCard, {
+      userId: input.userId ?? 'guest',
+      cardId: input.cardId,
+      bookingId: input.bookingId,
+      amount: input.amount,
+      currency: input.currency,
+    });
+    return {
+      paymentId: data?.paymentId ?? '',
+      status: data?.status ?? 'failed',
+      redirectUrl: data?.redirectUrl,
+    };
   },
 };

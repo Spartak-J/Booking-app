@@ -1,6 +1,5 @@
 import { CreatePaymentPayload, PaymentResult } from './payment.types';
 
-const MOCK_REDIRECT_URL = 'https://sandbox.liqpay.ua/mock/checkout';
 const randomId = () => `mock-pay-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -12,7 +11,6 @@ export const paymentServiceMock = {
     return {
       paymentId,
       status,
-      redirectUrl: MOCK_REDIRECT_URL,
     };
   },
 
@@ -21,7 +19,14 @@ export const paymentServiceMock = {
     return {
       paymentId,
       status: 'paid',
-      redirectUrl: MOCK_REDIRECT_URL,
+    };
+  },
+
+  async getStatus(paymentId: string): Promise<PaymentResult> {
+    await delay(200);
+    return {
+      paymentId,
+      status: 'paid',
     };
   },
 };

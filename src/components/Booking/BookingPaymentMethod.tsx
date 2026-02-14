@@ -6,7 +6,6 @@ import { useTheme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { Typography } from '@/ui';
 import { radius } from '@/theme';
-import { useAuthStore } from '@/store/authStore';
 
 const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -23,7 +22,6 @@ export type PaymentMethod = 'card' | 'paypal' | 'googlePay' | 'applePay' | 'cash
 export const BookingPaymentMethod = ({ value, onChange }: Props) => {
   const { colors, mode } = useTheme();
   const { t } = useTranslation();
-  const userName = useAuthStore((state) => state.user?.name);
   const isDark = mode === 'dark' || colors.background === colors.bgDark;
   const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
@@ -60,33 +58,6 @@ export const BookingPaymentMethod = ({ value, onChange }: Props) => {
             );
           })}
         </View>
-        {value === 'card' && (
-          <View style={styles.savedCard}>
-            <Typography variant="caption" style={styles.cardNumber}>
-              **** **** **** 9101
-            </Typography>
-            <View style={styles.cardMeta}>
-              <Typography variant="caption" style={styles.cardName}>
-                {userName || 'Ірина Брицька'}
-              </Typography>
-              <Typography variant="caption" style={styles.cardExpiry}>
-                01/2029
-              </Typography>
-            </View>
-            <View style={styles.cardBrand}>
-              <View
-                style={[styles.brandCircle, { backgroundColor: colors.paymentMastercardOrange }]}
-              />
-              <View
-                style={[
-                  styles.brandCircle,
-                  styles.brandCircleOverlap,
-                  { backgroundColor: colors.paymentMastercardRed },
-                ]}
-              />
-            </View>
-          </View>
-        )}
       </View>
     </View>
   );
@@ -138,42 +109,5 @@ const getStyles = (colors: any, isDark: boolean) =>
       height: s(8),
       borderRadius: s(4),
       backgroundColor: colors.textPrimary,
-    },
-    savedCard: {
-      borderRadius: radius.md,
-      padding: s(12),
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: isDark ? colors.bgDark : colors.surfaceLightDarker,
-      gap: s(6),
-    },
-    cardNumber: {
-      color: colors.textPrimary,
-      fontSize: s(14),
-    },
-    cardMeta: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    cardName: {
-      color: colors.textPrimary,
-      fontSize: s(13),
-    },
-    cardExpiry: {
-      color: colors.textPrimary,
-      fontSize: s(13),
-    },
-    cardBrand: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    brandCircle: {
-      width: s(16),
-      height: s(16),
-      borderRadius: s(8),
-    },
-    brandCircleOverlap: {
-      marginLeft: s(-6),
     },
   });

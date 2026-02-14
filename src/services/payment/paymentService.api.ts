@@ -24,6 +24,11 @@ export const paymentServiceApi = {
     const { data } = await apiClient.post(ENDPOINTS.payment.confirmHold, { paymentId });
     return normalizeResult(data);
   },
+
+  async getStatus(paymentId: string): Promise<PaymentResult> {
+    const { data } = await apiClient.get(ENDPOINTS.payment.status(paymentId));
+    return normalizeResult(data);
+  },
 };
 
 export type PaymentServiceApi = typeof paymentServiceApi;

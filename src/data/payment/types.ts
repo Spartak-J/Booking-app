@@ -8,4 +8,5 @@ export type PaymentCard = {
   brand: 'mastercard' | 'visa' | 'paypal' | 'amex' | 'unknown';
   isDefault?: boolean;
   createdAt: string;
+  token?: string;
 };

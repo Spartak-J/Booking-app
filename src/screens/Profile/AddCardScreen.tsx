@@ -10,9 +10,11 @@ import { AppLayout } from '@/layout/AppLayout';
 import HomeFooter from '@/components/Home/HomeFooter';
 import { BOTTOM_NAV_ITEMS } from '@/components/Home/homeNavigationData';
 import { Routes } from '@/navigation/routes';
+import { useAuthStore } from '@/store/authStore';
 
 export const AddCardScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const userId = useAuthStore((state) => state.user?.id);
 
   const handleSave = async (values: {
     holderName: string;
@@ -22,9 +24,12 @@ export const AddCardScreen = () => {
     saveCard: boolean;
   }) => {
     await PaymentRepository.addCard({
+      userId: userId ?? 'guest',
       holderName: values.holderName,
       number: values.cardNumber,
       expiry: values.expiry,
+      cvv: values.cvv,
+      saveCard: values.saveCard,
     });
     navigation.goBack();
   };
