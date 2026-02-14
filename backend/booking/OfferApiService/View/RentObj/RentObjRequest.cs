@@ -49,7 +49,7 @@ namespace OfferApiService.View.RentObj
         public bool HasBabyCrib { get; set; }         // Детская кроватка
 
         public List<RentObjParamValueRequest> ParamValues { get; set; } = new();
-        public List<string> Images { get; set; } = new();
+        public List<RentObjImageRequest> Images { get; set; } = new();
 
         public static RentObject MapToModel(
              RentObjRequest request
@@ -81,7 +81,12 @@ namespace OfferApiService.View.RentObj
                     .Select(RentObjParamValueRequest.MapToModel)
                     .ToList() ?? new List<RentObjParamValue>(),
                 Images = request.Images?
-                    .Select(url => new RentObjImage { Url = url })
+                    .Select(img => new RentObjImage 
+                    {
+                        id = img.id,
+                        Url = img.Url,
+                        RentObjId = img.RentObjId
+                    })
                     .ToList() ?? new List<RentObjImage>()
             };
         }

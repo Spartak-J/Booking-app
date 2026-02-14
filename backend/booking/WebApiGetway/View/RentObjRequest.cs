@@ -49,7 +49,7 @@ namespace WebApiGetway.View
         public bool HasBabyCrib { get; set; }         // Детская кроватка
 
         public List<RentObjParamValueRequest> ParamValues { get; set; } = new();
-        public List<string> Images { get; set; } = new();
+        public List<ImageRequest> Images { get; set; } = new();
 
       
 

@@ -259,7 +259,7 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
                 maxGuests: hotel.maxGuests ?? 1,
                 ownerId: hotel.ownerId ?? -1,
                 rentObj: {
-                    ...prev.rentObj,
+                    ...prev.offer?.rentObj,
                     id: ro.id ?? 0,
                     countryId: ro.countryId ?? 0,
                     countryTitle: ro.countryTitle ?? "",
@@ -281,7 +281,7 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
                     doubleBedsCount: ro.doubleBedsCount ?? 0,
                     hasBabyCrib: !!ro.hasBabyCrib,
                     paramValues: ro.paramValues ?? [],
-                    images: ro.images ?? []
+                    images: ro.images || []
                 }
             }
         }));
@@ -354,8 +354,6 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
     const handleAddImages = (e) => {
         const files = Array.from(e.target.files);
 
-        const existingImages = form.offer.rentObj.images || [];
-
         setForm(prev => ({
             ...prev,
             offer: {
@@ -363,7 +361,7 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
                 rentObj: {
                     ...prev.offer.rentObj,
                     images: [
-                        ...existingImages,
+                        ...prev.offer.rentObj.images, // ← ВАЖНО
                         ...files
                     ]
                 }
@@ -371,9 +369,6 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
         }));
 
         e.target.value = "";
-        setTimeout(() => {
-            scrollToLast(files.length);
-        }, 0);
     };
 
 
@@ -444,21 +439,6 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
 
 
 
-    const removeExistingImage = (id) => {
-        setForm(prev => ({
-            ...prev,
-            offer: {
-                ...prev.offer,
-                rentObj: {
-                    ...prev.offer.rentObj,
-                    images: prev.offer.rentObj.images.filter(img => img.id !== id)
-                }
-            }
-        }));
-    };
-
-
-
     const buildOfferPayload = () => {
         const rentObj = form.offer.rentObj || {};
         const paramValues = Array.isArray(rentObj.paramValues) ? rentObj.paramValues : [];
@@ -513,7 +493,10 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
                 singleBedsCount: Number(rentObj.singleBedsCount) || 0,
                 doubleBedsCount: Number(rentObj.doubleBedsCount) || 0,
                 hasBabyCrib: Boolean(rentObj.hasBabyCrib),
-                images: [],
+                images: rentObj.images
+                    ?.filter(img => !(img instanceof File))
+                    .map(img => img) || [],
+
                 paramValues: normalizedParamValues
             }
         };
@@ -528,8 +511,11 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
     const handleSave = async () => {
         try {
             setUploading(true);
-
+// debugger;
             const payload = buildOfferPayload();
+
+              console.log("!!!!!!!!!!!!!");
+
             console.log("Попытка отправки данных на бек:", JSON.stringify(payload, null, 2));
 
             let offerId = form.offer.id;
@@ -840,15 +826,55 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
                 </div>
                 <div className={styles.block_with_border__row}>
                     <Text text={t("Host.dataHousing.roomCount")} type="m_700_s_20" />
-                    <CounterButton value={form.offer.rentObj.roomCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, roomCount: val } }))} />
+                    <CounterButton
+                        value={form.offer.rentObj.roomCount}
+                        onChange={val => setForm(prev => ({
+                            ...prev,
+                            offer: {
+                                ...prev.offer,
+                                rentObj: {
+                                    ...prev.offer.rentObj,
+                                    roomCount: val
+                                }
+                            }
+                        }))}
+                    />
+
                 </div>
                 <div className={styles.block_with_border__row}>
                     <Text text={t("Host.dataHousing.singleBedsCount")} type="m_700_s_20" />
-                    <CounterButton value={form.offer.rentObj.singleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, singleBedsCount: val } }))} />
+                    <CounterButton
+                        value={form.offer.rentObj.singleBedsCount}
+                        onChange={val => setForm(prev => ({
+                            ...prev,
+                            offer: {
+                                ...prev.offer,
+                                rentObj: {
+                                    ...prev.offer.rentObj,
+                                    singleBedsCount: val
+                                }
+                            }
+                        }))}
+                    />
+
+
                 </div>
                 <div className={styles.block_with_border__row}>
                     <Text text={t("Host.dataHousing.doubleBedsCount")} type="m_700_s_20" />
-                    <CounterButton value={form.offer.rentObj.doubleBedsCount} onChange={val => setForm(prev => ({ ...prev, rentObj: { ...prev.rentObj, doubleBedsCount: val } }))} />
+                    <CounterButton
+                        value={form.offer.rentObj.doubleBedsCount}
+                        onChange={val => setForm(prev => ({
+                            ...prev,
+                            offer: {
+                                ...prev.offer,
+                                rentObj: {
+                                    ...prev.offer.rentObj,
+                                    doubleBedsCount: val
+                                }
+                            }
+                        }))}
+                    />
+
                 </div>
             </div>
 

@@ -15,8 +15,13 @@ namespace OfferApiService.Services
 {
     public class OfferService : TableServiceBase<Offer, OfferContext>, IOfferService
     {
+        private readonly IWebHostEnvironment _env;
+        public OfferService(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
 
-        public  async Task<Offer> GetOnlyOfferAsync(int id, params string[] includeProperties)
+        public async Task<Offer> GetOnlyOfferAsync(int id, params string[] includeProperties)
         {
             using var db = new OfferContext();
 
@@ -105,7 +110,6 @@ namespace OfferApiService.Services
             var existingParams = existingOffer.RentObj.ParamValues;
             var newParams = offer.RentObj.ParamValues ?? new List<RentObjParamValue>();
 
-            // Удаляем старые
             foreach (var existing in existingParams.ToList())
             {
                 if (!newParams.Any(p => p.id != 0 && p.id == existing.id))
@@ -113,8 +117,6 @@ namespace OfferApiService.Services
                     db.RentObjParamValues.Remove(existing);
                 }
             }
-
-            // Обновляем или добавляем новые
             foreach (var param in newParams)
             {
                 if (param.id == 0)
@@ -136,29 +138,32 @@ namespace OfferApiService.Services
             // =======================
 
             var existingImages = existingOffer.RentObj.Images;
-            var newImages = offer.RentObj.Images ?? new List<RentObjImage>();
+
+            var incomingImages = offer.RentObj.Images ?? new List<RentObjImage>();
+
+            var incomingIds = incomingImages
+                .Where(i => i.id != 0)
+                .Select(i => i.id)
+                .ToHashSet();
 
             foreach (var existing in existingImages.ToList())
             {
-                if (!newImages.Any(i => i.id == existing.id))
+                if (!incomingIds.Contains(existing.id))
                 {
+                    var relativePath = existing.Url.TrimStart('/');
+                    var fullPath = Path.Combine(_env.WebRootPath,
+                        relativePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+
+                    if (File.Exists(fullPath))
+                    {
+                        File.Delete(fullPath);
+                    }
+
                     db.RentObjImages.Remove(existing);
                 }
             }
 
-            foreach (var img in newImages)
-            {
-                var existing = existingImages.FirstOrDefault(i => i.id == img.id);
 
-                if (existing == null)
-                {
-                    existingImages.Add(img);
-                }
-                else
-                {
-                    db.Entry(existing).CurrentValues.SetValues(img);
-                }
-            }
 
             await db.SaveChangesAsync();
             return offer.id;

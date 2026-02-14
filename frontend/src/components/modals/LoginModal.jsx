@@ -19,7 +19,7 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
     const contentRef = useRef(null);
         const [hasScroll, setHasScroll] = useState(false);
 
-    const [formData, setFormData] = useState({ username: "", password: "" });
+    const [formData, setFormData] = useState({ login: "", password: "" });
     const [displayPassword, setDisplayPassword] = useState("");
 
     useEffect(() => {
@@ -77,7 +77,7 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const result = await login(formData.username, formData.password);
+        const result = await login(formData.login, formData.password);
 
         if (result.success) {
             setIsModalOpen(false);
@@ -108,8 +108,8 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
                     {/* Username */}
                     <input
                         type="text"
-                        name="username"
-                        value={formData.username}
+                        name="login"
+                        value={formData.login}
                         onChange={handleChange}
                         placeholder={t("Auth.login.signUp")}
                         className={`${styles.input} btn-h-120 btn-br-r-20 p-10`}
