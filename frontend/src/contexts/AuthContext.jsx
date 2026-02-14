@@ -36,9 +36,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-  const login = async (username, password) => {
+  const login = async (login, password) => {
     try {
-      const response = await http.post("/User/login", { username, password });
+      const response = await http.post("/User/login", { login, password });
       const jwt = response.data.token;
       console.log("JWT token:", jwt);
 

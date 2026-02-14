@@ -11,6 +11,7 @@ import { MyTravelsPanel } from "./MyTravelsPanel.jsx";
 import { PaymentInfoPanel } from "./PaymentInfoPanel.jsx";
 import { HelpPanel } from "./HelpPanel.jsx";
 import { PrivacyPanel } from "./PrivacyPanel.jsx";
+import {HistoryPanel} from "./HistoryPanel.jsx";
 import { MessagePanel } from "./MessagePanel.jsx";
 import { HousingPanel } from "./HousingPanel.jsx";
 import styles from './ProfilePage_menu.module.css';
@@ -46,6 +47,7 @@ export const ProfilePageMenu = ({ user }) => {
   const commonBottomButtons = [
     { key: "help", icon: "menu_btn_help", text: t("Prrofile.menu_btn_help") },
     { key: "privacy", icon: "menu_btn_privacy", text: t("Prrofile.menu_btn_privacy") },
+    { key: "history", icon: "menu_btn_history", text: t("Prrofile.menu_btn_history") },
     { key: "logout", icon: "menu_btn_logout", text: t("Prrofile.menu_btn_logout") },
   ];
 
@@ -58,11 +60,12 @@ export const ProfilePageMenu = ({ user }) => {
   const renderRightPanel = (key) => {
     switch (key) {
       case "account": return <AccountPanel user={user} />;
-      case "travels": return <MyTravelsPanel />;
+      case "travels": return <MyTravelsPanel isActivePanel={true}/>;
       case "payment": return <PaymentInfoPanel />;
       case "help": return <HelpPanel />;
       case "housing": return <HousingPanel />;
       case "privacy": return <PrivacyPanel />;
+       case "history": return <HistoryPanel isHistoryPanel={true}/>;
       case "message": return <MessagePanel />;
       default: return null;
     }

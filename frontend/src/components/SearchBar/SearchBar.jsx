@@ -1,5 +1,7 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { useLanguage } from "../../contexts/LanguageContext.jsx";
 import { AddGuestModal } from "../modals/AddGuestModal.jsx";
@@ -12,6 +14,7 @@ import styles from "./SearchBar.module.css";
 
 export const SearchBar = ({
   onSearch,
+  params,
   classNameWidth = "btn-w-960",
   classNameHeight = "btn-h-50",
   className
@@ -19,64 +22,75 @@ export const SearchBar = ({
   const { t } = useTranslation();
   const { offerApi } = useContext(ApiContext);
   const { language } = useLanguage();
-  const [location, setLocation] = useState("");
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const cityId = searchParams.get("cityId") || localStorage.getItem("locationId") || null;
+  const cityName = localStorage.getItem("city") || "";
+  const startDateStr = searchParams.get("startDate") || localStorage.getItem("startDate") || new Date().toISOString();
+  const endDateStr = searchParams.get("endDate") || localStorage.getItem("endDate") || new Date(Date.now() + 86400000).toISOString();
+  const adults = Number(searchParams.get("adults") || localStorage.getItem("adults") || 1);
+  const children = Number(searchParams.get("children") || localStorage.getItem("children") || 0);
+  const rooms = Number(searchParams.get("rooms") || localStorage.getItem("rooms") || 1);
+
+  const [dateRange, setDateRange] = useState({
+    start: startDateStr ? new Date(startDateStr) : null,
+    end: endDateStr ? new Date(endDateStr) : null,
+  });
+
+
+  const [location, setLocation] = useState(cityName);
   const [locationId, setLocationId] = useState(null);
   const [hotels, setHotels] = useState([]);
-  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+
+
+  useEffect(() => {
+    if (cityId) {
+      setLocationId(cityId); // устанавливаем ID города
+      // Можно найти название города, если нужно обновить location
+      const storedCityName = localStorage.getItem("city");
+      if (storedCityName) setLocation(storedCityName);
+    }
+  }, [cityId]);
+
+
 
   const [guests, setGuests] = useState({
-    rooms: 1,
-    adults: 2,
-    children: 0,
+    rooms: rooms,
+    adults: adults,
+    children: children,
   });
 
   const [isGuestOpen, setIsGuestOpen] = useState(false);
 
-  const handleSearch = async () => {
-    if (!locationId) return alert("Пожалуйста, выберите город");
-    if (!dateRange.start || !dateRange.end)
-      return alert("Пожалуйста, выберите даты");
-
-    const totalGuests = guests.adults + guests.children;
-
-    console.log("Initiating search with parameters:", {
-      locationId,
-      dateRange,
-      guests,
-      totalGuests,
-      language,
-    paramItemFilters: {}
-    });
-
-    try {
-      const response = await offerApi.searchOffers({
-       startDate: dateRange.start.toISOString(),
-    endDate: dateRange.end.toISOString(),
-        guests: totalGuests,
-        userDiscountPercent: 5,
-        lang: language,
-        cityId: locationId,
-        paramItemFilters: {} 
-      });
-
-      const foundHotels = response.data;
-      setHotels(foundHotels);
-
-      if (onSearch) {
-        onSearch(
-          foundHotels,
-          location,
-          totalGuests,
-          dateRange.start,
-          dateRange.end
-        );
-      }
-
-      console.log("Результаты поиска:", foundHotels);
-    } catch (error) {
-      console.error("Ошибка поиска предложений:", error);
+  const handleSearch = () => {
+    if (!locationId) {
+      alert("Пожалуйста, выберите город");
+      return;
     }
+
+    if (!dateRange.start || !dateRange.end) {
+      alert("Пожалуйста, выберите даты");
+      return;
+    }
+
+    const combinedParams = {
+      cityId: locationId,
+      startDate: dateRange.start.toISOString(),
+      endDate: dateRange.end.toISOString(),
+      adults: guests.adults,
+      children: guests.children,
+      rooms: guests.rooms,
+      params: Object.entries(params)
+        .map(([key, val]) => `${key}:${val}`)
+        .join(","),
+    };
+
+    const searchParams = new URLSearchParams(combinedParams);
+    navigate(`/search?${searchParams.toString()}`);
+
   };
+
 
   const setLocationInfo = (cityName, cityId) => {
     setLocation(cityName);
@@ -85,7 +99,7 @@ export const SearchBar = ({
 
   return (
     <div
-      className={`${styles.searchBar} ${styles.searchBar_bg_color_dark} ${className} flex-between btn-br-r-20 ${classNameWidth} ${classNameHeight}`}
+      className={`${styles.searchBar} ${styles.searchBar_bg_color_dark}   ${styles.searchBar_txt} ${className} flex-between btn-br-r-20 ${classNameWidth} ${classNameHeight}`}
     >
       <div className={`${styles.searchBar__container} gap-20 flex-center`}>
         <div
@@ -101,7 +115,10 @@ export const SearchBar = ({
         <DateRangeInput
           dateRange={dateRange}
           setDateRange={setDateRange}
+          icon_title="calendar"
+          icon_size={18}
         />
+
 
         <div
           style={{ position: "relative" }}
@@ -115,7 +132,7 @@ export const SearchBar = ({
 
           <button
             onClick={() => setIsGuestOpen(!isGuestOpen)}
-            className={styles.input_guest}
+            className={`${styles.input_guest} ${styles.input_guest_txt}`}
           >
             {`${guests.adults + guests.children} ${t("Search.guests")}`}
           </button>

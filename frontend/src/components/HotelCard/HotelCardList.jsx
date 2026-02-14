@@ -4,7 +4,8 @@ import styles from "./HotelCardList.module.css";
 
 export const HotelCardList = ({
   hotels = [],
-  guests = "1",
+  adults = "1",
+  children="0",
   startDate = "2026-01-22",
   endDate = "2026-01-24",
   onCardClick,
@@ -31,6 +32,9 @@ export const HotelCardList = ({
     return () => window.removeEventListener("resize", updateColumns);
   }, [cardWidth, gap]);
 
+useEffect(()=>{
+  console.log({hotelList: hotels})
+}, [hotels]);
 
   useEffect(() => {
     updateColumns();
@@ -52,20 +56,20 @@ export const HotelCardList = ({
           id={hotel.id}
           title={hotel.title}
           image={hotel.rentObj?.[0]?.mainImageUrl || "-image.jpg"}
-          city={hotel.city}
-          cityId={hotel.cityId}
+          city={hotel.rentObj.cityTitle}
+          cityId={hotel.rentObj?.[0]?.cityId}
           country={hotel.country}
           distance={hotel.distanceToCenter}
           rating={hotel.rating}
           reviews={hotel.reviews}
           price={hotel.totalPrice}
-          guests={guests}
+           adults ={adults}
+              children={children}
           startDate={startDate}
           endDate={endDate}
-          onClick={() => onCardClick && onCardClick(hotel.id)}
-          onCheckAvailability={() =>
-            onCheckAvailability && onCheckAvailability(hotel.id)
-          }
+          onClick={() => {
+            console.log ({id: hotel.id})
+          }}
         />
       ))}
     </div>

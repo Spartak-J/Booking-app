@@ -348,266 +348,266 @@ namespace TranslationApiService.Data.Seed
                 new DistrictTranslation { id = 9, EntityId = 5, Lang = "en", Title = "Frankivskyi District" },
                 new DistrictTranslation { id = 10, EntityId = 5, Lang = "uk", Title = "Франківський район" },
                 new DistrictTranslation { id = 11, EntityId = 6, Lang = "en", Title = "Zaliznychnyi District" },
-                new DistrictTranslation { id = 12, EntityId = 6, Lang = "uk", Title = "Залізничний район" }
+                new DistrictTranslation { id = 12, EntityId = 6, Lang = "uk", Title = "Залізничний район" },
 
-            //    // Одеса
-            //    new DistrictTranslation { id = 13, EntityId = 7, Lang = "en", Title = "Primorskyi District" },
-            //    new DistrictTranslation { id = 14, EntityId = 7, Lang = "uk", Title = "Приморський район" },
-            //    new DistrictTranslation { id = 15, EntityId = 8, Lang = "en", Title = "Malynovskyi District" },
-            //    new DistrictTranslation { id = 16, EntityId = 8, Lang = "uk", Title = "Малиновський район" },
-            //    new DistrictTranslation { id = 17, EntityId = 9, Lang = "en", Title = "Kyivskyi District" },
-            //    new DistrictTranslation { id = 18, EntityId = 9, Lang = "uk", Title = "Київський район" },
+                // Одеса
+                new DistrictTranslation { id = 13, EntityId = 7, Lang = "en", Title = "Primorskyi District" },
+                new DistrictTranslation { id = 14, EntityId = 7, Lang = "uk", Title = "Приморський район" },
+                new DistrictTranslation { id = 15, EntityId = 8, Lang = "en", Title = "Malynovskyi District" },
+                new DistrictTranslation { id = 16, EntityId = 8, Lang = "uk", Title = "Малиновський район" },
+                new DistrictTranslation { id = 17, EntityId = 9, Lang = "en", Title = "Kyivskyi District" },
+                new DistrictTranslation { id = 18, EntityId = 9, Lang = "uk", Title = "Київський район" },
 
-            //    // Харків
-            //    new DistrictTranslation { id = 19, EntityId = 10, Lang = "en", Title = "Kharkivskyi District" },
-            //    new DistrictTranslation { id = 20, EntityId = 10, Lang = "uk", Title = "Харківський район" },
-            //    new DistrictTranslation { id = 21, EntityId = 11, Lang = "en", Title = "Saltivskyi District" },
-            //    new DistrictTranslation { id = 22, EntityId = 11, Lang = "uk", Title = "Салтівський район" },
-            //    new DistrictTranslation { id = 23, EntityId = 12, Lang = "en", Title = "Osnovianskyi District" },
-            //    new DistrictTranslation { id = 24, EntityId = 12, Lang = "uk", Title = "Основ'янський район" },
+                // Харків
+                new DistrictTranslation { id = 19, EntityId = 10, Lang = "en", Title = "Kharkivskyi District" },
+                new DistrictTranslation { id = 20, EntityId = 10, Lang = "uk", Title = "Харківський район" },
+                new DistrictTranslation { id = 21, EntityId = 11, Lang = "en", Title = "Saltivskyi District" },
+                new DistrictTranslation { id = 22, EntityId = 11, Lang = "uk", Title = "Салтівський район" },
+                new DistrictTranslation { id = 23, EntityId = 12, Lang = "en", Title = "Osnovianskyi District" },
+                new DistrictTranslation { id = 24, EntityId = 12, Lang = "uk", Title = "Основ'янський район" },
 
-            //    // Дніпро
-            //    new DistrictTranslation { id = 25, EntityId = 13, Lang = "en", Title = "Sobornyi District" },
-            //    new DistrictTranslation { id = 26, EntityId = 13, Lang = "uk", Title = "Соборний район" },
-            //    new DistrictTranslation { id = 27, EntityId = 14, Lang = "en", Title = "Shevchenkivskyi District" },
-            //    new DistrictTranslation { id = 28, EntityId = 14, Lang = "uk", Title = "Шевченківський район" },
-            //    new DistrictTranslation { id = 29, EntityId = 15, Lang = "en", Title = "Central District" },
-            //    new DistrictTranslation { id = 30, EntityId = 15, Lang = "uk", Title = "Центральний район" },
+                // Дніпро
+                new DistrictTranslation { id = 25, EntityId = 13, Lang = "en", Title = "Sobornyi District" },
+                new DistrictTranslation { id = 26, EntityId = 13, Lang = "uk", Title = "Соборний район" },
+                new DistrictTranslation { id = 27, EntityId = 14, Lang = "en", Title = "Shevchenkivskyi District" },
+                new DistrictTranslation { id = 28, EntityId = 14, Lang = "uk", Title = "Шевченківський район" },
+                new DistrictTranslation { id = 29, EntityId = 15, Lang = "en", Title = "Central District" },
+                new DistrictTranslation { id = 30, EntityId = 15, Lang = "uk", Title = "Центральний район" },
 
-            //    // Запоріжжя
-            //    new DistrictTranslation { id = 31, EntityId = 16, Lang = "en", Title = "Zavodskyi District" },
-            //    new DistrictTranslation { id = 32, EntityId = 16, Lang = "uk", Title = "Заводський район" },
-            //    new DistrictTranslation { id = 33, EntityId = 17, Lang = "en", Title = "Oleksandrivskyi District" },
-            //    new DistrictTranslation { id = 34, EntityId = 17, Lang = "uk", Title = "Олександрівський район" },
-            //    new DistrictTranslation { id = 35, EntityId = 18, Lang = "en", Title = "Komunarskyi District" },
-            //    new DistrictTranslation { id = 36, EntityId = 18, Lang = "uk", Title = "Комунарський район" },
+                // Запоріжжя
+                new DistrictTranslation { id = 31, EntityId = 16, Lang = "en", Title = "Zavodskyi District" },
+                new DistrictTranslation { id = 32, EntityId = 16, Lang = "uk", Title = "Заводський район" },
+                new DistrictTranslation { id = 33, EntityId = 17, Lang = "en", Title = "Oleksandrivskyi District" },
+                new DistrictTranslation { id = 34, EntityId = 17, Lang = "uk", Title = "Олександрівський район" },
+                new DistrictTranslation { id = 35, EntityId = 18, Lang = "en", Title = "Komunarskyi District" },
+                new DistrictTranslation { id = 36, EntityId = 18, Lang = "uk", Title = "Комунарський район" },
 
-            //    // Івано-Франківськ
-            //    new DistrictTranslation { id = 37, EntityId = 19, Lang = "en", Title = "City Center" },
-            //    new DistrictTranslation { id = 38, EntityId = 19, Lang = "uk", Title = "Центр міста" },
-            //    new DistrictTranslation { id = 39, EntityId = 20, Lang = "en", Title = "Prykarpattia District" },
-            //    new DistrictTranslation { id = 40, EntityId = 20, Lang = "uk", Title = "Прикарпатський район" },
-            //    new DistrictTranslation { id = 41, EntityId = 21, Lang = "en", Title = "North District" },
-            //    new DistrictTranslation { id = 42, EntityId = 21, Lang = "uk", Title = "Північний район" },
+                // Івано-Франківськ
+                new DistrictTranslation { id = 37, EntityId = 19, Lang = "en", Title = "City Center" },
+                new DistrictTranslation { id = 38, EntityId = 19, Lang = "uk", Title = "Центр міста" },
+                new DistrictTranslation { id = 39, EntityId = 20, Lang = "en", Title = "Prykarpattia District" },
+                new DistrictTranslation { id = 40, EntityId = 20, Lang = "uk", Title = "Прикарпатський район" },
+                new DistrictTranslation { id = 41, EntityId = 21, Lang = "en", Title = "North District" },
+                new DistrictTranslation { id = 42, EntityId = 21, Lang = "uk", Title = "Північний район" },
 
-            //    // Чернівці
-            //    new DistrictTranslation { id = 43, EntityId = 22, Lang = "en", Title = "City Center" },
-            //    new DistrictTranslation { id = 44, EntityId = 22, Lang = "uk", Title = "Центр міста" },
-            //    new DistrictTranslation { id = 45, EntityId = 23, Lang = "en", Title = "East District" },
-            //    new DistrictTranslation { id = 46, EntityId = 23, Lang = "uk", Title = "Східний район" },
-            //    new DistrictTranslation { id = 47, EntityId = 24, Lang = "en", Title = "South District" },
-            //    new DistrictTranslation { id = 48, EntityId = 24, Lang = "uk", Title = "Південний район" },
-
-
-            //// Рівне
-            //new DistrictTranslation { id = 55, EntityId = 25, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 56, EntityId = 25, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 57, EntityId = 26, Lang = "en", Title = "East" },
-            //new DistrictTranslation { id = 58, EntityId = 26, Lang = "uk", Title = "Схід" },
-            //new DistrictTranslation { id = 59, EntityId = 27, Lang = "en", Title = "West" },
-            //new DistrictTranslation { id = 60, EntityId = 27, Lang = "uk", Title = "Захід" },
-
-            //// Вінниця
-            //new DistrictTranslation { id = 61, EntityId = 28, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 62, EntityId = 28, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 63, EntityId = 29, Lang = "en", Title = "North" },
-            //new DistrictTranslation { id = 64, EntityId = 29, Lang = "uk", Title = "Північ" },
-            //new DistrictTranslation { id = 65, EntityId = 30, Lang = "en", Title = "South" },
-            //new DistrictTranslation { id = 66, EntityId = 30, Lang = "uk", Title = "Південь" },
-
-            //// Черкаси
-            //new DistrictTranslation { id = 67, EntityId = 31, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 68, EntityId = 31, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 69, EntityId = 32, Lang = "en", Title = "North" },
-            //new DistrictTranslation { id = 70, EntityId = 32, Lang = "uk", Title = "Північ" },
-            //new DistrictTranslation { id = 71, EntityId = 33, Lang = "en", Title = "South" },
-            //new DistrictTranslation { id = 72, EntityId = 33, Lang = "uk", Title = "Південь" },
-
-            //// Полтава
-            //new DistrictTranslation { id = 73, EntityId = 34, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 74, EntityId = 34, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 75, EntityId = 35, Lang = "en", Title = "North" },
-            //new DistrictTranslation { id = 76, EntityId = 35, Lang = "uk", Title = "Північ" },
-            //new DistrictTranslation { id = 77, EntityId = 36, Lang = "en", Title = "South" },
-            //new DistrictTranslation { id = 78, EntityId = 36, Lang = "uk", Title = "Південь" },
-
-            //// Кропивницький
-            //new DistrictTranslation { id = 79, EntityId = 37, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 80, EntityId = 37, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 81, EntityId = 38, Lang = "en", Title = "East" },
-            //new DistrictTranslation { id = 82, EntityId = 38, Lang = "uk", Title = "Схід" },
-            //new DistrictTranslation { id = 83, EntityId = 39, Lang = "en", Title = "West" },
-            //new DistrictTranslation { id = 84, EntityId = 39, Lang = "uk", Title = "Захід" },
-
-            //// Миколаїв
-            //new DistrictTranslation { id = 85, EntityId = 40, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 86, EntityId = 40, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 87, EntityId = 41, Lang = "en", Title = "North" },
-            //new DistrictTranslation { id = 88, EntityId = 41, Lang = "uk", Title = "Північ" },
-            //new DistrictTranslation { id = 89, EntityId = 42, Lang = "en", Title = "South" },
-            //new DistrictTranslation { id = 90, EntityId = 42, Lang = "uk", Title = "Південь" },
-
-            //// Херсон
-            //new DistrictTranslation { id = 91, EntityId = 43, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 92, EntityId = 43, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 93, EntityId = 44, Lang = "en", Title = "North" },
-            //new DistrictTranslation { id = 94, EntityId = 44, Lang = "uk", Title = "Північ" },
-            //new DistrictTranslation { id = 95, EntityId = 45, Lang = "en", Title = "South" },
-            //new DistrictTranslation { id = 96, EntityId = 45, Lang = "uk", Title = "Південь" },
-
-            //// Луцьк
-            //new DistrictTranslation { id = 97, EntityId = 46, Lang = "en", Title = "Central" },
-            //new DistrictTranslation { id = 98, EntityId = 46, Lang = "uk", Title = "Центр" },
-            //new DistrictTranslation { id = 99, EntityId = 47, Lang = "en", Title = "North" },
-            //new DistrictTranslation { id = 100, EntityId = 47, Lang = "uk", Title = "Північ" },
-            //new DistrictTranslation { id = 101, EntityId = 48, Lang = "en", Title = "South" },
-            //new DistrictTranslation { id = 102, EntityId = 48, Lang = "uk", Title = "Південь" },
-            //// =================== DistrictTranslation ===================
-
-            //// New York
-            //new DistrictTranslation { id = 103, EntityId = 49, Lang = "en", Title = "Manhattan" },
-            //new DistrictTranslation { id = 104, EntityId = 49, Lang = "uk", Title = "Манхеттен" },
-            //new DistrictTranslation { id = 105, EntityId = 50, Lang = "en", Title = "Brooklyn" },
-            //new DistrictTranslation { id = 106, EntityId = 50, Lang = "uk", Title = "Бруклін" },
-            //new DistrictTranslation { id = 107, EntityId = 51, Lang = "en", Title = "Queens" },
-            //new DistrictTranslation { id = 108, EntityId = 51, Lang = "uk", Title = "Квінс" },
-
-            //// Los Angeles
-            //new DistrictTranslation { id = 109, EntityId = 52, Lang = "en", Title = "Hollywood" },
-            //new DistrictTranslation { id = 110, EntityId = 52, Lang = "uk", Title = "Голлівуд" },
-            //new DistrictTranslation { id = 111, EntityId = 53, Lang = "en", Title = "Downtown LA" },
-            //new DistrictTranslation { id = 112, EntityId = 53, Lang = "uk", Title = "Центр ЛА" },
-            //new DistrictTranslation { id = 113, EntityId = 54, Lang = "en", Title = "Santa Monica" },
-            //new DistrictTranslation { id = 114, EntityId = 54, Lang = "uk", Title = "Санта-Моніка" },
-
-            //// Chicago
-            //new DistrictTranslation { id = 115, EntityId = 106, Lang = "en", Title = "Loop" },
-            //new DistrictTranslation { id = 116, EntityId = 106, Lang = "uk", Title = "Луп" },
-            //new DistrictTranslation { id = 117, EntityId = 107, Lang = "en", Title = "Lincoln Park" },
-            //new DistrictTranslation { id = 118, EntityId = 107, Lang = "uk", Title = "Лінкольн-Парк" },
-            //new DistrictTranslation { id = 119, EntityId = 108, Lang = "en", Title = "South Side" },
-            //new DistrictTranslation { id = 120, EntityId = 108, Lang = "uk", Title = "Південна частина" },
-
-            //// Berlin
-            //new DistrictTranslation { id = 121, EntityId = 109, Lang = "en", Title = "Mitte" },
-            //new DistrictTranslation { id = 122, EntityId = 109, Lang = "uk", Title = "Мітте" },
-            //new DistrictTranslation { id = 123, EntityId = 110, Lang = "en", Title = "Charlottenburg" },
-            //new DistrictTranslation { id = 124, EntityId = 110, Lang = "uk", Title = "Шарлоттенбург" },
-            //new DistrictTranslation { id = 125, EntityId = 111, Lang = "en", Title = "Kreuzberg" },
-            //new DistrictTranslation { id = 126, EntityId = 111, Lang = "uk", Title = "Кройцберг" },
-
-            //// Munich
-            //new DistrictTranslation { id = 127, EntityId = 112, Lang = "en", Title = "Altstadt" },
-            //new DistrictTranslation { id = 128, EntityId = 112, Lang = "uk", Title = "Старе місто" },
-            //new DistrictTranslation { id = 129, EntityId = 113, Lang = "en", Title = "Schwabing" },
-            //new DistrictTranslation { id = 130, EntityId = 113, Lang = "uk", Title = "Швабінг" },
-            //new DistrictTranslation { id = 131, EntityId = 114, Lang = "en", Title = "Maxvorstadt" },
-            //new DistrictTranslation { id = 132, EntityId = 114, Lang = "uk", Title = "Максфорштадт" },
-
-            //// Hamburg
-            //new DistrictTranslation { id = 133, EntityId = 115, Lang = "en", Title = "Altstadt" },
-            //new DistrictTranslation { id = 134, EntityId = 115, Lang = "uk", Title = "Старе місто" },
-            //new DistrictTranslation { id = 135, EntityId = 116, Lang = "en", Title = "St. Pauli" },
-            //new DistrictTranslation { id = 136, EntityId = 116, Lang = "uk", Title = "Санкт-Паулі" },
-            //new DistrictTranslation { id = 137, EntityId = 117, Lang = "en", Title = "Altona" },
-            //new DistrictTranslation { id = 138, EntityId = 117, Lang = "uk", Title = "Альтона" },
-
-            //// Paris
-            //new DistrictTranslation { id = 139, EntityId = 118, Lang = "en", Title = "Montmartre" },
-            //new DistrictTranslation { id = 140, EntityId = 118, Lang = "uk", Title = "Монмартр" },
-            //new DistrictTranslation { id = 141, EntityId = 119, Lang = "en", Title = "Latin Quarter" },
-            //new DistrictTranslation { id = 142, EntityId = 119, Lang = "uk", Title = "Латинський квартал" },
-            //new DistrictTranslation { id = 143, EntityId = 120, Lang = "en", Title = "Marais" },
-            //new DistrictTranslation { id = 144, EntityId = 120, Lang = "uk", Title = "Маре" },
-
-            //// Lyon
-            //new DistrictTranslation { id = 145, EntityId = 121, Lang = "en", Title = "Presqu'île" },
-            //new DistrictTranslation { id = 146, EntityId = 121, Lang = "uk", Title = "Преск’іль" },
-            //new DistrictTranslation { id = 147, EntityId = 122, Lang = "en", Title = "Croix-Rousse" },
-            //new DistrictTranslation { id = 148, EntityId = 122, Lang = "uk", Title = "Круа-Рус" },
-            //new DistrictTranslation { id = 149, EntityId = 123, Lang = "en", Title = "Part-Dieu" },
-            //new DistrictTranslation { id = 150, EntityId = 123, Lang = "uk", Title = "Пар-Дьє" },
+                // Чернівці
+                new DistrictTranslation { id = 43, EntityId = 22, Lang = "en", Title = "City Center" },
+                new DistrictTranslation { id = 44, EntityId = 22, Lang = "uk", Title = "Центр міста" },
+                new DistrictTranslation { id = 45, EntityId = 23, Lang = "en", Title = "East District" },
+                new DistrictTranslation { id = 46, EntityId = 23, Lang = "uk", Title = "Східний район" },
+                new DistrictTranslation { id = 47, EntityId = 24, Lang = "en", Title = "South District" },
+                new DistrictTranslation { id = 48, EntityId = 24, Lang = "uk", Title = "Південний район" },
 
 
-            //// Marseille
-            //new DistrictTranslation { id = 151, EntityId = 124, Lang = "en", Title = "Old Port" },
-            //new DistrictTranslation { id = 152, EntityId = 124, Lang = "uk", Title = "Старий порт" },
-            //new DistrictTranslation { id = 153, EntityId = 125, Lang = "en", Title = "Le Panier" },
-            //new DistrictTranslation { id = 154, EntityId = 125, Lang = "uk", Title = "Ле Пан’є" },
-            //new DistrictTranslation { id = 155, EntityId = 126, Lang = "en", Title = "La Joliette" },
-            //new DistrictTranslation { id = 156, EntityId = 126, Lang = "uk", Title = "Ла Жольєт" },
+            // Рівне
+            new DistrictTranslation { id = 55, EntityId = 25, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 56, EntityId = 25, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 57, EntityId = 26, Lang = "en", Title = "East" },
+            new DistrictTranslation { id = 58, EntityId = 26, Lang = "uk", Title = "Схід" },
+            new DistrictTranslation { id = 59, EntityId = 27, Lang = "en", Title = "West" },
+            new DistrictTranslation { id = 60, EntityId = 27, Lang = "uk", Title = "Захід" },
 
-            //// London
-            //new DistrictTranslation { id = 157, EntityId = 127, Lang = "en", Title = "Camden" },
-            //new DistrictTranslation { id = 158, EntityId = 127, Lang = "uk", Title = "Кемден" },
-            //new DistrictTranslation { id = 159, EntityId = 128, Lang = "en", Title = "Westminster" },
-            //new DistrictTranslation { id = 160, EntityId = 128, Lang = "uk", Title = "Вестмінстер" },
-            //new DistrictTranslation { id = 161, EntityId = 129, Lang = "en", Title = "Greenwich" },
-            //new DistrictTranslation { id = 162, EntityId = 129, Lang = "uk", Title = "Грінвіч" },
+            // Вінниця
+            new DistrictTranslation { id = 61, EntityId = 28, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 62, EntityId = 28, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 63, EntityId = 29, Lang = "en", Title = "North" },
+            new DistrictTranslation { id = 64, EntityId = 29, Lang = "uk", Title = "Північ" },
+            new DistrictTranslation { id = 65, EntityId = 30, Lang = "en", Title = "South" },
+            new DistrictTranslation { id = 66, EntityId = 30, Lang = "uk", Title = "Південь" },
 
-            //// Manchester
-            //new DistrictTranslation { id = 163, EntityId = 130, Lang = "en", Title = "Salford" },
-            //new DistrictTranslation { id = 164, EntityId = 130, Lang = "uk", Title = "Салфорд" },
-            //new DistrictTranslation { id = 165, EntityId = 131, Lang = "en", Title = "Didsbury" },
-            //new DistrictTranslation { id = 166, EntityId = 131, Lang = "uk", Title = "Дідсбері" },
-            //new DistrictTranslation { id = 167, EntityId = 132, Lang = "en", Title = "Cheetham Hill" },
-            //new DistrictTranslation { id = 168, EntityId = 132, Lang = "uk", Title = "Чітем-Гілл" },
+            // Черкаси
+            new DistrictTranslation { id = 67, EntityId = 31, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 68, EntityId = 31, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 69, EntityId = 32, Lang = "en", Title = "North" },
+            new DistrictTranslation { id = 70, EntityId = 32, Lang = "uk", Title = "Північ" },
+            new DistrictTranslation { id = 71, EntityId = 33, Lang = "en", Title = "South" },
+            new DistrictTranslation { id = 72, EntityId = 33, Lang = "uk", Title = "Південь" },
 
-            //// Birmingham
-            //new DistrictTranslation { id = 169, EntityId = 133, Lang = "en", Title = "City Centre" },
-            //new DistrictTranslation { id = 170, EntityId = 133, Lang = "uk", Title = "Центр міста" },
-            //new DistrictTranslation { id = 171, EntityId = 134, Lang = "en", Title = "Edgbaston" },
-            //new DistrictTranslation { id = 172, EntityId = 134, Lang = "uk", Title = "Еджбастон" },
-            //new DistrictTranslation { id = 173, EntityId = 135, Lang = "en", Title = "Selly Oak" },
-            //new DistrictTranslation { id = 174, EntityId = 135, Lang = "uk", Title = "Селлі-Оук" },
+            // Полтава
+            new DistrictTranslation { id = 73, EntityId = 34, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 74, EntityId = 34, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 75, EntityId = 35, Lang = "en", Title = "North" },
+            new DistrictTranslation { id = 76, EntityId = 35, Lang = "uk", Title = "Північ" },
+            new DistrictTranslation { id = 77, EntityId = 36, Lang = "en", Title = "South" },
+            new DistrictTranslation { id = 78, EntityId = 36, Lang = "uk", Title = "Південь" },
 
-            //// Madrid
-            //new DistrictTranslation { id = 175, EntityId = 136, Lang = "en", Title = "Centro" },
-            //new DistrictTranslation { id = 176, EntityId = 136, Lang = "uk", Title = "Центро" },
-            //new DistrictTranslation { id = 177, EntityId = 137, Lang = "en", Title = "Salamanca" },
-            //new DistrictTranslation { id = 178, EntityId = 137, Lang = "uk", Title = "Саламанка" },
-            //new DistrictTranslation { id = 179, EntityId = 138, Lang = "en", Title = "Chamartín" },
-            //new DistrictTranslation { id = 180, EntityId = 138, Lang = "uk", Title = "Чамартін" },
+            // Кропивницький
+            new DistrictTranslation { id = 79, EntityId = 37, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 80, EntityId = 37, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 81, EntityId = 38, Lang = "en", Title = "East" },
+            new DistrictTranslation { id = 82, EntityId = 38, Lang = "uk", Title = "Схід" },
+            new DistrictTranslation { id = 83, EntityId = 39, Lang = "en", Title = "West" },
+            new DistrictTranslation { id = 84, EntityId = 39, Lang = "uk", Title = "Захід" },
 
-            //// Barcelona
-            //new DistrictTranslation { id = 181, EntityId = 139, Lang = "en", Title = "Eixample" },
-            //new DistrictTranslation { id = 182, EntityId = 139, Lang = "uk", Title = "Ейшампле" },
-            //new DistrictTranslation { id = 183, EntityId = 140, Lang = "en", Title = "Gràcia" },
-            //new DistrictTranslation { id = 184, EntityId = 140, Lang = "uk", Title = "Грасія" },
-            //new DistrictTranslation { id = 185, EntityId = 141, Lang = "en", Title = "Ciutat Vella" },
-            //new DistrictTranslation { id = 186, EntityId = 141, Lang = "uk", Title = "С’юта Велья" },
+            // Миколаїв
+            new DistrictTranslation { id = 85, EntityId = 40, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 86, EntityId = 40, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 87, EntityId = 41, Lang = "en", Title = "North" },
+            new DistrictTranslation { id = 88, EntityId = 41, Lang = "uk", Title = "Північ" },
+            new DistrictTranslation { id = 89, EntityId = 42, Lang = "en", Title = "South" },
+            new DistrictTranslation { id = 90, EntityId = 42, Lang = "uk", Title = "Південь" },
 
-            //// Valencia
-            //new DistrictTranslation { id = 187, EntityId = 142, Lang = "en", Title = "El Carmen" },
-            //new DistrictTranslation { id = 188, EntityId = 142, Lang = "uk", Title = "Ель Кармен" },
-            //new DistrictTranslation { id = 189, EntityId = 143, Lang = "en", Title = "Ruzafa" },
-            //new DistrictTranslation { id = 190, EntityId = 143, Lang = "uk", Title = "Русaфа" },
-            //new DistrictTranslation { id = 191, EntityId = 144, Lang = "en", Title = "Benimaclet" },
-            //new DistrictTranslation { id = 192, EntityId = 144, Lang = "uk", Title = "Бенімаcлет" },
+            // Херсон
+            new DistrictTranslation { id = 91, EntityId = 43, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 92, EntityId = 43, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 93, EntityId = 44, Lang = "en", Title = "North" },
+            new DistrictTranslation { id = 94, EntityId = 44, Lang = "uk", Title = "Північ" },
+            new DistrictTranslation { id = 95, EntityId = 45, Lang = "en", Title = "South" },
+            new DistrictTranslation { id = 96, EntityId = 45, Lang = "uk", Title = "Південь" },
 
-            //// Warsaw
-            //new DistrictTranslation { id = 193, EntityId = 145, Lang = "en", Title = "Śródmieście" },
-            //new DistrictTranslation { id = 194, EntityId = 145, Lang = "uk", Title = "Шродмієстє" },
-            //new DistrictTranslation { id = 195, EntityId = 146, Lang = "en", Title = "Praga-Północ" },
-            //new DistrictTranslation { id = 196, EntityId = 146, Lang = "uk", Title = "Прага-Північ" },
-            //new DistrictTranslation { id = 197, EntityId = 147, Lang = "en", Title = "Wola" },
-            //new DistrictTranslation { id = 198, EntityId = 147, Lang = "uk", Title = "Воля" },
+            // Луцьк
+            new DistrictTranslation { id = 97, EntityId = 46, Lang = "en", Title = "Central" },
+            new DistrictTranslation { id = 98, EntityId = 46, Lang = "uk", Title = "Центр" },
+            new DistrictTranslation { id = 99, EntityId = 47, Lang = "en", Title = "North" },
+            new DistrictTranslation { id = 100, EntityId = 47, Lang = "uk", Title = "Північ" },
+            new DistrictTranslation { id = 101, EntityId = 48, Lang = "en", Title = "South" },
+            new DistrictTranslation { id = 102, EntityId = 48, Lang = "uk", Title = "Південь" },
+            // =================== DistrictTranslation ===================
 
-            //// Krakow
-            //new DistrictTranslation { id = 199, EntityId = 148, Lang = "en", Title = "Old Town" },
-            //new DistrictTranslation { id = 200, EntityId = 148, Lang = "uk", Title = "Старе місто" },
-            //new DistrictTranslation { id = 201, EntityId = 149, Lang = "en", Title = "Kazimierz" },
-            //new DistrictTranslation { id = 202, EntityId = 149, Lang = "uk", Title = "Казімєж" },
-            //new DistrictTranslation { id = 203, EntityId = 150, Lang = "en", Title = "Podgórze" },
-            //new DistrictTranslation { id = 204, EntityId = 150, Lang = "uk", Title = "Подгуже" },
+            // New York
+            new DistrictTranslation { id = 103, EntityId = 49, Lang = "en", Title = "Manhattan" },
+            new DistrictTranslation { id = 104, EntityId = 49, Lang = "uk", Title = "Манхеттен" },
+            new DistrictTranslation { id = 105, EntityId = 50, Lang = "en", Title = "Brooklyn" },
+            new DistrictTranslation { id = 106, EntityId = 50, Lang = "uk", Title = "Бруклін" },
+            new DistrictTranslation { id = 107, EntityId = 51, Lang = "en", Title = "Queens" },
+            new DistrictTranslation { id = 108, EntityId = 51, Lang = "uk", Title = "Квінс" },
 
-            //// Poznan
-            //new DistrictTranslation { id = 205, EntityId = 151, Lang = "en", Title = "Stare Miasto" },
-            //new DistrictTranslation { id = 206, EntityId = 151, Lang = "uk", Title = "Старе місто" },
-            //new DistrictTranslation { id = 207, EntityId = 152, Lang = "en", Title = "Grunwald" },
-            //new DistrictTranslation { id = 208, EntityId = 152, Lang = "uk", Title = "Грюнвальд" },
-            //new DistrictTranslation { id = 209, EntityId = 153, Lang = "en", Title = "Jeżyce" },
-            //new DistrictTranslation { id = 210, EntityId = 153, Lang = "uk", Title = "Єжице" }
+            // Los Angeles
+            new DistrictTranslation { id = 109, EntityId = 52, Lang = "en", Title = "Hollywood" },
+            new DistrictTranslation { id = 110, EntityId = 52, Lang = "uk", Title = "Голлівуд" },
+            new DistrictTranslation { id = 111, EntityId = 53, Lang = "en", Title = "Downtown LA" },
+            new DistrictTranslation { id = 112, EntityId = 53, Lang = "uk", Title = "Центр ЛА" },
+            new DistrictTranslation { id = 113, EntityId = 54, Lang = "en", Title = "Santa Monica" },
+            new DistrictTranslation { id = 114, EntityId = 54, Lang = "uk", Title = "Санта-Моніка" },
+
+            // Chicago
+            new DistrictTranslation { id = 115, EntityId = 106, Lang = "en", Title = "Loop" },
+            new DistrictTranslation { id = 116, EntityId = 106, Lang = "uk", Title = "Луп" },
+            new DistrictTranslation { id = 117, EntityId = 107, Lang = "en", Title = "Lincoln Park" },
+            new DistrictTranslation { id = 118, EntityId = 107, Lang = "uk", Title = "Лінкольн-Парк" },
+            new DistrictTranslation { id = 119, EntityId = 108, Lang = "en", Title = "South Side" },
+            new DistrictTranslation { id = 120, EntityId = 108, Lang = "uk", Title = "Південна частина" },
+
+            // Berlin
+            new DistrictTranslation { id = 121, EntityId = 109, Lang = "en", Title = "Mitte" },
+            new DistrictTranslation { id = 122, EntityId = 109, Lang = "uk", Title = "Мітте" },
+            new DistrictTranslation { id = 123, EntityId = 110, Lang = "en", Title = "Charlottenburg" },
+            new DistrictTranslation { id = 124, EntityId = 110, Lang = "uk", Title = "Шарлоттенбург" },
+            new DistrictTranslation { id = 125, EntityId = 111, Lang = "en", Title = "Kreuzberg" },
+            new DistrictTranslation { id = 126, EntityId = 111, Lang = "uk", Title = "Кройцберг" },
+
+            // Munich
+            new DistrictTranslation { id = 127, EntityId = 112, Lang = "en", Title = "Altstadt" },
+            new DistrictTranslation { id = 128, EntityId = 112, Lang = "uk", Title = "Старе місто" },
+            new DistrictTranslation { id = 129, EntityId = 113, Lang = "en", Title = "Schwabing" },
+            new DistrictTranslation { id = 130, EntityId = 113, Lang = "uk", Title = "Швабінг" },
+            new DistrictTranslation { id = 131, EntityId = 114, Lang = "en", Title = "Maxvorstadt" },
+            new DistrictTranslation { id = 132, EntityId = 114, Lang = "uk", Title = "Максфорштадт" },
+
+            // Hamburg
+            new DistrictTranslation { id = 133, EntityId = 115, Lang = "en", Title = "Altstadt" },
+            new DistrictTranslation { id = 134, EntityId = 115, Lang = "uk", Title = "Старе місто" },
+            new DistrictTranslation { id = 135, EntityId = 116, Lang = "en", Title = "St. Pauli" },
+            new DistrictTranslation { id = 136, EntityId = 116, Lang = "uk", Title = "Санкт-Паулі" },
+            new DistrictTranslation { id = 137, EntityId = 117, Lang = "en", Title = "Altona" },
+            new DistrictTranslation { id = 138, EntityId = 117, Lang = "uk", Title = "Альтона" },
+
+            // Paris
+            new DistrictTranslation { id = 139, EntityId = 118, Lang = "en", Title = "Montmartre" },
+            new DistrictTranslation { id = 140, EntityId = 118, Lang = "uk", Title = "Монмартр" },
+            new DistrictTranslation { id = 141, EntityId = 119, Lang = "en", Title = "Latin Quarter" },
+            new DistrictTranslation { id = 142, EntityId = 119, Lang = "uk", Title = "Латинський квартал" },
+            new DistrictTranslation { id = 143, EntityId = 120, Lang = "en", Title = "Marais" },
+            new DistrictTranslation { id = 144, EntityId = 120, Lang = "uk", Title = "Маре" },
+
+            // Lyon
+            new DistrictTranslation { id = 145, EntityId = 121, Lang = "en", Title = "Presqu'île" },
+            new DistrictTranslation { id = 146, EntityId = 121, Lang = "uk", Title = "Преск’іль" },
+            new DistrictTranslation { id = 147, EntityId = 122, Lang = "en", Title = "Croix-Rousse" },
+            new DistrictTranslation { id = 148, EntityId = 122, Lang = "uk", Title = "Круа-Рус" },
+            new DistrictTranslation { id = 149, EntityId = 123, Lang = "en", Title = "Part-Dieu" },
+            new DistrictTranslation { id = 150, EntityId = 123, Lang = "uk", Title = "Пар-Дьє" },
+
+
+            // Marseille
+            new DistrictTranslation { id = 151, EntityId = 124, Lang = "en", Title = "Old Port" },
+            new DistrictTranslation { id = 152, EntityId = 124, Lang = "uk", Title = "Старий порт" },
+            new DistrictTranslation { id = 153, EntityId = 125, Lang = "en", Title = "Le Panier" },
+            new DistrictTranslation { id = 154, EntityId = 125, Lang = "uk", Title = "Ле Пан’є" },
+            new DistrictTranslation { id = 155, EntityId = 126, Lang = "en", Title = "La Joliette" },
+            new DistrictTranslation { id = 156, EntityId = 126, Lang = "uk", Title = "Ла Жольєт" },
+
+            // London
+            new DistrictTranslation { id = 157, EntityId = 127, Lang = "en", Title = "Camden" },
+            new DistrictTranslation { id = 158, EntityId = 127, Lang = "uk", Title = "Кемден" },
+            new DistrictTranslation { id = 159, EntityId = 128, Lang = "en", Title = "Westminster" },
+            new DistrictTranslation { id = 160, EntityId = 128, Lang = "uk", Title = "Вестмінстер" },
+            new DistrictTranslation { id = 161, EntityId = 129, Lang = "en", Title = "Greenwich" },
+            new DistrictTranslation { id = 162, EntityId = 129, Lang = "uk", Title = "Грінвіч" },
+
+            // Manchester
+            new DistrictTranslation { id = 163, EntityId = 130, Lang = "en", Title = "Salford" },
+            new DistrictTranslation { id = 164, EntityId = 130, Lang = "uk", Title = "Салфорд" },
+            new DistrictTranslation { id = 165, EntityId = 131, Lang = "en", Title = "Didsbury" },
+            new DistrictTranslation { id = 166, EntityId = 131, Lang = "uk", Title = "Дідсбері" },
+            new DistrictTranslation { id = 167, EntityId = 132, Lang = "en", Title = "Cheetham Hill" },
+            new DistrictTranslation { id = 168, EntityId = 132, Lang = "uk", Title = "Чітем-Гілл" },
+
+            // Birmingham
+            new DistrictTranslation { id = 169, EntityId = 133, Lang = "en", Title = "City Centre" },
+            new DistrictTranslation { id = 170, EntityId = 133, Lang = "uk", Title = "Центр міста" },
+            new DistrictTranslation { id = 171, EntityId = 134, Lang = "en", Title = "Edgbaston" },
+            new DistrictTranslation { id = 172, EntityId = 134, Lang = "uk", Title = "Еджбастон" },
+            new DistrictTranslation { id = 173, EntityId = 135, Lang = "en", Title = "Selly Oak" },
+            new DistrictTranslation { id = 174, EntityId = 135, Lang = "uk", Title = "Селлі-Оук" },
+
+            // Madrid
+            new DistrictTranslation { id = 175, EntityId = 136, Lang = "en", Title = "Centro" },
+            new DistrictTranslation { id = 176, EntityId = 136, Lang = "uk", Title = "Центро" },
+            new DistrictTranslation { id = 177, EntityId = 137, Lang = "en", Title = "Salamanca" },
+            new DistrictTranslation { id = 178, EntityId = 137, Lang = "uk", Title = "Саламанка" },
+            new DistrictTranslation { id = 179, EntityId = 138, Lang = "en", Title = "Chamartín" },
+            new DistrictTranslation { id = 180, EntityId = 138, Lang = "uk", Title = "Чамартін" },
+
+            // Barcelona
+            new DistrictTranslation { id = 181, EntityId = 139, Lang = "en", Title = "Eixample" },
+            new DistrictTranslation { id = 182, EntityId = 139, Lang = "uk", Title = "Ейшампле" },
+            new DistrictTranslation { id = 183, EntityId = 140, Lang = "en", Title = "Gràcia" },
+            new DistrictTranslation { id = 184, EntityId = 140, Lang = "uk", Title = "Грасія" },
+            new DistrictTranslation { id = 185, EntityId = 141, Lang = "en", Title = "Ciutat Vella" },
+            new DistrictTranslation { id = 186, EntityId = 141, Lang = "uk", Title = "С’юта Велья" },
+
+            // Valencia
+            new DistrictTranslation { id = 187, EntityId = 142, Lang = "en", Title = "El Carmen" },
+            new DistrictTranslation { id = 188, EntityId = 142, Lang = "uk", Title = "Ель Кармен" },
+            new DistrictTranslation { id = 189, EntityId = 143, Lang = "en", Title = "Ruzafa" },
+            new DistrictTranslation { id = 190, EntityId = 143, Lang = "uk", Title = "Русaфа" },
+            new DistrictTranslation { id = 191, EntityId = 144, Lang = "en", Title = "Benimaclet" },
+            new DistrictTranslation { id = 192, EntityId = 144, Lang = "uk", Title = "Бенімаcлет" },
+
+            // Warsaw
+            new DistrictTranslation { id = 193, EntityId = 145, Lang = "en", Title = "Śródmieście" },
+            new DistrictTranslation { id = 194, EntityId = 145, Lang = "uk", Title = "Шродмієстє" },
+            new DistrictTranslation { id = 195, EntityId = 146, Lang = "en", Title = "Praga-Północ" },
+            new DistrictTranslation { id = 196, EntityId = 146, Lang = "uk", Title = "Прага-Північ" },
+            new DistrictTranslation { id = 197, EntityId = 147, Lang = "en", Title = "Wola" },
+            new DistrictTranslation { id = 198, EntityId = 147, Lang = "uk", Title = "Воля" },
+
+            // Krakow
+            new DistrictTranslation { id = 199, EntityId = 148, Lang = "en", Title = "Old Town" },
+            new DistrictTranslation { id = 200, EntityId = 148, Lang = "uk", Title = "Старе місто" },
+            new DistrictTranslation { id = 201, EntityId = 149, Lang = "en", Title = "Kazimierz" },
+            new DistrictTranslation { id = 202, EntityId = 149, Lang = "uk", Title = "Казімєж" },
+            new DistrictTranslation { id = 203, EntityId = 150, Lang = "en", Title = "Podgórze" },
+            new DistrictTranslation { id = 204, EntityId = 150, Lang = "uk", Title = "Подгуже" },
+
+            // Poznan
+            new DistrictTranslation { id = 205, EntityId = 151, Lang = "en", Title = "Stare Miasto" },
+            new DistrictTranslation { id = 206, EntityId = 151, Lang = "uk", Title = "Старе місто" },
+            new DistrictTranslation { id = 207, EntityId = 152, Lang = "en", Title = "Grunwald" },
+            new DistrictTranslation { id = 208, EntityId = 152, Lang = "uk", Title = "Грюнвальд" },
+            new DistrictTranslation { id = 209, EntityId = 153, Lang = "en", Title = "Jeżyce" },
+            new DistrictTranslation { id = 210, EntityId = 153, Lang = "uk", Title = "Єжице" }
 
         );
 

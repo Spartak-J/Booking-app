@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useSearchParams  } from "react-router-dom";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { AuthContext } from "../../contexts/AuthContext";
 
@@ -16,7 +16,7 @@ import styles from "./BookingDetailsPage.module.css";
 export const BookingDetailsPage = () => {
   const location = useLocation();
   const { offerApi } = useContext(ApiContext);
-  const { login } = useContext(AuthContext);
+    const { user, token } = useContext(AuthContext);
 
   const [bookingStep, setBookingStep] = useState("details");
 
@@ -26,7 +26,7 @@ export const BookingDetailsPage = () => {
   const initialHotel = location.state?.hotel || null;
   const initialOffer = location.state?.offer || null;
 
-  const { id } = useParams();
+
   const [hotel, setHotel] = useState(initialHotel);
   const [offer, setOffer] = useState(initialOffer);
   const [images, setImages] = useState(initialHotel?.imagesUrl || []);
@@ -34,12 +34,26 @@ export const BookingDetailsPage = () => {
   const [offerTitle, setOfferTitle] = useState("");
 
 
-  const queryParams = new URLSearchParams(location.search);
-  const startDate = queryParams.get("checkin");
-  const endDate = queryParams.get("checkout");
-  const guests = queryParams.get("guests");
+ const { offerId } = useParams();
+  // query-параметры (?startDate=...&endDate=...)
+  const [searchParams] = useSearchParams();
 
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+  const adults = Number(searchParams.get("adults"));
+  const children = Number(searchParams.get("children"));
+  const price = Number(searchParams.get("price"));
 
+  console.log({
+    user,
+    startDate,
+    endDate,
+    adults,
+    children,
+    price,
+  });
+
+const { id } = useParams();
   const start = new Date(startDate);
   const end = new Date(endDate);
   const diffTime = end - start;
@@ -47,7 +61,7 @@ export const BookingDetailsPage = () => {
   console.log("Количество дней:", diffDays);
 
   const mainImg = images[0];
-
+  console.log("Hotel ID:", id);
   useEffect(() => {
     console.log("bookingStep:", bookingStep);
   }, [bookingStep]);
@@ -77,33 +91,33 @@ export const BookingDetailsPage = () => {
   // }, 900);
 
 
-  useEffect(() => {
-    if (initialOffer) return;
+  // useEffect(() => {
+  //   if (initialOffer) return;
 
-    if (!offerApi || !id) return;
+  //   if (!offerApi || !offerId) return;
 
-    offerApi
-      .searchId({
-        id,
-        cityId: id,
-        startDate,
-        endDate,
-        guests,
-        userDiscountPercent: 5,
-      })
-      .then((res) => {
-        const data = res.data[0];
+  //   offerApi
+  //     .searchId({
+  //       offerId,
+  //       cityId: offerId,
+  //       startDate,
+  //       endDate,
+  //       guests,
+  //       userDiscountPercent: 5,
+  //     })
+  //     .then((res) => {
+  //       const data = res.data[0];
 
-        setOffer(data);
-        setHotel(data.rentObj[0]);
-        setOfferTitle(data.title);
-        setImages(data.rentObj[0]?.imagesUrl || []);
-        setParamValues(data.rentObj[0]?.paramValues || []);
-        console.log("Loaded offer:", data);
-        console.log("Loaded hotel:", data.rentObj[0]);
-      })
-      .catch((err) => console.error("Error loading offer:", err));
-  }, [id, offerApi, startDate, endDate, guests]);
+  //       setOffer(data);
+  //       setHotel(data.rentObj[0]);
+  //       setOfferTitle(data.title);
+  //       setImages(data.rentObj[0]?.imagesUrl || []);
+  //       setParamValues(data.rentObj[0]?.paramValues || []);
+  //       console.log("Loaded offer:", data);
+  //       console.log("Loaded hotel:", data.rentObj[0]);
+  //     })
+  //     .catch((err) => console.error("Error loading offer:", err));
+  // }, [id, offerApi, startDate, endDate, guests]);
 
   return (
     <div className={styles.bookingDetailsPage}>

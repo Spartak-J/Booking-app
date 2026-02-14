@@ -77,7 +77,7 @@ namespace UserApiService.Services
         {
             await using var db = new UserContext();
 
-            var client = await db.Clients
+            var client = await db.Users
                 .FirstOrDefaultAsync(x => x.id == userId);
 
             if (client == null)
@@ -104,7 +104,25 @@ namespace UserApiService.Services
             return true;
         }
 
+        // =====================================================================
+        // CLIENT →получить все заказы из истории и  избранное
+        // =====================================================================
+        public async Task<List<HistoryOfferLink>> GetOffersToClientHistory(int userId)
+        {
+            await using var db = new UserContext();
 
+            var client = await db.Users
+                .FirstOrDefaultAsync(x => x.id == userId);
+
+            if (client == null)
+                return null;
+
+            var historyOffers = await db.HistoryOfferLinks
+                .Where(x => x.ClientId == client.id)
+                .ToListAsync();
+
+            return historyOffers; 
+        }
 
         // =====================================================================
         // OWNER → добавить объявление

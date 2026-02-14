@@ -33,8 +33,17 @@ align-items: start;
 }
 .container_price{
   width: fit-content;
+  min-width: 120px;
   padding: 10px 18px;
   color: var(--color-text-secondary);
   border-radius: 20px;
   background-color: var(--color--hotel-info-bg);
+}
+
+ .hotelCard_btn{
+  width: fit-content;
+  max-width: 310px;
+  min-height: 44px;
+ 
+   border: 1px solid var(--color--btn-state-border) !important;
 }

@@ -13,6 +13,11 @@ namespace OrderApiService.View
         public int ClientId { get; set; }
         public int Guests { get; set; }
 
+        public int? Adults { get; set; }
+        public int? Children { get; set; }
+        public string? MainGuestFirstName { get; set; }
+        public string? MainGuestLastName { get; set; }
+
         // Даты проживания
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -43,6 +48,11 @@ namespace OrderApiService.View
         //public string? PaymentMethod { get; set; }
         public DateTime CreatedAt { get; set; }
 
+        public bool? isBusinessTrip { get; set; } = false;
+
+        public string? PaymentMethod { get; set; }
+
+
         // ===== Метод маппинга =====
         public static OrderResponse MapToResponse(Order model)
         {
@@ -58,7 +68,11 @@ namespace OrderApiService.View
                 OfferId = model.OfferId,
                 ClientId = model.ClientId,
                 Guests = model.Guests,
+                Adults = model.Adults,
+                Children = model.Children,
 
+                MainGuestFirstName=model.MainGuestFirstName,
+                MainGuestLastName=model.MainGuestLastName,
                 // ===== Даты проживания =====
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
@@ -82,9 +96,10 @@ namespace OrderApiService.View
                 // ===== Примечание =====
                 ClientNote = model.ClientNote,
 
+                isBusinessTrip = model.isBusinessTrip,
                 // ===== Статус и оплата =====
                 Status = model.Status.ToString(),
-                //PaymentMethod = model.PaymentMethod,
+                PaymentMethod = model.PaymentMethod,
 
                 // ===== Системные поля =====
                 CreatedAt = model.CreatedAt

@@ -14,7 +14,7 @@ export const Footer = () => {
 
   return (
     <footer className={styles.footer}>
-      <svg className={styles.footer__svg} viewBox="0 0 1920 445" preserveAspectRatio="xMidYMid slice">
+      {/* <svg className={styles.footer__svg} viewBox="0 0 1920 445" preserveAspectRatio="xMidYMid slice">
         <path d="M0 132.88C0 132.88 287.5 0 324.25 0C361 0 581 122.106 648.5 132.88C716 143.654 1920 132.88 1920 132.88V445H0V132.88Z" fill="#EDE5D1" />
         <g transform="translate(247 40)">
           <foreignObject width="200" height="100">
@@ -23,9 +23,9 @@ export const Footer = () => {
             </div>
           </foreignObject>
         </g>
-      </svg>
+      </svg> */}
 
-
+ <div className={styles.logo}><Logo_Oselya /></div>
 
       <div className={styles.footer__columns}>
         {Object.entries(footerLinks).map(([section, links]) => (

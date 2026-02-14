@@ -43,8 +43,8 @@ namespace OrderApiService.Controllers
             }
             catch (Exception ex)
             {
-                // _logger.LogError(ex, "Ошибка при создании заказа");
-                return StatusCode(StatusCodes.Status500InternalServerError, "Внутренняя ошибка сервера");
+                Console.WriteLine(ex.ToString());
+                throw;
             }
         }
 

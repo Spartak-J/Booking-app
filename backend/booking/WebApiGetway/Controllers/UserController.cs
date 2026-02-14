@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WebApiGetway.Controllers;
 using WebApiGetway.Service.Interfase;
-using Microsoft.Extensions.Caching.Memory;
+using WebApiGetway.View;
 
 [ApiController]
 [Route("[controller]")]
@@ -170,7 +171,7 @@ public class UserController : ControllerBase
 
         var offerObjResult = await _gateway.ForwardRequestAsync<object>(
                "OfferApiService",
-               $"/api/offer/get/offers/{userId}",
+               $"/api/Offer/get/offersByOwner/{userId}",
                HttpMethod.Get,
                null
            );
@@ -188,13 +189,13 @@ public class UserController : ControllerBase
         var idList = new List<int>();
         foreach (var statsOffer in updateOfferDictList)
         {
-            var id = int.Parse(statsOffer["EntityId"].ToString());
+            var id = int.Parse(statsOffer["id"].ToString());
             idList.Add(id);
         }
         //получаем рейтинг
         var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Post, idList);
         if (ratingObjResult is not OkObjectResult okRating)
-            return ratingObjResult;
+            return Ok(updateOfferDictList);
         var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
 
         BffHelper.UpdateOfferListWithRating(updateOfferDictList, ratingDictList);
@@ -344,27 +345,6 @@ public class UserController : ControllerBase
             return Unauthorized();
 
 
-        var userObjResult = await _gateway.ForwardRequestAsync<object>(
-            "UserApiService",
-            $"/api/user/me",
-            HttpMethod.Get,
-            null
-        );
-
-        if (userObjResult is not OkObjectResult okUser)
-            return userObjResult;
-
-        var userDictList = BffHelper.ConvertActionResultToDict(okUser);
-        var user = userDictList[0];
-
-
-        var userRole = user["roleName"].ToString();
-        if (!string.Equals(userRole, "client", StringComparison.OrdinalIgnoreCase))
-            return StatusCode(
-                StatusCodes.Status403Forbidden,
-                new { message = "Вы не клиент" }
-            );
-
 
         var orderObjResult = await _gateway.ForwardRequestAsync<object>(
                "OrderApiService",
@@ -383,7 +363,90 @@ public class UserController : ControllerBase
 
         var updateOrderDictList = BffHelper.UpdateListWithTranslations(orderDictList, orderTranslations);
 
-        return Ok(updateOrderDictList);
+
+        var OrderResponse = new List<OrderResponseForAccountCard>();
+
+        foreach (var orderDict in updateOrderDictList)
+        {
+            var idOffer = int.Parse(orderDict["offerId"].ToString());
+
+
+            var offerObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "OfferApiService",
+                  $"/api/offer/get/{idOffer}",
+                  HttpMethod.Get,
+                  null
+              );
+
+            if (offerObjResult is not OkObjectResult okOffer)
+                return offerObjResult;
+
+            var offerDictList = BffHelper.ConvertActionResultToDict(okOffer);
+            if (offerDictList == null || !offerDictList.Any())
+                continue;
+
+            var offer = offerDictList.FirstOrDefault();
+            if (offer == null)
+                continue;
+
+            if (!offer.TryGetValue("rentObj", out var rentObjRaw))
+                continue;
+
+            var rentList = rentObjRaw as List<Dictionary<string, object>>;
+            var rentObj = rentList?.FirstOrDefault();
+            if (rentObj == null)
+                continue;
+
+            var imageList = rentObj["images"] as List<Dictionary<string, object>>;
+            var mainImgUrl = imageList?.FirstOrDefault()?["url"]?.ToString() ?? "";
+
+
+            var countryId = int.Parse(rentObj["countryId"].ToString());
+            var cityId = int.Parse(rentObj["cityId"].ToString());
+
+            var translateOffer = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Offer/get-translations/{idOffer}/{lang}", HttpMethod.Get, null);
+            string? titleOffer = null;
+
+            if (translateOffer is OkObjectResult okOfferTr)
+            {
+                var offerTranslateDictList = BffHelper.ConvertActionResultToDict(okOfferTr);
+                titleOffer = offerTranslateDictList?.FirstOrDefault()?["title"]?.ToString()
+                             ?? titleOffer;
+            }
+
+            //var translateCountry = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Country/get-translations/{countryId}/{lang}", HttpMethod.Get, null);
+            //var countryTranslateDictList = BffHelper.ConvertActionResultToDict(okOffer);
+            //var countruTr = countryTranslateDictList[0];
+            //var countryTitle = offerTr["Title"].ToString();
+
+
+            orderDict.TryGetValue("offerId", out var offerIdRaw);
+            orderDict.TryGetValue("startDate", out var startDateRaw);
+            orderDict.TryGetValue("endDate", out var endDateRaw);
+            orderDict.TryGetValue("paymentMethod", out var paymentRaw);
+            orderDict.TryGetValue("status", out var statusRaw);
+
+            orderDict.TryGetValue("totalPrice", out var totalPriceRaw);
+
+            var order = new OrderResponseForAccountCard
+            {
+                OfferId = int.TryParse(offerIdRaw?.ToString(), out var oid) ? oid : 0,
+                ClientId = userId,
+                Title = titleOffer ?? "Без названия",
+                StartDate = startDateRaw?.ToString() ?? "",
+                EndDate = endDateRaw?.ToString() ?? "",
+                TotalPrice = decimal.TryParse(totalPriceRaw?.ToString(), out var price) ? price : 0,
+                PaymentMethod = paymentRaw?.ToString() ?? "",
+                Status = statusRaw?.ToString() ?? "",
+                MainImageUrl = mainImgUrl ?? ""
+            };
+
+            OrderResponse.Add(order);
+
+        }
+
+
+        return Ok(OrderResponse);
     }
 
 

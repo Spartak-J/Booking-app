@@ -5,6 +5,7 @@ export const locationApi = {
   getAllCountries: (lang ) => http.get(`/Translation/country/get-all-translations/${lang}`),
 
    getFullCountries: (lang ) => http.get(`/Bff/get/allCountries/${lang}`),
+getCountriesWithCode: (lang ) => http.get(`/Bff/get/countries/countriesCode/${lang}`),
 
 
   getAllRegions: (lang ) => http.get(`/Translation/region/get-all-translations/${lang}`),

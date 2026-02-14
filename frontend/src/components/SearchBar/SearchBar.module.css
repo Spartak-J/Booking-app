@@ -1,11 +1,31 @@
 .searchBar {
   position: relative;
+
+}
+
+.searchBar_txt,
+.input_city_txt,
+.input_guest_txt,
+.input_date_title_txt {
+  font-size: 16px;
+  line-height: 20px;
   font-family: 'Montserrat Alternates';
   font-style: normal;
   font-weight: 400;
-  font-size: 32px;
-  line-height: 39px;
 }
+
+.searchBar_Main_txt,
+.input_city_Main_txt,
+.input_guest_Main_txt,
+.input_date_title_Main_txt {
+ font-size: 32px ;
+line-height: 39px ;
+  font-family: 'Montserrat Alternates';
+  font-style: normal;
+  font-weight: 400;
+}
+
+
 
 .searchBar_bg_color_dark {
   background-color: var(--color-search-bg);
@@ -45,11 +65,6 @@
   text-align: center;
   white-space: nowrap;
 
-  font-family: 'Montserrat Alternates';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 39px;
 
 }
 
@@ -69,23 +84,12 @@
   height: 100%;
   text-align: center;
   box-sizing: border-box;
-  font-family: 'Montserrat Alternates';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 39px;
 }
 
 .input_city::placeholder {
   opacity: 1;
   line-height: normal;
   color: var(--color-text);
-
-  font-family: 'Montserrat Alternates';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 39px;
 }
 
 .input_icon {
@@ -100,12 +104,6 @@
   border: none !important;
   background-color: transparent;
   width: 100%;
-  font-family: 'Montserrat Alternates';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 39px;
-
 }
 
 .suggestions_wrapper {

@@ -10,7 +10,11 @@ namespace WebApiGetway.View
         public int ClientId { get; set; }
 
         // Количество гостей
-        public int Guests { get; set; }
+        public int Adults { get; set; }
+        public int Children { get; set; }
+
+        public string? MainGuestFirstName { get; set; }
+        public string? MainGuestLastName { get; set; }
 
         // Даты проживания
         public DateTime StartDate { get; set; }
@@ -37,6 +41,8 @@ namespace WebApiGetway.View
         public string? ClientNote { get; set; }
         // ===== Статус заказа =====
         public OrderStatus Status { get; set; }          // Текущий статус заказа (новый, подтверждён, отменён и т.д.)
+        public bool? isBusinessTrip { get; set; } = false;
+
         public string PaymentMethod { get; set; }
 
 
@@ -53,9 +59,17 @@ namespace WebApiGetway.View
             {
                 OfferId = request.OfferId,
                 ClientId = userId,
-                Guests = request.Guests,
+                Adults = request.Adults,
+                Children = request.Children,
+
+                MainGuestFirstName = request.MainGuestFirstName,
+                MainGuestLastName = request.MainGuestLastName,
+
+
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
+                isBusinessTrip = request.isBusinessTrip,
+                PaymentMethod = request.PaymentMethod,
 
                 OrderPrice = decimal.Parse(offer["orderPrice"].ToString()),
                 DiscountPercent = decimal.Parse(offer["discountPercent"].ToString()),
@@ -70,7 +84,8 @@ namespace WebApiGetway.View
 
                 ClientNote = request.ClientNote,
                 Status = 0,
-                //PaymentMethod = offer["paymentMethod"].ToString(),
+             
+
             };
         }
     }
