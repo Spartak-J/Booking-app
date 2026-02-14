@@ -6,7 +6,12 @@
 
 import apiClient from '@/api/client';
 import { ENDPOINTS } from '@/config/endpoints';
-import { CreatePaymentPayload, PaymentResult } from './payment.types';
+import {
+  CreatePaymentPayload,
+  PaymentResult,
+  StartTokenizeCardPayload,
+  TokenizeCardStatusResult,
+} from './payment.types';
 
 const normalizeResult = (data: any): PaymentResult => ({
   paymentId: data?.paymentId ?? String(data?.id ?? data?.payment_id ?? ''),
@@ -28,6 +33,22 @@ export const paymentServiceApi = {
   async getStatus(paymentId: string): Promise<PaymentResult> {
     const { data } = await apiClient.get(ENDPOINTS.payment.status(paymentId));
     return normalizeResult(data);
+  },
+
+  async startTokenizeCard(payload: StartTokenizeCardPayload): Promise<PaymentResult> {
+    const { data } = await apiClient.post(ENDPOINTS.payment.tokenizeStart, payload);
+    return normalizeResult(data);
+  },
+
+  async getTokenizeCardStatus(paymentId: string): Promise<TokenizeCardStatusResult> {
+    const { data } = await apiClient.get(ENDPOINTS.payment.tokenizeStatus(paymentId));
+    return {
+      paymentId: data?.paymentId ?? String(data?.id ?? ''),
+      status: data?.status ?? 'created',
+      cardToken: data?.cardToken,
+      card: data?.card ?? null,
+      redirectUrl: data?.redirectUrl ?? data?.redirect_url,
+    };
   },
 };
 

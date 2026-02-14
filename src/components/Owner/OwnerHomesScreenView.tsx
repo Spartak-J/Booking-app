@@ -66,7 +66,6 @@ export const OwnerHomesScreenView: React.FC<OwnerHomesScreenViewProps> = ({
       title={title}
       onBack={onBack}
       contentStyle={styles.content}
-      keysBottomOffset={-s(72)}
       rightSlot={
         <IconButton
           onPress={() => {}}
@@ -87,7 +86,12 @@ export const OwnerHomesScreenView: React.FC<OwnerHomesScreenViewProps> = ({
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Card style={styles.card} padding="sm" onPress={() => onOpen(item.id)}>
-              <Typography variant="subtitle" tone="primary" numberOfLines={1} style={styles.cardTitle}>
+              <Typography
+                variant="subtitle"
+                tone="primary"
+                numberOfLines={1}
+                style={styles.cardTitle}
+              >
                 {item.title}
               </Typography>
               <View style={styles.cardTop}>
@@ -101,14 +105,27 @@ export const OwnerHomesScreenView: React.FC<OwnerHomesScreenViewProps> = ({
 
                 <View style={styles.cardMeta}>
                   <View style={styles.metaRow}>
-                    <MaterialCommunityIcons name="map-marker-outline" size={s(14)} color={tokens.textPrimary} />
-                    <Typography variant="caption" tone="primary" numberOfLines={2} style={styles.metaText}>
+                    <MaterialCommunityIcons
+                      name="map-marker-outline"
+                      size={s(14)}
+                      color={tokens.textPrimary}
+                    />
+                    <Typography
+                      variant="caption"
+                      tone="primary"
+                      numberOfLines={2}
+                      style={styles.metaText}
+                    >
                       {item.address || item.city || ''}
                     </Typography>
                   </View>
 
                   <View style={styles.metaRow}>
-                    <MaterialCommunityIcons name="star-outline" size={s(14)} color={tokens.textPrimary} />
+                    <MaterialCommunityIcons
+                      name="star-outline"
+                      size={s(14)}
+                      color={tokens.textPrimary}
+                    />
                     <Typography variant="caption" tone="primary" style={styles.metaText}>
                       {item.rating?.toFixed(1) ?? '0.0'}
                     </Typography>
@@ -117,13 +134,28 @@ export const OwnerHomesScreenView: React.FC<OwnerHomesScreenViewProps> = ({
                     </Typography>
                   </View>
 
-                  <Typography variant="caption" tone="primary" numberOfLines={1} style={styles.priceText}>
+                  <Typography
+                    variant="caption"
+                    tone="primary"
+                    numberOfLines={1}
+                    style={styles.priceText}
+                  >
                     {item.price ?? ''}
                   </Typography>
 
                   <View style={styles.actionColumn}>
-                    <Button size="small" variant="ghost" title={reviewsLabel} onPress={() => onOpenReviews(item.id)} />
-                    <Button size="small" variant="ghost" title={editLabel} onPress={() => onEdit(item.id)} />
+                    <Button
+                      size="small"
+                      variant="ghost"
+                      title={reviewsLabel}
+                      onPress={() => onOpenReviews(item.id)}
+                    />
+                    <Button
+                      size="small"
+                      variant="ghost"
+                      title={editLabel}
+                      onPress={() => onEdit(item.id)}
+                    />
                     <Button
                       size="small"
                       variant="ghost"
@@ -168,11 +200,11 @@ const getStyles = (tokens: Record<string, string>) =>
     content: {
       paddingHorizontal: spacing.md,
       paddingTop: spacing.md,
-      paddingBottom: spacing.sm,
+      paddingBottom: spacing.xl,
     },
     list: {
       gap: spacing.md,
-      paddingBottom: spacing.xxl + spacing.lg,
+      paddingBottom: spacing.xl,
     },
     card: {
       gap: spacing.sm,

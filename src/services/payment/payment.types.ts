@@ -14,3 +14,24 @@ export interface PaymentResult {
   status: PaymentStatus;
   redirectUrl?: string;
 }
+
+export interface StartTokenizeCardPayload {
+  userId: string;
+  holderName: string;
+}
+
+export interface TokenizeCardStatusResult {
+  paymentId: string;
+  status: PaymentStatus;
+  cardToken?: string;
+  card?: {
+    id: string;
+    holderName: string;
+    numberMasked: string;
+    last4: string;
+    expiry: string;
+    brand: string;
+    token?: string;
+  } | null;
+  redirectUrl?: string;
+}

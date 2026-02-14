@@ -4,6 +4,7 @@ import { User } from '@/types';
 import { ENDPOINTS } from '@/config/endpoints';
 import { getApiLang, mapUser } from '@/utils/apiAdapters';
 import { mockUser, mockUsers } from '@/utils/mockData';
+import { toUserFacingApiError } from '@/utils/apiError';
 
 type LoginPayload = { email: string; password: string };
 type RegisterPayload = { email: string; password: string; name: string; role?: User['role'] };
@@ -16,6 +17,33 @@ const resolveRoleByEmail = (email: string): User['role'] | null => {
   if (normalized === OWNER_EMAIL) return 'owner';
   if (normalized === ADMIN_EMAIL) return 'admin';
   return null;
+};
+
+const shortHash = (value: string): string => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash).toString(36).slice(0, 6);
+};
+
+const buildUsernameFromEmail = (email: string): string => {
+  const normalized = email.trim().toLowerCase();
+  const [localPart] = normalized.split('@');
+  const base = localPart && localPart.length > 0 ? localPart : normalized;
+  return `${base}_${shortHash(normalized)}`;
+};
+
+const resolveLoginUsernames = (email: string): string[] => {
+  const normalized = email.trim().toLowerCase();
+  const [localPart] = normalized.split('@');
+  return Array.from(
+    new Set([
+      buildUsernameFromEmail(normalized),
+      normalized,
+      localPart && localPart.length > 0 ? localPart : normalized,
+    ]),
+  );
 };
 
 const fetchProfile = async (token: string): Promise<User> => {
@@ -44,25 +72,36 @@ export const authService = {
             email: payload.email,
             role: forcedRole,
             name:
-              forcedRole === 'admin'
-                ? 'Admin'
-                : forcedRole === 'owner'
-                  ? 'Owner'
-                  : baseUser.name,
+              forcedRole === 'admin' ? 'Admin' : forcedRole === 'owner' ? 'Owner' : baseUser.name,
           }
         : baseUser;
       return { token: `mock-token-${user.id}`, user };
     }
-    const { data } = await apiClient.post<any>(ENDPOINTS.auth.login, {
-      username: payload.email,
-      password: payload.password,
-    });
+    const usernames = resolveLoginUsernames(payload.email);
+    let lastError: unknown;
+    for (const username of usernames) {
+      try {
+        const { data } = await apiClient.post<any>(ENDPOINTS.auth.login, {
+          username,
+          password: payload.password,
+        });
 
-    const token: string =
-      data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
-    if (!token) throw new Error('Токен не получен при логине');
-    const user = await fetchProfile(token);
-    return { token, user };
+        const token: string =
+          data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
+        if (!token) throw new Error('Токен не получен при логине');
+        const user = await fetchProfile(token);
+        return { token, user };
+      } catch (error: any) {
+        const status = error?.response?.status;
+        if (status === 401) {
+          lastError = error;
+          continue;
+        }
+        throw toUserFacingApiError(error, 'Не удалось выполнить вход.');
+      }
+    }
+
+    throw toUserFacingApiError(lastError, 'Неверный логин или пароль.');
   },
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     if (USE_MOCKS) {
@@ -80,24 +119,33 @@ export const authService = {
       return { token: `mock-token-${user.id}`, user };
     }
     const resolvedRole = payload.role === 'owner' ? 'owner' : 'user';
-    const { data } = await apiClient.post<any>(ENDPOINTS.auth.register, {
-      username: payload.name || payload.email,
-      password: payload.password,
-      email: payload.email,
-      phoneNumber: '',
-      countryId: 1,
-      discount: 0,
-      roleName: resolvedRole === 'owner' ? 'Owner' : 'Client',
-    });
-    const token: string =
-      data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
-    if (!token) throw new Error('Токен не получен при регистрации');
-    const user = await fetchProfile(token);
-    return { token, user };
+    try {
+      const { data } = await apiClient.post<any>(ENDPOINTS.auth.register, {
+        username: buildUsernameFromEmail(payload.email),
+        password: payload.password,
+        email: payload.email,
+        phoneNumber: '',
+        countryId: 1,
+        birthDate: '2000-01-01T00:00:00Z',
+        discount: 0,
+        roleName: resolvedRole === 'owner' ? 'Owner' : 'Client',
+      });
+      const token: string =
+        data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
+      if (!token) throw new Error('Токен не получен при регистрации');
+      const user = await fetchProfile(token);
+      return { token, user };
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось выполнить регистрацию.');
+    }
   },
   resetPassword: async (email: string) => {
     if (USE_MOCKS) return Promise.resolve();
-    await apiClient.post(ENDPOINTS.auth.reset, { email });
+    try {
+      await apiClient.post(ENDPOINTS.auth.reset, { email });
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось отправить запрос на смену пароля.');
+    }
   },
   googleLogin: async (): Promise<AuthResponse> => {
     if (USE_MOCKS) {

@@ -29,7 +29,7 @@ import { radius } from '@/theme';
 import { PaymentRepository } from '@/data/payment';
 import type { PaymentCard } from '@/data/payment/types';
 import { paymentService } from '@/services/payment';
-import type { PaymentMethod as ApiPaymentMethod } from '@/services/payment';
+import type { PaymentMethod as ApiPaymentMethod, PaymentResult } from '@/services/payment';
 
 const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -166,13 +166,34 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
           throw new Error(t('profile.payment.noCard'));
         }
 
-        const savedResult = await PaymentRepository.chargeSavedCard({
+        let savedResult: PaymentResult = await PaymentRepository.chargeSavedCard({
           userId: userId ?? 'guest',
           cardId: selectedCardId,
           bookingId: `draft-${offerId}-${Date.now()}`,
           amount: totalAmount,
           currency: 'UAH',
         });
+
+        if (savedResult.status === 'hold') {
+          savedResult = await paymentService.confirmHold(savedResult.paymentId);
+        }
+
+        if (savedResult.status !== 'paid') {
+          for (let attempt = 0; attempt < 15; attempt += 1) {
+            await wait(2000);
+            savedResult = await paymentService.getStatus(savedResult.paymentId);
+            if (savedResult.status === 'hold') {
+              savedResult = await paymentService.confirmHold(savedResult.paymentId);
+            }
+            if (
+              savedResult.status === 'paid' ||
+              savedResult.status === 'failed' ||
+              savedResult.status === 'cancelled'
+            ) {
+              break;
+            }
+          }
+        }
 
         if (savedResult.status !== 'paid') {
           throw new Error('Оплату не вдалося провести.');

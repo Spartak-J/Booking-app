@@ -44,6 +44,8 @@ export default ({ config }) => ({
     EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL,
     EXPO_PUBLIC_USE_MOCKS: process.env.EXPO_PUBLIC_USE_MOCKS ?? 'true',
     USE_MOCKS: process.env.EXPO_PUBLIC_USE_MOCKS ?? 'true',
+    EXPO_PUBLIC_USE_MOCKS_PAYMENT: process.env.EXPO_PUBLIC_USE_MOCKS_PAYMENT,
+    USE_MOCKS_PAYMENT: process.env.EXPO_PUBLIC_USE_MOCKS_PAYMENT,
     EXPO_PUBLIC_SENDER_ID: process.env.EXPO_PUBLIC_SENDER_ID,
   },
 });

@@ -10,6 +10,7 @@ import { BookingRepository } from '@/data/bookings';
 import { Hotel } from '@/data/types';
 import { messageService } from '@/services/messages';
 import { isOfferAvailableForDates } from '@/services/bookingAvailability';
+import { toUserFacingApiError } from '@/utils/apiError';
 
 let cachedHotels: Hotel[] | null = null;
 
@@ -134,42 +135,51 @@ export const bookingService = {
       return booking;
     }
     const lang = getApiLang();
+    const adults = Math.max(1, payload.guests);
+    const children = 0;
     const request = {
       offerId: Number(payload.offerId),
       guests: payload.guests,
+      adults,
+      children,
       startDate: payload.checkIn,
       endDate: payload.checkOut,
       clientNote: '',
     };
-    const { data } = await apiClient.post<any>(ENDPOINTS.booking.create, request, {
-      params: { lang },
-    });
-    const response = Array.isArray(data) ? data[0] : (data?.data ?? data?.order ?? data);
-    return mapBooking(response);
+    try {
+      const { data } = await apiClient.post<any>(ENDPOINTS.booking.create(lang), request);
+      const response = Array.isArray(data) ? data[0] : (data?.data ?? data?.order ?? data);
+      return mapBooking(response);
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось создать бронирование.');
+    }
   },
   getUserBookings: async (userId: string) => {
     if (USE_MOCKS) {
       const items = await Promise.all(
-        BOOKINGS
-          .filter((item) => item.userId === userId)
-          .map(async (item) => {
-            const offer = mockOffers.find((o) => o.id === item.offerId);
-            const hotel = await findHotelForOffer(offer);
-            return {
-              ...item,
-              hotelId: hotel?.id ?? item.hotelId,
-              status: resolveStatus(item),
-            };
-          }),
+        BOOKINGS.filter((item) => item.userId === userId).map(async (item) => {
+          const offer = mockOffers.find((o) => o.id === item.offerId);
+          const hotel = await findHotelForOffer(offer);
+          return {
+            ...item,
+            hotelId: hotel?.id ?? item.hotelId,
+            status: resolveStatus(item),
+          };
+        }),
       );
       return { items, total: items.length };
     }
-    const { data } = await apiClient.get<any>(ENDPOINTS.booking.all);
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    const items = list
-      .filter((order) => String(order?.clientId ?? order?.userId) === userId)
-      .map(mapBooking);
-    return { items, total: items.length };
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.booking.all);
+      const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+      const items = list
+        .filter((order) => String(order?.clientId ?? order?.userId) === userId)
+        .map(mapBooking);
+      return { items, total: items.length };
+    } catch (error) {
+      console.warn('[bookingService.getUserBookings] API fallback to empty list', error);
+      return { items: [], total: 0 };
+    }
   },
   getOwnerBookings: async (ownerId: string, filters?: OwnerBookingsFilters) => {
     if (USE_MOCKS) {
@@ -181,25 +191,30 @@ export const bookingService = {
         .filter((b) => matchesDateRange(b, filters));
       return { items, total: items.length };
     }
-    const ordersRes = await apiClient.get<any>(ENDPOINTS.booking.all);
-    const orders: any[] = Array.isArray(ordersRes.data)
-      ? ordersRes.data
-      : (ordersRes.data?.data ?? []);
+    try {
+      const ordersRes = await apiClient.get<any>(ENDPOINTS.booking.all);
+      const orders: any[] = Array.isArray(ordersRes.data)
+        ? ordersRes.data
+        : (ordersRes.data?.data ?? []);
 
-    const offersRes = await apiClient.get<any>(ENDPOINTS.offers.allRaw);
-    const offers: any[] = Array.isArray(offersRes.data)
-      ? offersRes.data
-      : (offersRes.data?.data ?? []);
-    const ownerOfferIds = offers
-      .filter((o) => String(o?.ownerId ?? '') === ownerId)
-      .map((o) => String(o?.id));
+      const offersRes = await apiClient.get<any>(ENDPOINTS.offers.allRaw);
+      const offers: any[] = Array.isArray(offersRes.data)
+        ? offersRes.data
+        : (offersRes.data?.data ?? []);
+      const ownerOfferIds = offers
+        .filter((o) => String(o?.ownerId ?? '') === ownerId)
+        .map((o) => String(o?.id));
 
-    const items = orders
-      .filter((o) => ownerOfferIds.includes(String(o?.offerId)))
-      .map(mapBooking)
-      .filter((booking) => matchesOffer(booking, filters))
-      .filter((booking) => matchesDateRange(booking, filters));
-    return { items, total: items.length };
+      const items = orders
+        .filter((o) => ownerOfferIds.includes(String(o?.offerId)))
+        .map(mapBooking)
+        .filter((booking) => matchesOffer(booking, filters))
+        .filter((booking) => matchesDateRange(booking, filters));
+      return { items, total: items.length };
+    } catch (error) {
+      console.warn('[bookingService.getOwnerBookings] API fallback to empty list', error);
+      return { items: [], total: 0 };
+    }
   },
   getById: async (bookingId: string) => {
     if (USE_MOCKS) {
@@ -213,9 +228,14 @@ export const bookingService = {
         status: resolveStatus(booking),
       };
     }
-    const { data } = await apiClient.get<any>(ENDPOINTS.booking.byId(bookingId));
-    const response = Array.isArray(data) ? data[0] : (data?.data ?? data);
-    return response ? mapBooking(response) : undefined;
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.booking.byId(bookingId));
+      const response = Array.isArray(data) ? data[0] : (data?.data ?? data);
+      return response ? mapBooking(response) : undefined;
+    } catch (error) {
+      console.warn('[bookingService.getById] API fallback to undefined', error);
+      return undefined;
+    }
   },
   cancel: async (bookingId: string) => {
     if (USE_MOCKS) {
@@ -231,9 +251,13 @@ export const bookingService = {
       return;
     }
     const lang = getApiLang();
-    await apiClient.post(ENDPOINTS.booking.updateStatus(bookingId), null, {
-      params: { orderState: 'Cancelled', lang },
-    });
+    try {
+      await apiClient.post(ENDPOINTS.booking.updateStatus(bookingId), null, {
+        params: { orderState: 'Cancelled', lang },
+      });
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось отменить бронирование.');
+    }
   },
   updateStatus: async (bookingId: string, status: Booking['status']) => {
     if (USE_MOCKS) {
@@ -254,10 +278,14 @@ export const bookingService = {
     }
     const lang = getApiLang();
     const statusValue = status === 'cancelled' ? 'Cancelled' : status;
-    const { data } = await apiClient.post<any>(ENDPOINTS.booking.updateStatus(bookingId), null, {
-      params: { orderState: statusValue, lang },
-    });
-    const response = Array.isArray(data) ? data[0] : (data?.data ?? data);
-    return mapBooking(response ?? {});
+    try {
+      const { data } = await apiClient.post<any>(ENDPOINTS.booking.updateStatus(bookingId), null, {
+        params: { orderState: statusValue, lang },
+      });
+      const response = Array.isArray(data) ? data[0] : (data?.data ?? data);
+      return mapBooking(response ?? {});
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось обновить статус бронирования.');
+    }
   },
 };

@@ -4,6 +4,7 @@ import { USE_MOCKS } from '@/config/constants';
 import { User } from '@/types';
 import { mapUser } from '@/utils/apiAdapters';
 import { USERS } from '@/data/users/users.mock';
+import { toUserFacingApiError } from '@/utils/apiError';
 
 const mapMockUserToDomain = (user: (typeof USERS)[number]): User => ({
   id: user.id,
@@ -21,9 +22,14 @@ export const usersAdminService = {
     if (USE_MOCKS) {
       return USERS.map(mapMockUserToDomain);
     }
-    const { data } = await apiClient.get<any>(ENDPOINTS.user.all);
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    return list.map(mapUser);
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.user.all);
+      const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+      return list.map(mapUser);
+    } catch (error) {
+      console.warn('[usersAdminService.getUsers] API fallback to empty list', error);
+      return [];
+    }
   },
 
   getUserById: async (id: string): Promise<User | null> => {
@@ -31,9 +37,14 @@ export const usersAdminService = {
       const user = USERS.find((item) => item.id === id);
       return user ? mapMockUserToDomain(user) : null;
     }
-    const { data } = await apiClient.get<any>(ENDPOINTS.user.byId(id));
-    const payload = Array.isArray(data) ? data[0] : (data?.data ?? data);
-    return payload ? mapUser(payload) : null;
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.user.byId(id));
+      const payload = Array.isArray(data) ? data[0] : (data?.data ?? data);
+      return payload ? mapUser(payload) : null;
+    } catch (error) {
+      console.warn('[usersAdminService.getUserById] API fallback to null', error);
+      return null;
+    }
   },
 
   toggleUserBlocked: async (id: string): Promise<User | null> => {
@@ -46,7 +57,11 @@ export const usersAdminService = {
     const current = await usersAdminService.getUserById(id);
     if (!current) return null;
     const nextBlocked = !current.isBlocked;
-    await apiClient.patch(ENDPOINTS.user.byId(id), { isBlocked: nextBlocked });
-    return { ...current, isBlocked: nextBlocked };
+    try {
+      await apiClient.patch(ENDPOINTS.user.byId(id), { isBlocked: nextBlocked });
+      return { ...current, isBlocked: nextBlocked };
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось обновить статус блокировки пользователя.');
+    }
   },
 };

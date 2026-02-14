@@ -29,6 +29,7 @@ type HeaderBarProps = {
   backStyle?: StyleProp<ViewStyle>;
   searchStyle?: StyleProp<ViewStyle>;
   menuStyle?: StyleProp<ViewStyle>;
+  iconColor?: string;
 };
 
 const DEFAULT_BACK_ICON: IconName = 'arrow-left';
@@ -52,6 +53,7 @@ const HeaderBar = ({
   backStyle,
   searchStyle,
   menuStyle,
+  iconColor,
 }: HeaderBarProps) => {
   const { tokens } = useTheme();
   const palette = useMemo(
@@ -82,7 +84,7 @@ const HeaderBar = ({
           <MaterialCommunityIcons
             name={backIconName}
             size={backIconSize ?? s(18)}
-            color={palette.icon}
+            color={iconColor ?? palette.icon}
           />
         </Pressable>
       )}
@@ -103,13 +105,17 @@ const HeaderBar = ({
       {renderSearch && (
         <Pressable
           onPress={onSearch}
-          style={[styles.searchButton, renderAvatar ? styles.searchButtonWithAvatar : null, searchStyle]}
+          style={[
+            styles.searchButton,
+            renderAvatar ? styles.searchButtonWithAvatar : null,
+            searchStyle,
+          ]}
           accessibilityRole="button"
         >
           <MaterialCommunityIcons
             name="magnify"
             size={searchIconSize ?? s(18)}
-            color={palette.icon}
+            color={iconColor ?? palette.icon}
           />
         </Pressable>
       )}
@@ -128,7 +134,11 @@ const HeaderBar = ({
           style={[styles.menuButton, menuStyle]}
           accessibilityRole="button"
         >
-          <MaterialCommunityIcons name="menu" size={menuIconSize ?? s(20)} color={palette.icon} />
+          <MaterialCommunityIcons
+            name="menu"
+            size={menuIconSize ?? s(20)}
+            color={iconColor ?? palette.icon}
+          />
         </Pressable>
       )}
     </View>
@@ -155,7 +165,7 @@ const getStyles = (palette: Palette) =>
     backButton: {
       position: 'absolute',
       left: s(19),
-      top: s(3),
+      top: s(6),
       width: s(24),
       height: s(24),
       alignItems: 'center',

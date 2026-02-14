@@ -6,6 +6,7 @@ import { getAuthState } from '@/store/authStore';
 import { USE_MOCKS } from '@/config/constants';
 import { mockOffers, mockReviews } from '@/utils/mockData';
 import { BookingRepository } from '@/data/bookings';
+import { toUserFacingApiError } from '@/utils/apiError';
 
 type ReviewPayload = {
   bookingId: string;
@@ -50,9 +51,14 @@ export const reviewService = {
       return mockReviews.filter((review) => review.offerId === offerId);
     }
     const lang = getApiLang();
-    const { data } = await apiClient.post<any>(ENDPOINTS.reviews.byOffer(offerId, lang));
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    return list.map(mapReview);
+    try {
+      const { data } = await apiClient.post<any>(ENDPOINTS.reviews.byOffer(offerId, lang));
+      const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+      return list.map(mapReview);
+    } catch (error) {
+      console.warn('[reviewService.getByOfferId] API fallback to empty list', error);
+      return [];
+    }
   },
   getByBookingId: async (bookingId: string) => {
     if (USE_MOCKS) {
@@ -65,9 +71,14 @@ export const reviewService = {
   getByUser: async (lang?: string) => {
     if (USE_MOCKS) return mockReviews;
     const resolvedLang = lang ?? getApiLang();
-    const { data } = await apiClient.post<any>(ENDPOINTS.reviews.byUser(resolvedLang));
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    return list.map(mapReview);
+    try {
+      const { data } = await apiClient.post<any>(ENDPOINTS.reviews.byUser(resolvedLang));
+      const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+      return list.map(mapReview);
+    } catch (error) {
+      console.warn('[reviewService.getByUser] API fallback to empty list', error);
+      return [];
+    }
   },
   create: async (payload: ReviewPayload) => {
     if (USE_MOCKS) {
@@ -109,11 +120,19 @@ export const reviewService = {
       createdAt: new Date().toISOString(),
       isApproved: true,
     };
-    const { data } = await apiClient.post<any>(ENDPOINTS.reviews.create(payload.bookingId), body, {
-      params: { lang },
-    });
-    const result = Array.isArray(data) ? data[0] : (data?.data ?? data);
-    return mapReview({ ...result, offerId: payload.offerId, orderId: payload.bookingId });
+    try {
+      const { data } = await apiClient.post<any>(
+        ENDPOINTS.reviews.create(payload.bookingId),
+        body,
+        {
+          params: { lang },
+        },
+      );
+      const result = Array.isArray(data) ? data[0] : (data?.data ?? data);
+      return mapReview({ ...result, offerId: payload.offerId, orderId: payload.bookingId });
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось создать отзыв.');
+    }
   },
   update: async (id: string, payload: Pick<Review, 'rating' | 'comment'>, bookingId?: string) => {
     if (USE_MOCKS) {
@@ -143,17 +162,29 @@ export const reviewService = {
       isApproved: true,
     };
     const orderId = bookingId ?? '';
-    const { data } = await apiClient.post<any>(ENDPOINTS.reviews.update(orderId, id, lang), body, {
-      params: { lang },
-    });
-    const result = Array.isArray(data) ? data[0] : (data?.data ?? data);
-    return mapReview(result);
+    try {
+      const { data } = await apiClient.post<any>(
+        ENDPOINTS.reviews.update(orderId, id, lang),
+        body,
+        {
+          params: { lang },
+        },
+      );
+      const result = Array.isArray(data) ? data[0] : (data?.data ?? data);
+      return mapReview(result);
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось обновить отзыв.');
+    }
   },
   remove: async (id: string, bookingId?: string) => {
     if (USE_MOCKS) return;
     const userId = getAuthState().user?.id;
     if (!userId) throw new Error('Не удалось определить пользователя');
     const orderId = bookingId ?? id;
-    await apiClient.delete(ENDPOINTS.reviews.delete(userId, orderId, id));
+    try {
+      await apiClient.delete(ENDPOINTS.reviews.delete(userId, orderId, id));
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось удалить отзыв.');
+    }
   },
 };

@@ -48,6 +48,8 @@ export const ENDPOINTS = {
     confirmHold: '/Bff/payments/confirm-hold',
     status: (paymentId: string) => `/Bff/payments/status/${paymentId}`,
     tokenize: '/Bff/payments/tokenize',
+    tokenizeStart: '/Bff/payments/tokenize/start',
+    tokenizeStatus: (paymentId: string) => `/Bff/payments/tokenize/status/${paymentId}`,
     cards: (userId: string) => `/Bff/payments/cards/${userId}`,
     chargeSavedCard: '/Bff/payments/charge-saved-card',
   },

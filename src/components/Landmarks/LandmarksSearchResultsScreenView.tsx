@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 import HomeMenuSheet from '@/components/Home/HomeMenuSheet';
 import { MENU_ITEMS } from '@/components/Home/homeNavigationData';
 import { Landmark } from '@/services/landmarkService';
-import { spacing, radius, useTheme, withOpacity } from '@/theme';
+import { spacing, radius, useTheme } from '@/theme';
 import { Button, HeaderBar, ScreenContainer, Typography } from '@/ui';
 import { s } from '@/utils/scale';
-import backgroundLandmarks from '@/assets/images/landmarks_bg.jpg';
 import { useTranslation } from '@/i18n';
 
 type Props = {
@@ -40,7 +40,6 @@ export const LandmarksSearchResultsScreenView: React.FC<Props> = ({
     () => ({
       screenBg: isDark ? colors.bgDark : colors.surfaceLight,
       text: isDark ? colors.surfaceLight : colors.textPrimary,
-      cardLabelBg: withOpacity(colors.black, 0.1),
       cardLabelText: colors.surfaceLight,
       footerBg: isDark ? colors.bgDark : colors.surfaceLight,
       footerIcon: isDark ? colors.surfaceLight : colors.black,
@@ -51,7 +50,6 @@ export const LandmarksSearchResultsScreenView: React.FC<Props> = ({
 
   return (
     <ScreenContainer style={[styles.container, { backgroundColor: palette.screenBg }]} edges={[]}>
-      <Image source={backgroundLandmarks} style={styles.background} />
       <HeaderBar
         title={t('landmarks.title')}
         onBack={onBack}
@@ -86,7 +84,8 @@ export const LandmarksSearchResultsScreenView: React.FC<Props> = ({
             style={styles.card}
           >
             <Image source={item.image} style={styles.cardImage} />
-            <View style={[styles.cardLabel, { backgroundColor: palette.cardLabelBg }]}>
+            <View style={styles.cardLabel}>
+              <BlurView intensity={28} tint="dark" style={StyleSheet.absoluteFillObject} />
               <Typography
                 variant="subtitle"
                 style={[styles.cardLabelText, { color: palette.cardLabelText }]}
@@ -99,12 +98,6 @@ export const LandmarksSearchResultsScreenView: React.FC<Props> = ({
           </Button>
         ))}
       </ScrollView>
-
-      <View style={[styles.bottomNav, { backgroundColor: palette.footerBg }]}>
-        <View style={[styles.navBack, { backgroundColor: palette.footerIcon }]} />
-        <View style={[styles.navHome, { backgroundColor: palette.footerIcon }]} />
-        <View style={[styles.navOverview, { backgroundColor: palette.footerIcon }]} />
-      </View>
 
       <HomeMenuSheet
         visible={menuOpen}
@@ -121,29 +114,23 @@ const getStyles = (colors: Record<string, string>) =>
     container: {
       flex: 1,
     },
-    background: {
-      ...StyleSheet.absoluteFillObject,
-      resizeMode: 'cover',
-      zIndex: 0,
-    },
     header: {
       position: 'absolute',
       width: '100%',
       height: s(36),
       left: 0,
-      top: s(43),
+      top: 0,
       zIndex: 2,
     },
     backButton: {
       position: 'absolute',
       left: s(19),
-      top: s(12),
+      top: s(6),
       width: s(24),
       height: s(24),
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: withOpacity(colors.bgCard, 0.6),
-      borderRadius: radius.round,
+      backgroundColor: 'transparent',
     },
     headerTitle: {
       position: 'absolute',
@@ -172,16 +159,16 @@ const getStyles = (colors: Record<string, string>) =>
     },
     cityLabel: {
       position: 'absolute',
-      top: s(94),
+      top: s(58),
       alignSelf: 'center',
       zIndex: 1,
     },
     list: {
-      marginTop: s(130),
+      marginTop: s(94),
     },
     listContent: {
       paddingHorizontal: s(19),
-      paddingBottom: s(80),
+      paddingBottom: s(24),
       gap: spacing.sm,
     },
     card: {
@@ -200,6 +187,7 @@ const getStyles = (colors: Record<string, string>) =>
       left: s(7),
       bottom: s(6),
       borderRadius: radius.md,
+      overflow: 'hidden',
       paddingVertical: spacing.xs,
       paddingHorizontal: spacing.sm,
     },
@@ -207,37 +195,6 @@ const getStyles = (colors: Record<string, string>) =>
       fontSize: s(14),
       lineHeight: s(17),
     },
-    bottomNav: {
-      position: 'absolute',
-      width: s(412),
-      height: s(48),
-      left: 0,
-      bottom: 0,
-    },
-    navBack: {
-      position: 'absolute',
-      width: s(44),
-      height: s(44),
-      left: s(136),
-      top: s(2),
-    },
-    navHome: {
-      position: 'absolute',
-      width: s(44),
-      height: s(44),
-      left: s(182),
-      top: s(2),
-      borderRadius: radius.round,
-    },
-    navOverview: {
-      position: 'absolute',
-      width: s(16),
-      height: s(16),
-      left: s(276),
-      top: s(16),
-      borderRadius: s(2),
-    },
   });
 
 export default LandmarksSearchResultsScreenView;
-

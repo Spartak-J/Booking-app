@@ -10,9 +10,14 @@ export const adminService = {
   getUserById: usersAdminService.getUserById,
   toggleUserBlocked: usersAdminService.toggleUserBlocked,
   getOffers: async (): Promise<Offer[]> => {
-    const { data } = await apiClient.get<any>(ENDPOINTS.offers.allRaw);
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    return list.map(mapOfferFull);
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.offers.allRaw);
+      const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+      return list.map(mapOfferFull);
+    } catch (error) {
+      console.warn('[adminService.getOffers] API fallback to empty list', error);
+      return [];
+    }
   },
   getOfferById: async (id: string): Promise<Offer | null> => {
     return offerService.getById(id);
@@ -22,9 +27,14 @@ export const adminService = {
     return offers.filter((offer) => offer.ownerId === userId);
   },
   getBookings: async (): Promise<Booking[]> => {
-    const { data } = await apiClient.get<any>(ENDPOINTS.booking.all);
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    return list.map(mapBooking);
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.booking.all);
+      const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+      return list.map(mapBooking);
+    } catch (error) {
+      console.warn('[adminService.getBookings] API fallback to empty list', error);
+      return [];
+    }
   },
   getBookingsByUser: async (userId: string): Promise<Booking[]> => {
     const bookings = await adminService.getBookings();

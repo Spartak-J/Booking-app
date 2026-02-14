@@ -5,15 +5,20 @@ import { User } from '@/types';
 import { mapUserPatchToApiUpdateRequest } from '@/services/profile/profileMapper';
 import { mockOffers, mockUser, mockUsers } from '@/utils/mockData';
 import { mapUser } from '@/utils/apiAdapters';
+import { toUserFacingApiError } from '@/utils/apiError';
 
 export const profileService = {
   getProfile: async (id: string): Promise<User> => {
     if (USE_MOCKS) {
       return mockUsers.find((item) => item.id === id) ?? mockUser;
     }
-    const { data } = await apiClient.get<any>(ENDPOINTS.user.byId(id));
-    const payload = data?.data ?? data;
-    return mapUser(payload);
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.user.byId(id));
+      const payload = data?.data ?? data;
+      return mapUser(payload);
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось загрузить профиль.');
+    }
   },
 
   updateProfile: async (id: string, payload: Partial<User>): Promise<User> => {
@@ -38,9 +43,13 @@ export const profileService = {
       Object.assign(mockUser, payload);
       return mockUser;
     }
-    const request = mapUserPatchToApiUpdateRequest(id, payload);
-    const { data } = await apiClient.put<any>(ENDPOINTS.user.update, request);
-    const payloadData = data?.data ?? data;
-    return mapUser(payloadData);
+    try {
+      const request = mapUserPatchToApiUpdateRequest(id, payload);
+      const { data } = await apiClient.put<any>(ENDPOINTS.user.update, request);
+      const payloadData = data?.data ?? data;
+      return mapUser(payloadData);
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось обновить профиль.');
+    }
   },
 };

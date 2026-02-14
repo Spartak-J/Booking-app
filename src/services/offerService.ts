@@ -8,6 +8,7 @@ import { cityService } from '@/services/cityService';
 import { mockOffers } from '@/utils/mockData';
 import { BookingRepository } from '@/data/bookings';
 import { isOfferAvailableForDates } from '@/services/bookingAvailability';
+import { toUserFacingApiError } from '@/utils/apiError';
 
 export type OfferFilters = {
   cityId?: string;
@@ -210,7 +211,13 @@ export const offerService = {
     } else if (cities.length > 0) {
       params.cityId = cities[0].id;
     }
-    if (filters.guests) params.guests = filters.guests;
+    const adults = Math.max(1, filters.guests ?? 1);
+    const children = 0;
+    const rooms = 1;
+    params.guests = adults + children;
+    params.adults = adults;
+    params.children = children;
+    params.rooms = rooms;
     if (filters.dates?.from && filters.dates?.to) {
       params.startDate = filters.dates.from;
       params.endDate = filters.dates.to;
@@ -226,12 +233,17 @@ export const offerService = {
       ? ENDPOINTS.offers.searchShort(lang)
       : ENDPOINTS.offers.searchPublic(lang);
     if (!params.cityId) return { items: [], total: 0 };
-    const { data } = await apiClient.get<any>(endpoint, {
-      params: token ? params : { ...params, userDiscountPercent: 0 },
-    });
-    const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-    const items = list.map(mapOfferShort);
-    return { items, total: items.length };
+    try {
+      const { data } = await apiClient.get<any>(endpoint, {
+        params: token ? params : { ...params, userDiscountPercent: 0 },
+      });
+      const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+      const items = list.map(mapOfferShort);
+      return { items, total: items.length };
+    } catch (error) {
+      console.warn('[offerService.getAll] API fallback to empty list', error);
+      return { items: [], total: 0 };
+    }
   },
   getById: async (id: string) => {
     if (USE_MOCKS) {
@@ -246,12 +258,19 @@ export const offerService = {
     params.startDate = today.toISOString();
     params.endDate = tomorrow.toISOString();
     params.guests = '2';
+    params.adults = '2';
+    params.children = '0';
+    params.rooms = '1';
     params.userDiscountPercent = '0';
 
-    const { data } = await apiClient.get<any>(ENDPOINTS.offers.fullById(id, lang), { params });
-    const payload = Array.isArray(data) ? data[0] : (data?.data?.[0] ?? data?.data ?? data);
-    if (!payload) throw new Error('Предложение не найдено');
-    return mapOfferFull(payload);
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.offers.fullById(id, lang), { params });
+      const payload = Array.isArray(data) ? data[0] : (data?.data?.[0] ?? data?.data ?? data);
+      if (!payload) throw new Error('Предложение не найдено');
+      return mapOfferFull(payload);
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось загрузить предложение.');
+    }
   },
   create: async (payload: Partial<Offer>): Promise<Offer> => {
     if (USE_MOCKS) {

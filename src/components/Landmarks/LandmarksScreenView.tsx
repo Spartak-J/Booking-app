@@ -40,6 +40,7 @@ export const LandmarksScreenView: React.FC<Props> = ({
           title={t('landmarks.title')}
           onBack={onBack}
           onMenu={onMenu}
+          iconColor={colors.black}
           showBack
           showSearch={false}
           showMenu
@@ -51,7 +52,11 @@ export const LandmarksScreenView: React.FC<Props> = ({
 
         <View style={styles.inlineSearch}>
           <View style={styles.inlineSearchCityIconWrap}>
-            <MaterialCommunityIcons name="city-variant-outline" size={s(16)} color={colors.surfaceLight} />
+            <MaterialCommunityIcons
+              name="city-variant-outline"
+              size={s(16)}
+              color={colors.surfaceLight}
+            />
           </View>
           <Input
             value={cityQuery}
@@ -60,7 +65,12 @@ export const LandmarksScreenView: React.FC<Props> = ({
             containerStyle={styles.inlineSearchInputContainer}
             inputStyle={styles.inlineSearchInput}
           />
-          <Button size="small" variant="primary" onPress={onSearch} style={styles.inlineSearchButton}>
+          <Button
+            size="small"
+            variant="primary"
+            onPress={onSearch}
+            style={styles.inlineSearchButton}
+          >
             <MaterialCommunityIcons name="magnify" size={s(18)} color={colors.surfaceLight} />
           </Button>
         </View>
@@ -92,7 +102,7 @@ const getStyles = (colors: Record<string, string>) =>
       backgroundColor: 'transparent',
     },
     headerTitle: {
-      color: colors.textPrimary,
+      color: colors.black,
     },
     backButton: {
       width: s(24),

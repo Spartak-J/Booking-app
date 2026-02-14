@@ -106,7 +106,7 @@ const getStyles = (colors: Record<string, string>) =>
       backgroundColor: withOpacity(colors.surface, 0.85),
     },
     header: {
-      marginTop: spacing.md,
+      marginTop: 0,
       paddingHorizontal: spacing.md,
     },
     headerTitle: {
@@ -166,4 +166,3 @@ const getStyles = (colors: Record<string, string>) =>
   });
 
 export default LandmarkDetailScreenView;
-

@@ -17,26 +17,18 @@ export const cityService = {
       return Array.from(map.values());
     }
     const lang = getApiLang();
-    const [citiesRes, translationsRes] = await Promise.all([
-      apiClient.get<any>(ENDPOINTS.locations.cities),
-      apiClient.get<any>(ENDPOINTS.locations.cityTranslations(lang)),
-    ]);
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.locations.cities(lang));
+      const citiesRaw: any[] = Array.isArray(data) ? data : (data?.data ?? []);
 
-    const citiesRaw: any[] = Array.isArray(citiesRes.data)
-      ? citiesRes.data
-      : (citiesRes.data?.data ?? []);
-    const translations: any[] = Array.isArray(translationsRes.data)
-      ? translationsRes.data
-      : (translationsRes.data?.data ?? []);
-
-    const titleMap = new Map(
-      translations.map((t) => [String(t?.entityId ?? t?.id ?? ''), t?.title ?? t?.name ?? '']),
-    );
-
-    return citiesRaw.map((city) => ({
-      id: String(city?.id ?? ''),
-      name: titleMap.get(String(city?.id ?? '')) ?? `City #${city?.id ?? ''}`,
-      country: '',
-    }));
+      return citiesRaw.map((city) => ({
+        id: String(city?.id ?? ''),
+        name: city?.title ?? city?.name ?? `City #${city?.id ?? ''}`,
+        country: city?.countryTitle ?? city?.country ?? '',
+      }));
+    } catch (error) {
+      console.warn('[cityService.getAll] API fallback to empty list', error);
+      return [];
+    }
   },
 };

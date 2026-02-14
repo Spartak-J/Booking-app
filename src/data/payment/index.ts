@@ -23,17 +23,21 @@ export const PaymentRepository = {
   async addCard(input: {
     userId?: string;
     holderName: string;
-    number: string;
+    token: string;
+    last4: string;
+    numberMasked: string;
+    brand: PaymentCard['brand'];
     expiry: string;
-    cvv: string;
     saveCard?: boolean;
   }): Promise<PaymentCard> {
     const { data } = await apiClient.post<any>(ENDPOINTS.payment.tokenize, {
       userId: input.userId ?? 'guest',
       holderName: input.holderName,
-      cardNumber: input.number,
+      cardToken: input.token,
+      last4: input.last4,
+      numberMasked: input.numberMasked,
+      brand: input.brand,
       expiry: input.expiry,
-      cvv: input.cvv,
       saveCard: input.saveCard ?? true,
     });
 
