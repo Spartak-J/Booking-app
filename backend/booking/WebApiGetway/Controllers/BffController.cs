@@ -1,14 +1,15 @@
 ﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using WebApiGetway.Models.Enum;
 using WebApiGetway.Service.Interfase;
 using WebApiGetway.View;
-using Microsoft.Extensions.Caching.Memory;
-using System.Net.WebSockets;
-using WebApiGetway.Models.Enum;
 
 namespace WebApiGetway.Controllers
 {
@@ -607,25 +608,25 @@ namespace WebApiGetway.Controllers
             {
                 EntityId = offerId,
                 Lang = targetLang,
-                Title = await TranslateAsync(
-                    sourceTranslation.Title, sourceLang, targetLang),
-                TitleInfo = await TranslateAsync(
-                    sourceTranslation.TitleInfo, sourceLang, targetLang),
-                Description = await TranslateAsync(
-                    sourceTranslation.Description, sourceLang, targetLang)
+
             };
+
+            translatedTranslation.Title = await Translator.TranslateAsync(Offer.Title, sourceLang, targetLang);
+            translatedTranslation.TitleInfo = await Translator.TranslateAsync(Offer.TitleInfo, sourceLang, targetLang);
+            translatedTranslation.Description = await Translator.TranslateAsync(Offer.Description, sourceLang, targetLang);
+
 
 
             var sourceTranslationResult = await _gateway.ForwardRequestAsync<object>(
                 "TranslationApiService",
-                $"/api/Offer/create-translations/{lang}",
+                $"/api/Offer/create-translations/{sourceLang}",
                 HttpMethod.Post,
                 sourceTranslation
             );
 
             var translatedTranslationResult = await _gateway.ForwardRequestAsync<object>(
               "TranslationApiService",
-              $"/api/Offer/create-translations/{lang}",
+              $"/api/Offer/create-translations/{targetLang}",
               HttpMethod.Post,
               translatedTranslation
           );
@@ -702,33 +703,32 @@ namespace WebApiGetway.Controllers
             {
                 EntityId = offerId,
                 Lang = targetLang,
-                Title = await TranslateAsync(
-                    sourceTranslation.Title, sourceLang, targetLang),
-                TitleInfo = await TranslateAsync(
-                    sourceTranslation.TitleInfo, sourceLang, targetLang),
-                Description = await TranslateAsync(
-                    sourceTranslation.Description, sourceLang, targetLang)
+                
             };
+
+            translatedTranslation.Title = await Translator.TranslateAsync(Offer.Title, sourceLang, targetLang);
+            translatedTranslation.TitleInfo = await Translator.TranslateAsync(Offer.TitleInfo, sourceLang, targetLang);
+            translatedTranslation.Description = await Translator.TranslateAsync(Offer.Description, sourceLang, targetLang);
 
 
             var sourceTranslationResult = await _gateway.ForwardRequestAsync<object>(
                 "TranslationApiService",
-                $"/api/Offer/create-translations/{lang}",
-                HttpMethod.Post,
+                $"/api/Offer/update-translations/{offerId}/{lang}",
+                HttpMethod.Put,
                 sourceTranslation
             );
 
             var translatedTranslationResult = await _gateway.ForwardRequestAsync<object>(
               "TranslationApiService",
-              $"/api/Offer/create-translations/{lang}",
+              $"/api/Offer/update-translations/{lang}",
               HttpMethod.Post,
               translatedTranslation
           );
 
             var addToOwnerLink = await _gateway.ForwardRequestAsync<object>(
               "UserApiService",
-              $"/api/User/owner/offers/add/{offerId}",
-              HttpMethod.Post,
+             $"/api/Offer/update-translations/{offerId}/{lang}",
+              HttpMethod.Put,
               null
           );
 
@@ -2028,53 +2028,66 @@ namespace WebApiGetway.Controllers
         //--------------------------перевод текста-------------------------------------
 
 
-        private async Task<string> TranslateAsync(string text, string fromLang, string toLang)
+        private class LibreTranslateResponse
         {
-            if (string.IsNullOrWhiteSpace(text))
-                return text;
+            public string TranslatedText { get; set; }
+        }
 
-            try
+
+        public class TranslateApiResponse
+        {
+            [JsonPropertyName("translated_text")]
+            public string translatedText { get; set; }
+        }
+
+        public class Translator
+        {
+            private static readonly string ApiUrl = "https://api.translateapi.ai/api/v1/translate/";
+            private static readonly string ApiKey = "ta_2e6e006e57caa4c8d35f7f813f813b84f1e020b7029a2b8daef06cdf"; // твой ключ
+
+            public static async Task<string> TranslateAsync(string text, string fromLang, string toLang)
             {
-                using var httpClient = new HttpClient();
+                if (string.IsNullOrWhiteSpace(text))
+                    return text;
 
-                // Укажи свой ключ DeepL API
-                var apiKey = "YOUR_DEEPL_API_KEY";
-
-                // Формируем POST запрос в формате x-www-form-urlencoded
-                var content = new FormUrlEncodedContent(new[]
+                try
                 {
-            new KeyValuePair<string, string>("text", text),
-            new KeyValuePair<string, string>("source_lang", fromLang.ToUpper()), // EN, UK
-            new KeyValuePair<string, string>("target_lang", toLang.ToUpper())    // EN, UK
-        });
+                    using var httpClient = new HttpClient();
+                    httpClient.DefaultRequestHeaders.Authorization = 
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ApiKey);
 
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://api-free.deepl.com/v2/translate");
-                request.Headers.Add("Authorization", $"DeepL-Auth-Key {apiKey}");
-                request.Content = content;
+                    var payload = new
+                    {
+                        text = text,
+                        source_language = fromLang.ToLower(), 
+                        target_language = toLang.ToLower()   
+                    };
 
-                var response = await httpClient.SendAsync(request);
+                    var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    var content = JsonContent.Create(payload, options: options);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Ошибка DeepL: {response.StatusCode}");
-                    Console.WriteLine($"Тело ответа: {errorBody}");
-                    return text; // fallback на исходный текст
+                    var response = await httpClient.PostAsync(ApiUrl, content);
+                    var raw = await response.Content.ReadAsStringAsync();
+
+                    Console.WriteLine("TranslateAPI.ai raw response:");
+                    Console.WriteLine(raw);
+
+                    if (!response.IsSuccessStatusCode)
+                        return text;
+
+                    var result = JsonSerializer.Deserialize<TranslateApiResponse>(raw);
+                    return result?.translatedText ?? text;
                 }
-
-                // DeepL возвращает JSON вида { "translations":[{"detected_source_language":"EN","text":"..."}] }
-                var resultJson = await response.Content.ReadFromJsonAsync<DeepLTranslateResponse>();
-
-                return resultJson?.Translations?.FirstOrDefault()?.Text ?? text;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Исключение при переводе: {ex.Message}");
-                return text; 
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Translate error: {ex.Message}");
+                    return text;
+                }
             }
         }
 
-    
+   
+
         public class DeepLTranslateResponse
         {
             public List<DeepLTranslationItem> Translations { get; set; }
