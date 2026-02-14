@@ -160,3 +160,4 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+backend/Globals/obj/
