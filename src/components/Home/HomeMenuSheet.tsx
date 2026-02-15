@@ -12,6 +12,8 @@ import { s, SCREEN_WIDTH } from '@/utils/scale';
 import type { MenuItem } from './types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
+import { useCurrencyStore } from '@/store/currencyStore';
+import { SUPPORTED_CURRENCIES } from '@/types/currency';
 
 type HomeMenuSheetProps = {
   visible: boolean;
@@ -33,7 +35,8 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
   const [languageOpen, setLanguageOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('Українська');
-  const [selectedCurrency, setSelectedCurrency] = useState<string>('UAH');
+  const selectedCurrency = useCurrencyStore((state) => state.currency);
+  const setCurrency = useCurrencyStore((state) => state.setCurrency);
 
   const handleClose = () => {
     setLanguageOpen(false);
@@ -138,7 +141,11 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                       >
                         <Typography
                           variant="menuOption"
-                          style={label === selectedLanguage ? styles.dropdownItemTextActive : styles.dropdownItemText}
+                          style={
+                            label === selectedLanguage
+                              ? styles.dropdownItemTextActive
+                              : styles.dropdownItemText
+                          }
                           numberOfLines={1}
                         >
                           {label}
@@ -159,11 +166,15 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                             ? styles.dropdownItemActive
                             : styles.dropdownItemInactive,
                         ]}
-                        onPress={() => setSelectedCurrency(label)}
+                        onPress={() => setCurrency(label)}
                       >
                         <Typography
                           variant="caption"
-                          style={label === selectedCurrency ? styles.dropdownItemTextActive : styles.dropdownItemText}
+                          style={
+                            label === selectedCurrency
+                              ? styles.dropdownItemTextActive
+                              : styles.dropdownItemText
+                          }
                           numberOfLines={1}
                         >
                           {label}
@@ -228,7 +239,7 @@ const LANGUAGE_OPTIONS = [
   'Türkçe',
 ];
 
-const CURRENCY_OPTIONS = ['UAH', 'USD', 'EUR', 'GBP', 'PLN', 'CHF', 'CAD'];
+const CURRENCY_OPTIONS = SUPPORTED_CURRENCIES;
 
 const getStyles = (palette: ReturnType<typeof getPalette>) =>
   StyleSheet.create({

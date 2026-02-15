@@ -5,6 +5,7 @@ export default ({ config }) => ({
   name: 'mobile-app',
   slug: 'mobile-app',
   version: '1.0.0',
+  scheme: 'mobileapp',
 
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -26,6 +27,18 @@ export default ({ config }) => ({
   android: {
     package: 'com.booking.like.mobile',
     googleServicesFile: './google-services.json',
+    intentFilters: [
+      {
+        action: 'VIEW',
+        data: [
+          {
+            scheme: 'mobileapp',
+            host: 'payment',
+          },
+        ],
+        category: ['BROWSABLE', 'DEFAULT'],
+      },
+    ],
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff',

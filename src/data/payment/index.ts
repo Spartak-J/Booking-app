@@ -2,6 +2,7 @@
 import type { PaymentCard } from './types';
 import apiClient from '@/api/client';
 import { ENDPOINTS } from '@/config/endpoints';
+import type { CurrencyCode } from '@/types/currency';
 
 export const PaymentRepository = {
   async getCards(userId = 'guest'): Promise<PaymentCard[]> {
@@ -69,7 +70,7 @@ export const PaymentRepository = {
     cardId: string;
     bookingId: string;
     amount: number;
-    currency: 'UAH';
+    currency: CurrencyCode;
   }) {
     const { data } = await apiClient.post<any>(ENDPOINTS.payment.chargeSavedCard, {
       userId: input.userId ?? 'guest',

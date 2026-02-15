@@ -55,7 +55,7 @@ export const OfferRoomsList = ({ rooms, onBook }: OfferRoomsListProps) => {
             </View>
             <View style={styles.priceTag}>
               <Typography variant="caption" style={styles.priceText}>
-                UAH {formatPrice(room.price, 'UAH', false)}
+                {formatPrice(room.price)}
               </Typography>
             </View>
           </View>

@@ -78,8 +78,7 @@ export const OfferCard: React.FC<Props> = ({ offer, onPress }) => {
             </Text>
             <View style={styles.priceRow}>
               <Text style={styles.fromLabel}>{t('common.from')}</Text>
-              <Text style={styles.price}>{formatPrice(offer.pricePerNight, 'UAH', false)}</Text>
-              <Text style={styles.currency}>₴</Text>
+              <Text style={styles.price}>{formatPrice(offer.pricePerNight)}</Text>
             </View>
           </View>
           <View style={styles.metaRow}>
@@ -190,11 +189,6 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
     price: {
       fontSize: 18,
       fontFamily: 'MontserratAlternates-Bold',
-      color: colors.textPrimary ?? colors.text,
-    },
-    currency: {
-      fontSize: 16,
-      fontFamily: 'MontserratAlternates-Regular',
       color: colors.textPrimary ?? colors.text,
     },
   });

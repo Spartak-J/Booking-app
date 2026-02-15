@@ -24,6 +24,7 @@ import { OfferGalleryScreen } from '@/screens/Offer/OfferGalleryScreen';
 import { BookingScreen } from '@/screens/Bookings/BookingScreen';
 import { BookingDetailsScreen } from '@/screens/Bookings/BookingDetailsScreen';
 import { BookingSuccessScreen } from '@/screens/Bookings/BookingSuccessScreen';
+import { BookingFailureScreen } from '@/screens/Bookings/BookingFailureScreen';
 import { PastBookingDetailsScreen } from '@/screens/Bookings/PastBookingDetailsScreen';
 import { SearchResultsScreen } from '@/screens/Home/SearchResultsScreen';
 import { SavedScreen } from '@/screens/Saved/SavedScreen';
@@ -73,6 +74,7 @@ export type RootStackParamList = {
   Booking: { offerId: string };
   BookingDetails: { bookingId: string };
   BookingSuccess: { bookingId: string; offerId?: string; offerTitle?: string; totalPrice?: number };
+  BookingFailure: { message?: string; offerId?: string };
   PastBookingDetails: {
     booking: {
       id: string;
@@ -198,53 +200,54 @@ export const RootNavigator = () => {
           headerShown: false,
         }}
       >
-          {!token && !guestMode ? (
-            <>
-              <Stack.Screen name="Welcome" component={WelcomeScreen} />
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen name="Register" component={RegisterScreen} />
-              <Stack.Screen name="Auth" component={AuthTabsScreen} />
-            </>
-          ) : (
-            <>
-              {role === 'admin' ? (
-                <Stack.Screen name="AdminMenu" component={AdminMenuScreen} />
-              ) : (
-                <Stack.Screen name="Main" component={MainTabs} />
-              )}
-              {role === 'admin' ? (
-                <Stack.Screen name="Main" component={MainTabs} />
-              ) : (
-                <Stack.Screen name="AdminMenu" component={AdminMenuScreen} />
-              )}
-              <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
-              <Stack.Screen name="Saved" component={SavedScreen} />
-              <Stack.Screen name="Landmarks" component={LandmarksScreen} />
-              <Stack.Screen name="LandmarksCity" component={LandmarksCityScreen} />
-              <Stack.Screen name="LandmarksSearchResults" component={LandmarksSearchResultsScreen} />
-              <Stack.Screen name="LandmarkDetail" component={LandmarkDetailScreen} />
-              <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} />
-              <Stack.Screen name="OfferGallery" component={OfferGalleryScreen} />
-              <Stack.Screen name="Booking" component={BookingScreen} />
-              <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
-              <Stack.Screen name="BookingSuccess" component={BookingSuccessScreen} />
-              <Stack.Screen name="PastBookingDetails" component={PastBookingDetailsScreen} />
-              <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-              <Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />
-              <Stack.Screen name="AddCard" component={AddCardScreen} />
-              <Stack.Screen name="HelpCenter" component={HelpScreen} />
-              <Stack.Screen name="AboutCenter" component={AboutScreen} />
-              <Stack.Screen name="PrivacyCenter" component={PrivacyScreen} />
-              <Stack.Screen name="SettingsCenter" component={SettingsScreen} />
-              <Stack.Screen name="AdminEntry" component={AdminEntryScreen} />
-              <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
-              <Stack.Screen name="AdminOffers" component={AdminOffersScreen} />
-              <Stack.Screen name="AdminOfferDetails" component={AdminOfferDetailsScreen} />
-              <Stack.Screen name="OwnerHomes" component={OwnerHomesScreen} />
-              <Stack.Screen name="OwnerAddHome" component={OwnerAddHomeScreen} />
-              <Stack.Screen name="OwnerReviews" component={OwnerReviewsScreen} />
-            </>
-          )}
+        {!token && !guestMode ? (
+          <>
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Auth" component={AuthTabsScreen} />
+          </>
+        ) : (
+          <>
+            {role === 'admin' ? (
+              <Stack.Screen name="AdminMenu" component={AdminMenuScreen} />
+            ) : (
+              <Stack.Screen name="Main" component={MainTabs} />
+            )}
+            {role === 'admin' ? (
+              <Stack.Screen name="Main" component={MainTabs} />
+            ) : (
+              <Stack.Screen name="AdminMenu" component={AdminMenuScreen} />
+            )}
+            <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
+            <Stack.Screen name="Saved" component={SavedScreen} />
+            <Stack.Screen name="Landmarks" component={LandmarksScreen} />
+            <Stack.Screen name="LandmarksCity" component={LandmarksCityScreen} />
+            <Stack.Screen name="LandmarksSearchResults" component={LandmarksSearchResultsScreen} />
+            <Stack.Screen name="LandmarkDetail" component={LandmarkDetailScreen} />
+            <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} />
+            <Stack.Screen name="OfferGallery" component={OfferGalleryScreen} />
+            <Stack.Screen name="Booking" component={BookingScreen} />
+            <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
+            <Stack.Screen name="BookingSuccess" component={BookingSuccessScreen} />
+            <Stack.Screen name="BookingFailure" component={BookingFailureScreen} />
+            <Stack.Screen name="PastBookingDetails" component={PastBookingDetailsScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />
+            <Stack.Screen name="AddCard" component={AddCardScreen} />
+            <Stack.Screen name="HelpCenter" component={HelpScreen} />
+            <Stack.Screen name="AboutCenter" component={AboutScreen} />
+            <Stack.Screen name="PrivacyCenter" component={PrivacyScreen} />
+            <Stack.Screen name="SettingsCenter" component={SettingsScreen} />
+            <Stack.Screen name="AdminEntry" component={AdminEntryScreen} />
+            <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
+            <Stack.Screen name="AdminOffers" component={AdminOffersScreen} />
+            <Stack.Screen name="AdminOfferDetails" component={AdminOfferDetailsScreen} />
+            <Stack.Screen name="OwnerHomes" component={OwnerHomesScreen} />
+            <Stack.Screen name="OwnerAddHome" component={OwnerAddHomeScreen} />
+            <Stack.Screen name="OwnerReviews" component={OwnerReviewsScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

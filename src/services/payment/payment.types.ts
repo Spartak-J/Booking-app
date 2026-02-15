@@ -1,3 +1,5 @@
+import type { CurrencyCode } from '@/types/currency';
+
 export type PaymentMethod = 'pay' | 'hold' | 'subscribe' | 'apay' | 'gpay';
 
 export type PaymentStatus = 'created' | 'hold' | 'paid' | 'failed' | 'cancelled';
@@ -5,8 +7,12 @@ export type PaymentStatus = 'created' | 'hold' | 'paid' | 'failed' | 'cancelled'
 export interface CreatePaymentPayload {
   bookingId: string;
   amount: number;
-  currency: 'UAH';
+  currency: CurrencyCode;
   method: PaymentMethod;
+  offerId?: number;
+  checkIn?: string;
+  checkOut?: string;
+  guests?: number;
 }
 
 export interface PaymentResult {

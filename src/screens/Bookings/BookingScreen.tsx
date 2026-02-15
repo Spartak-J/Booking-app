@@ -37,6 +37,12 @@ export const BookingScreen = () => {
             totalPrice,
           })
         }
+        onBookingFailure={({ message }) =>
+          navigation.replace(Routes.BookingFailure, {
+            message,
+            offerId: params.offerId,
+          })
+        }
       />
     </AppLayout>
   );

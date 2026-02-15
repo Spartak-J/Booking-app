@@ -53,4 +53,7 @@ export const ENDPOINTS = {
     cards: (userId: string) => `/Bff/payments/cards/${userId}`,
     chargeSavedCard: '/Bff/payments/charge-saved-card',
   },
+  currency: {
+    rates: '/Bff/currency/rates',
+  },
 };

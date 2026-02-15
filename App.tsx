@@ -17,6 +17,7 @@ import { RootNavigator } from '@/navigation/RootNavigator';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { notificationService } from '@/services/notificationService';
 import { useAuthStore } from '@/store/authStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { ThemeProvider, useTheme } from '@/theme';
 
@@ -25,6 +26,7 @@ import { SplashScreen } from '@/screens/SplashScreen';
 
 const AppContent = () => {
   const { tokens } = useTheme();
+  useCurrencyStore((state) => state.currency);
 
   // Загрузка шрифтов
   const [fontsLoaded] = useFonts({
@@ -50,11 +52,13 @@ const AppContent = () => {
 
   // Гидратация хранилищ (Auth, Language)
   useEffect(() => {
-    Promise.all([useAuthStore.getState().hydrate(), useLanguageStore.getState().hydrate()]).finally(
-      () => {
-        setReady(true);
-      },
-    );
+    Promise.all([
+      useAuthStore.getState().hydrate(),
+      useLanguageStore.getState().hydrate(),
+      useCurrencyStore.getState().hydrate(),
+    ]).finally(() => {
+      setReady(true);
+    });
   }, []);
 
   // Стабильная ссылка на функцию завершения (предотвращает ре-рендеры сплэша)

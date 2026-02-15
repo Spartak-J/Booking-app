@@ -15,6 +15,7 @@ export enum Routes {
   Booking = 'Booking',
   BookingDetails = 'BookingDetails',
   BookingSuccess = 'BookingSuccess',
+  BookingFailure = 'BookingFailure',
   PastBookingDetails = 'PastBookingDetails',
   AdminPanel = 'AdminPanel',
   AdminUserDetails = 'AdminUserDetails',

@@ -1,7 +1,6 @@
 // Component: BookingScreenView. Used in: BookingScreen.
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
   AppState,
   Dimensions,
   Linking,
@@ -61,6 +60,54 @@ const waitForAppReturn = (timeoutMs: number) =>
     }, timeoutMs);
   });
 
+const getHttpStatus = (error: unknown): number | undefined =>
+  typeof error === 'object' && error !== null && 'response' in error
+    ? (error as { response?: { status?: number } }).response?.status
+    : undefined;
+
+const extractPaymentIdFromDeepLink = (url: string): string | undefined => {
+  const tokenMatch = /[?&]token=([^&]+)/i.exec(url);
+  if (tokenMatch?.[1]) {
+    return decodeURIComponent(tokenMatch[1]);
+  }
+
+  const paymentIdMatch = /[?&](paymentId|payment_id|order_id|orderId)=([^&]+)/i.exec(url);
+  if (paymentIdMatch?.[2]) {
+    return decodeURIComponent(paymentIdMatch[2]);
+  }
+
+  return undefined;
+};
+
+const waitForPaymentReturn = (timeoutMs: number) =>
+  new Promise<{ cancelled: boolean; paymentId?: string }>((resolve) => {
+    let resolved = false;
+
+    const finish = (payload: { cancelled: boolean; paymentId?: string }) => {
+      if (resolved) {
+        return;
+      }
+
+      resolved = true;
+      subscription.remove();
+      resolve(payload);
+    };
+
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      const normalized = url.toLowerCase();
+      if (normalized.startsWith('mobileapp://payment/result')) {
+        finish({ cancelled: false, paymentId: extractPaymentIdFromDeepLink(url) });
+        return;
+      }
+
+      if (normalized.startsWith('mobileapp://payment/cancel')) {
+        finish({ cancelled: true });
+      }
+    });
+
+    setTimeout(() => finish({ cancelled: false }), timeoutMs);
+  });
+
 const mapBookingPaymentToApiMethod = (method: PaymentMethod): ApiPaymentMethod => {
   if (method === 'googlePay') return 'gpay';
   if (method === 'applePay') return 'apay';
@@ -79,6 +126,7 @@ type BookingScreenViewProps = {
     offerTitle?: string;
     totalPrice?: number;
   }) => void;
+  onBookingFailure: (payload: { message: string }) => void;
 };
 
 type CardPaymentFlow = 'saved' | 'liqpay';
@@ -89,6 +137,7 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   isLoading,
   onBack,
   onBookingSuccess,
+  onBookingFailure,
 }) => {
   const { colors, mode } = useTheme();
   const { t } = useTranslation();
@@ -143,10 +192,8 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
     PaymentRepository.getCards(userId ?? 'guest')
       .then((list) => {
         setCards(list);
-        if (list.length > 0 && !selectedCardId) {
-          setSelectedCardId(list[0].id);
-          setCardPaymentFlow('saved');
-        }
+        setSelectedCardId((prev) => prev ?? list[0]?.id);
+        if (list.length > 0) setCardPaymentFlow('saved');
       })
       .catch(() => setCards([]));
   }, [userId]);
@@ -196,24 +243,51 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         }
 
         if (savedResult.status !== 'paid') {
-          throw new Error('Оплату не вдалося провести.');
+          throw new Error('booking.payment.failed');
         }
       }
 
       if (useLiqPayFlow) {
+        const paymentCurrency = 'UAH';
+        const paymentAmount = Math.max(1, Number(totalAmount.toFixed(2)));
+
         const paymentResult = await paymentService.createPayment({
           bookingId: `draft-${offerId}-${Date.now()}`,
-          amount: totalAmount,
-          currency: 'UAH',
+          amount: paymentAmount,
+          currency: paymentCurrency,
           method: mapBookingPaymentToApiMethod(paymentMethod),
+          offerId: Number(offerId),
+          checkIn: dates.from,
+          checkOut: dates.to,
+          guests: guests ?? 1,
         });
+
+        let latest = paymentResult;
 
         if (paymentResult.redirectUrl) {
           await Linking.openURL(paymentResult.redirectUrl);
-          await waitForAppReturn(180000);
+          if (paymentMethod === 'paypal') {
+            const paymentReturn = await waitForPaymentReturn(180000);
+            if (paymentReturn.cancelled) {
+              throw new Error('booking.payment.cancelled');
+            }
+            if (paymentReturn.paymentId) {
+              latest = { ...latest, paymentId: paymentReturn.paymentId };
+            } else {
+              await waitForAppReturn(10000);
+            }
+          } else {
+            const paymentReturn = await waitForPaymentReturn(180000);
+            if (paymentReturn.cancelled) {
+              throw new Error('booking.payment.cancelled');
+            }
+            if (paymentReturn.paymentId) {
+              latest = { ...latest, paymentId: paymentReturn.paymentId };
+            } else {
+              await waitForAppReturn(10000);
+            }
+          }
         }
-
-        let latest = paymentResult;
 
         if (latest.status === 'hold') {
           latest = await paymentService.confirmHold(latest.paymentId);
@@ -222,7 +296,15 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         if (latest.status !== 'paid') {
           for (let attempt = 0; attempt < 15; attempt += 1) {
             await wait(2000);
-            latest = await paymentService.getStatus(latest.paymentId);
+            try {
+              latest = await paymentService.getStatus(latest.paymentId);
+            } catch (error) {
+              const httpStatus = getHttpStatus(error);
+              if (paymentMethod === 'paypal' && httpStatus === 404) {
+                continue;
+              }
+              throw error;
+            }
             if (latest.status === 'hold') {
               latest = await paymentService.confirmHold(latest.paymentId);
             }
@@ -238,11 +320,9 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
 
         if (latest.status !== 'paid') {
           if (latest.status === 'failed' || latest.status === 'cancelled') {
-            throw new Error('Оплату не вдалося провести.');
+            throw new Error('booking.payment.failed');
           }
-          throw new Error(
-            'Платіж ще обробляється. Перевірте статус платежу і повторіть бронювання.',
-          );
+          throw new Error('booking.payment.processing');
         }
       }
 
@@ -266,8 +346,8 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
       });
     },
     onError: (err: unknown) => {
-      const message = err instanceof Error ? t(err.message) : String(err);
-      Alert.alert(t('booking.error'), message);
+      const message = err instanceof Error ? t(err.message) : t('booking.payment.failed');
+      onBookingFailure({ message });
     },
   });
 
@@ -438,6 +518,21 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
           })}
         </View>
       </Modal>
+
+      <Modal
+        visible={mutation.isPending}
+        onClose={() => {}}
+        variant="dialog"
+        position="center"
+        overlayOpacity={0.55}
+      >
+        <View style={styles.paymentStateContainer}>
+          <Loader variant="spinner" />
+          <Typography variant="body" tone="primary" style={styles.paymentStateText}>
+            {t('booking.payment.processing')}
+          </Typography>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -562,6 +657,16 @@ const getStyles = (colors: any, isDark: boolean, headerTextColor: string) =>
     cardPickerItemActive: {
       borderColor: colors.primary,
       backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLight,
+    },
+    paymentStateContainer: {
+      width: s(280),
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: s(14),
+      paddingVertical: s(8),
+    },
+    paymentStateText: {
+      textAlign: 'center',
     },
   });
 

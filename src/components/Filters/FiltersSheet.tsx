@@ -10,6 +10,7 @@ import { radius, typography, withOpacity } from '@/theme';
 import { s } from '@/utils/scale';
 import { AMENITY_OPTIONS } from '@/utils/amenities';
 import { useTranslation } from '@/i18n';
+import { useCurrencyStore } from '@/store/currencyStore';
 
 const MIN_PRICE = 1000;
 const MAX_PRICE = 20000;
@@ -86,6 +87,8 @@ const roundToStep = (value: number) => Math.round(value / PRICE_STEP) * PRICE_ST
 export const FiltersSheet: React.FC<Props> = ({ filters, onChange, onApply, onClose, onReset }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const selectedCurrency = useCurrencyStore((state) => state.currency);
+  const convertFromUah = useCurrencyStore((state) => state.convertFromUah);
   const isDark = colors.background === colors.bgDark;
   const palette = useMemo(
     () => ({
@@ -112,6 +115,8 @@ export const FiltersSheet: React.FC<Props> = ({ filters, onChange, onApply, onCl
 
   const priceFrom = clamp(filters.priceFrom ?? MIN_PRICE, MIN_PRICE, MAX_PRICE);
   const priceTo = clamp(filters.priceTo ?? MAX_PRICE, MIN_PRICE, MAX_PRICE);
+  const displayPriceFrom = Math.round(convertFromUah(priceFrom));
+  const displayPriceTo = Math.round(convertFromUah(priceTo));
   const [trackWidth, setTrackWidth] = useState<number>(s(369));
   const [dragging, setDragging] = useState(false);
   const [minStartValue, setMinStartValue] = useState(priceFrom);
@@ -250,10 +255,10 @@ export const FiltersSheet: React.FC<Props> = ({ filters, onChange, onApply, onCl
           </Typography>
           <View style={styles.priceLabels}>
             <Typography variant="caption" style={styles.priceText}>
-              від {priceFrom} UAH
+              від {displayPriceFrom} {selectedCurrency}
             </Typography>
             <Typography variant="caption" style={styles.priceText}>
-              до {priceTo} UAH
+              до {displayPriceTo} {selectedCurrency}
             </Typography>
           </View>
           <View
