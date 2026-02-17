@@ -1,21 +1,11 @@
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
-
 import { useNavigate } from "react-router-dom";
-import { Header_Full } from "../../components/Header/Header_Full.jsx";
-import { AttractionGallery } from "../../components/AttractionCard/AttractionGallery.jsx";
-import { LoginModal } from "../../components/modals/LoginModal.jsx";
-import { RegisterModal } from "../../components/modals/RegisterModal.jsx";
-import { Footer } from "../../components/Footer/Footer.jsx";
-import { Text } from "../../components/UI/Text/Text.jsx";
-import { TwoColumnInfoSection } from "../../components/Info_Components/TwoColumnInfoSection.jsx";
-import { MoreOffersSection } from "../../components/Info_Components/MoreOffersSection.jsx";
-import { SearchBar_Main } from "../../components/SearchBar/SearchBar_Main.jsx";
-import { PlaceCard_carousel } from "../../components/PlacesCard/PlaceCard_carousel.jsx"
-import { HotelMap } from "../../components/Hotel/HotelMap.jsx";
-import {ActionButton__Primary} from "../../components/UI/Button/ActionButton_Primary.jsx";
 
+import { Header_Full } from "../../components/Header/Header_Full.jsx";
+import { Footer } from "../../components/Footer/Footer.jsx";
+import { IconButton_Search } from "../../components/UI/Button/IconButton_Search.jsx";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { useLanguage } from "../../contexts/LanguageContext";
 
@@ -51,31 +41,86 @@ export const AttractionPage = () => {
 
   const lat = 48.8566;
   const lng = 2.3522;
-const { t } = useTranslation();
+  const { t } = useTranslation();
 
+
+   const handleSearchClick = () => {
+    navigate("/attractionByCity"); 
+  };
   return (
-    <div className={styles.cityPage}>
-      <Header_Full titleBtn="city" title ={Attraction.title} showFilterBtn={false} openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
+    <div className={styles.attraction_page}>
+      <Header_Full titleBtn="city" title={Attraction.title} showFilterBtn={false} openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
 
-      <main className={styles.hotel_page__content}>
-        <AttractionGallery images={Attraction.images} />
-        <div className={styles.description_container}>
-          <div className={styles.text_column}>
-            <p>{Attraction.description}</p>
-          </div>
-          <div className={styles.map_column}>
-            <div className={`${styles.card_map} flex-left btn-w-full`} >
-              {lat && lng ? (
-                <HotelMap lat={lat} lng={lng} minHeight="280"/>
-              ) : (
-                <div className={styles.mapPlaceholder}>Координаты отсутствуют</div>
-              )}
+      <main className={styles.attraction_page__content}>
+        <section className="container-fluid my-5">
+          <div className="row align-items-start g-4">
+
+
+            <div className="col-lg-5">
+              <div
+                className="  rounded-4 w-100 d-flex flex-column"
+                style={{ gap: "55px" }}
+              >
+                <div className="mb-3">
+                  <div className="mb-3">
+                    <div className="input-group" style={{ border: '1px solid #ced4da', borderRadius: '0.375rem', overflow: 'hidden' }}>
+                      <input
+                        type="text"
+                        className="form-control border-0"
+                        placeholder="Місто"
+                        aria-label="Місто"
+                        style={{ boxShadow: 'none' }}
+                      />
+                      <button
+                        className="btn btn-outline-secondary border-0"
+                        type="button"
+                        aria-label="search"
+                        style={{
+                          pointerEvents: 'auto',
+                          backgroundColor: 'transparent',
+                          boxShadow: 'none',
+                          borderLeft: '1px solid #ced4da',
+                        }}
+                          onClick={handleSearchClick}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'transparent'}  // отключаем hover
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <IconButton_Search icon_name="search" />
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+                <p className="mb-4">
+                  Відкривай для себе нові незабутні локації! Пізнавай разом з нами
+                  багату історію України та всього світу, подорожуй у кращі місця
+                  та знаходь найкраще житло у визначних локаціях.
+                </p>
+
+              </div>
             </div>
-            <div className={`flex-center btn-w-full ${styles.btn_container}`}>
-              <ActionButton__Primary text ={t("Attraction.find_housing")} className='btn-w-573  btn-h-59 btn-br-r-20'/>
+            <div className="col-lg-7">
+              <div style={{
+                height: "454px",
+                width: "100%",
+                overflow: "hidden",
+                borderRadius: "20px"
+              }}>
+                <img
+                  src="img/attractions/default.svg"
+                  alt="Атракція"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block"
+                  }}
+                />
+              </div>
             </div>
+
           </div>
-        </div>
+        </section>
       </main >
       <Footer />
 

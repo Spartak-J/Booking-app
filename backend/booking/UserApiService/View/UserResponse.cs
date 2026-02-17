@@ -8,6 +8,7 @@ namespace UserApiService.View
     {
         public int id { get; set; }
         public string Username { get; set; } = string.Empty;
+        public string? Lastname { get; set; }
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public int CountryId { get; set; }
@@ -23,6 +24,7 @@ namespace UserApiService.View
             {
                 id = model.id,
                 Username = model.Username ?? string.Empty,
+                Lastname = model.Lastname ?? string.Empty,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 CountryId = model.CountryId,

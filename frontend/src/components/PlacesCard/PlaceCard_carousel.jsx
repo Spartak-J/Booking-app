@@ -67,7 +67,7 @@ export const PlaceCard_carousel = ({ list }) => {
 
 
   const getOffset = () => {
-    const centerIndex = index + visibleCount; // индекс в extendedList
+    const centerIndex = index + visibleCount; 
     const viewportWidth = viewportRef.current?.offsetWidth || 0;
     const leftPadding = viewportWidth / 2 - CARD_WIDTH_ACTIVE / 2;
     return centerIndex * (CARD_WIDTH + GAP) - leftPadding;
@@ -91,7 +91,7 @@ export const PlaceCard_carousel = ({ list }) => {
             return (
               <Link
                 key={`${item.id}-${i}`}
-                to={`/attraction/${item.slug}`}
+                to={`/attractionDetail`}
                 className={`${styles.card} ${isActive ? styles.active : ''}`}
                 style={{
                   width: isActive ? CARD_WIDTH_ACTIVE : CARD_WIDTH,

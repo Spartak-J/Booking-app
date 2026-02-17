@@ -9,6 +9,7 @@ justify-content: center;
   overflow: hidden;
   margin-top: 50px;
   padding-bottom: 20px;
+  color:var(--color-text-title) !important;
 }
 
 

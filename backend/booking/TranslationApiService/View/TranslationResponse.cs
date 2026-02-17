@@ -14,6 +14,7 @@ namespace TranslationApiService.View
 
         public string? Description { get; set; }
         public string? TitleInfo { get; set; }     //  краткая инфа 
+        public string? History { get; set; }
         public string? Address { get; set; }
 
     }

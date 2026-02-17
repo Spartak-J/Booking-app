@@ -9,6 +9,7 @@ namespace OfferApiService.Models.RentObjModel
 
         public int ParamItemId { get; set; }
         public ParamItem ParamItem { get; set; }
+        public string? IconName { get; set; } = null;
 
         public bool? ValueBool { get; set; }
         public int? ValueInt { get; set; }
