@@ -725,7 +725,7 @@ namespace WebApiGetway.Controllers
               translatedTranslation
           );
 
-            var addToOwnerLink = await _gateway.ForwardRequestAsync<object>(
+          var addToOwnerLink = await _gateway.ForwardRequestAsync<object>(
               "UserApiService",
              $"/api/Offer/update-translations/{offerId}/{lang}",
               HttpMethod.Put,
@@ -1682,26 +1682,26 @@ namespace WebApiGetway.Controllers
 
                     BffHelper.UpdateListWithTranslations(CitiesDictList, translationsCity);
 
-                    foreach (var city in CitiesDictList)
-                    {
+                    //foreach (var city in CitiesDictList)
+                    //{
 
-                        var DistrictsDictList = city["districts"] as List<Dictionary<string, object>>;
+                    //    var DistrictsDictList = city["districts"] as List<Dictionary<string, object>>;
 
-                        var translateDistrictsListResult =
-                        await _gateway.ForwardRequestAsync<object>(
-                           "TranslationApiService",
-                           $"/api/District/get-all-translations/{lang}",
-                           HttpMethod.Get,
-                           null);
+                    //    var translateDistrictsListResult =
+                    //    await _gateway.ForwardRequestAsync<object>(
+                    //       "TranslationApiService",
+                    //       $"/api/District/get-all-translations/{lang}",
+                    //       HttpMethod.Get,
+                    //       null);
 
-                        if (translateDistrictsListResult is not OkObjectResult okTranslateDistrict)
-                            return translateDistrictsListResult;
-                        var translationsDistrict = BffHelper.ConvertActionResultToDict(okTranslateDistrict);
+                    //    if (translateDistrictsListResult is not OkObjectResult okTranslateDistrict)
+                    //        return translateDistrictsListResult;
+                    //    var translationsDistrict = BffHelper.ConvertActionResultToDict(okTranslateDistrict);
 
 
-                        BffHelper.UpdateListWithTranslations(DistrictsDictList, translationsDistrict);
+                    //    BffHelper.UpdateListWithTranslations(DistrictsDictList, translationsDistrict);
 
-                    }
+                    //}
                 }
             }
 
@@ -1854,26 +1854,72 @@ namespace WebApiGetway.Controllers
         }
 
 
+
+
+        //===============================================================================================================
+        //                          city за id
+        //===============================================================================================================
+
+        [HttpGet("location/get/city/{id}/{lang}")]
+        public async Task<IActionResult> GetPopularTopCity(
+            [FromRoute] string id,
+            [FromRoute] string lang)
+        {
+          
+            var citiesObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "LocationApiService",
+                  $"/api/City/get/{id}",
+                  HttpMethod.Get,
+                  id);
+            if (citiesObjResult is not OkObjectResult okCities)
+                return citiesObjResult;
+
+            var cityDictList = BffHelper.ConvertActionResultToDict(okCities);
+
+
+            var translateListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-translations/{id}/{lang}", HttpMethod.Get, null);
+            var cityTitle = GetStringFromActionResult(translateListResult, "title");
+            var cityDescription = GetStringFromActionResult(translateListResult, "description");
+            var cityHistory = GetStringFromActionResult(translateListResult, "history");
+
+            if (translateListResult is not OkObjectResult okTranslate)
+                return translateListResult;
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+
+
+            BffHelper.UpdateListWithTranslations(cityDictList, translations);
+
+            return Ok(cityDictList);
+        }
+
+
         //===============================================================================================================
         //                         Топ city за период (week / month / year)
         //===============================================================================================================
 
-        [HttpGet("statistic/top/{period}/get/city/{lang}")]
+        [HttpGet("statistic/top/{period}/get/city/{limit}/{lang}")]
         public async Task<IActionResult> GetPopularTopCity(
-            StatisticPeriod period,
-            string lang)
+               [FromRoute] string period,
+            [FromRoute] int limit,
+            [FromRoute] string lang)
         {
-            const int entityTypeId = 2; // City
-            const int limit = 10;
+            var statisticPeriod = period.ToLower() switch
+            {
+                "week" => StatisticPeriod.Week,
+                "month" => StatisticPeriod.Month,
+                "year" => StatisticPeriod.Year,
+                _ => throw new ArgumentOutOfRangeException(nameof(period))
+            };
+            const int entityTypeId = 2; // city
+            //const int limit = 10;
 
-            var statisticUrl = period switch
+            var statisticUrl = statisticPeriod switch
             {
                 StatisticPeriod.Week => "/api/EntityStatistic/top-week",
                 StatisticPeriod.Month => "/api/EntityStatistic/top-month",
                 StatisticPeriod.Year => "/api/EntityStatistic/top-year",
                 _ => throw new ArgumentOutOfRangeException()
             };
-
             var url =
                 $"{statisticUrl}" +
                 $"?entityType={entityTypeId}" +
@@ -1885,7 +1931,6 @@ namespace WebApiGetway.Controllers
                     url,
                     HttpMethod.Get,
                     null);
-
             if (statisticResult is not OkObjectResult okStatistic)
                 return statisticResult;
             var statisticObjDictList = BffHelper.ConvertActionResultToDict(okStatistic);
@@ -1893,13 +1938,13 @@ namespace WebApiGetway.Controllers
             var idList = new List<int>();
             foreach (var statsOffer in statisticObjDictList)
             {
-                var id = int.Parse(statsOffer["id"].ToString());
+                var id = int.Parse(statsOffer["entityId"].ToString());
                 idList.Add(id);
             }
           
             var citiesObjResult = await _gateway.ForwardRequestAsync<object>(
                   "LocationApiService",
-                  $"/api/city/search/cities/populars",
+                  $"/api/City/search/cities/populars",
                   HttpMethod.Post,
                   idList);
             if (citiesObjResult is not OkObjectResult okCities)
@@ -1929,22 +1974,29 @@ namespace WebApiGetway.Controllers
         //                         Топ offer за период (week / month / year)
         //===============================================================================================================
 
-        [HttpGet("statistic/top/{period}/get/offer/{lang}")]
+        [HttpGet("statistic/top/{period}/get/offer/{limit}/{lang}")]
         public async Task<IActionResult> GetPopularTopOffer(
-            StatisticPeriod period,
-            string lang)
+            [FromRoute] string period,
+            [FromRoute] int limit,
+            [FromRoute] string lang)
         {
+            var statisticPeriod = period.ToLower() switch
+            {
+                "week" => StatisticPeriod.Week,
+                "month" => StatisticPeriod.Month,
+                "year" => StatisticPeriod.Year,
+                _ => throw new ArgumentOutOfRangeException(nameof(period))
+            };
             const int entityTypeId = 3; // Offer
-            const int limit = 10;
+            //const int limit = 10;
 
-            var statisticUrl = period switch
+            var statisticUrl = statisticPeriod switch
             {
                 StatisticPeriod.Week => "/api/EntityStatistic/top-week",
                 StatisticPeriod.Month => "/api/EntityStatistic/top-month",
                 StatisticPeriod.Year => "/api/EntityStatistic/top-year",
                 _ => throw new ArgumentOutOfRangeException()
             };
-
             var url =
                 $"{statisticUrl}" +
                 $"?entityType={entityTypeId}" +
@@ -1965,7 +2017,7 @@ namespace WebApiGetway.Controllers
             var idList = new List<int>();
             foreach (var statsOffer in statisticObjDictList)
             {
-                var id  =int.Parse(statsOffer["EntityId"].ToString());
+                var id  =int.Parse(statsOffer["entityId"].ToString());
                 idList.Add(id);
             }
             //получаем данные
@@ -1979,7 +2031,7 @@ namespace WebApiGetway.Controllers
 
             var statisticOfferDictList = BffHelper.ConvertActionResultToDict(okOffer);
 
-            // Получаем список переводов для title
+        
             var translateListResult =
                 await _gateway.ForwardRequestAsync<object>(
                     "TranslationApiService",
@@ -1993,23 +2045,77 @@ namespace WebApiGetway.Controllers
 
             BffHelper.UpdateListWithTranslations(statisticOfferDictList, translations);
 
+            var translateCityResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-all-translations/{lang}", HttpMethod.Get, null);
+            if (translateCityResult is not OkObjectResult okTranslateCity)
+                return Ok(statisticOfferDictList);
 
-            //заменяем название города
-            foreach (var offer in statisticOfferDictList)
-            {
-                var rentObj = (offer["rentObj"] as List<Dictionary<string, object>>)[0];
+            var translationsCity = BffHelper.ConvertActionResultToDict(okTranslateCity);
 
-                var cityId = rentObj["cityId"];
+            BffHelper. UpdateCityTitlesInOffers(statisticOfferDictList, translationsCity);
 
-                var translateCity = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-translations/{cityId}/{lang}", HttpMethod.Get, null);
-                var cityTitle = GetStringFromActionResult(translateCity, "title");
+            //foreach (var offer in statisticOfferDictList)
+            //{
+            //    var offerRentList = offer["rentObj"] as List<Dictionary<string, object>>;
+            //    if (offerRentList == null || offerRentList.Count == 0)
+            //        continue;
 
-                offer["cityTitle"] = cityTitle;
-            }
+            //    var offerRentObj = offerRentList[0];
+            //    var 
+
+                //if (!offerRentObj.TryGetValue("cityId", out var cityIdRaw))
+                //    continue;
+
+                //var offerCityId = -1;
+                //if (cityIdRaw is JsonElement json)
+                //{
+                //    var str = json.GetString();
+                //    offerCityId = Convert.ToInt32(str);
+                //}
+
+                //foreach(var city in translationsCity)
+                //{
+                //    var transRentList = offer["rentObj"] as List<Dictionary<string, object>>;
+                //    if (transRentList == null || transRentList.Count == 0)
+                //        continue;
+
+                //    var transRentObj = transRentList[0];
+
+                //    if (!transRentObj.TryGetValue("entityId", out var entityIdRaw))
+                //        continue;
+
+                //    var entityId = Convert.ToInt32(entityIdRaw);
+                //    if(offerCityId == entityId)
+                //    {
+                //        offerRentObj["cityTitle"] = transRentObj["title"];
+                //        break;
+                //    }
+                //}
+           // }
+
+
+            //foreach (var offer in statisticOfferDictList)
+            //{
+            //    var rentList = offer["rentObj"] as List<Dictionary<string, object>>;
+            //    if (rentList == null || rentList.Count == 0)
+            //        continue;
+
+            //    var rentObj = rentList[0];
+
+            //    if (!rentObj.TryGetValue("cityId", out var cityIdRaw))
+            //        continue;
+
+            //    var cityId = Convert.ToInt32(cityIdRaw);
+
+            //    if (cityTranslationDict.TryGetValue(cityId, out var cityTitle))
+            //    {
+            //        offer["cityTitle"] = cityTitle;
+            //    }
+            //}
+
             //получаем рейтинг
             var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Post, idList);
             if (ratingObjResult is not OkObjectResult okRating)
-                return ratingObjResult;
+                return Ok(statisticOfferDictList);
             var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
 
             BffHelper.UpdateOfferListWithRating(statisticOfferDictList, ratingDictList);

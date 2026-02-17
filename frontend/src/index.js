@@ -11,6 +11,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ApiProvider } from './contexts/ApiContext';
 import { LanguageProvider } from "./contexts/LanguageContext";
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ApiProvider>

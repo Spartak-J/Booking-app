@@ -180,10 +180,16 @@ public class UserController : ControllerBase
             return offerObjResult;
 
         var offerDictList = BffHelper.ConvertActionResultToDict(okOffer);
+        var translateListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Offer/get-all-translations/{lang}", HttpMethod.Get, null);
 
-        var offerTranslations = await GetTranslationsAsync(lang, "Offer");
+        var transItemDict = BffHelper.ConvertActionResultToDict(translateListResult as OkObjectResult);
 
-        var updateOfferDictList = BffHelper.UpdateListWithTranslations(offerDictList, offerTranslations);
+      
+      
+
+        //var offerTranslations = await GetTranslationsAsync(lang, "Offer");
+
+        var updateOfferDictList = BffHelper.UpdateListWithTranslations(offerDictList, transItemDict);
 
 
         var idList = new List<int>();
