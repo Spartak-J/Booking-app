@@ -34,7 +34,7 @@ export const CityCard_carousel = () => {
   const [visibleCount, setVisibleCount] = useState(3);
   const [withTransition, setWithTransition] = useState(true);
   const [cityList, setCitiesList] = useState([]);
-  const [activeId, setActiveId] = useState(options[0].id);
+
 
   useEffect(() => {
     const loadOffers = async () => {
