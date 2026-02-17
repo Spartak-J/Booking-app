@@ -10,9 +10,8 @@
 }
 
 .card__imageWrapper img {
-  flex: 1 1 265px;
   width: 100%;
-  height: 265px;
+  height: 264.8px;
   object-fit: cover;
   border-radius: 20px 20px 0 0;
 }
@@ -20,10 +19,10 @@
 .card__container {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  flex:1;
+  justify-content: start;
   gap: 4px;
   color: var(--color-text);
+  padding-left: 31px;
 }
 
 
@@ -37,7 +36,7 @@ margin-right: 5px;
 
 .card__details {
   display: flex;
-  justify-content:space-around;
+  justify-content: flex-start;
   align-items: center;
 }
 

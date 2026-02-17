@@ -10,7 +10,6 @@ namespace OfferApiService.View.RentObj
         public string? Title { get; set; }
         public int CategoryId { get; set; }
         public bool IsFilterable { get; set; }
-        public string? IconName { get; set; } = null;
         public ParamValueType ValueType { get; set; } = ParamValueType.Boolean;
 
         public static ParamItemResponse MapToResponse(ParamItem model)
@@ -23,7 +22,6 @@ namespace OfferApiService.View.RentObj
                 ValueType = model.ValueType,
                 CategoryId = model.CategoryId,
                 IsFilterable = model.IsFilterable,
-                IconName = model.IconName,
             };
         }
     }

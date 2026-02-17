@@ -25,21 +25,21 @@ namespace LocationApiService.Controllers
         //  получение городов для списка популярных 
         //===========================================================================================
 
-        [HttpPost("search/cities/populars")]
-        public async Task<ActionResult<List<CityResponseForPupularList>>> GetSearchPopularCities(
-          [FromBody] List<int> idList)
+        [HttpGet("search/cities/populars")]
+        public async Task<ActionResult<List<CityResponse>>> GetSearchPopularCities(
+            [FromQuery] List<int> idList)
         {
 
 
-            var result = new List<CityResponseForPupularList>();
+            var result = new List<CityResponse>();
             foreach (var cityId in idList)
             {
                 var exists = await _cityService.ExistsEntityAsync(cityId);
                 if (!exists)
-                    continue;
+                    return NotFound(new { message = $"offerId {cityId} not found" });
 
                 var cityRez = await _cityService.GetEntityAsync(cityId);
-                var city = CityResponseForPupularList.MapToResponse(cityRez, _baseUrl);
+                var city = CityResponse.MapToResponse(cityRez, _baseUrl);
                 result.Add(city);
             }
 

@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-
 import { Link } from 'react-router-dom';
-import { useLanguage } from "../../contexts/LanguageContext";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { CityCard__Popular } from './CityCard__Popular.jsx';
 import { Text } from '../UI/Text/Text.jsx';
 import { IconButtonArrow } from '../UI/Button/IconButton_arrow.jsx';
-import { ApiContext } from "../../contexts/ApiContext.jsx";
-
 import styles from './CityCard_carousel.module.css';
 
-const cityListMock = [
+const cityList = [
   { id: 1, slug: 'kyiv', title: 'Київ', imageSrc: "/img/city/Kyiv.svg" },
   { id: 2, slug: 'odesa', title: 'Одеса', imageSrc: "/img/city/Odesa.svg" },
   { id: 3, slug: 'lviv', title: 'Львів', imageSrc: "/img/city/Lviv.svg" },
@@ -22,10 +18,8 @@ const cityListMock = [
 ];
 
 export const CityCard_carousel = () => {
-  const { locationApi } = useContext(ApiContext);
   const { darkMode } = useContext(ThemeContext);
   const viewportRef = useRef(null);
-  const { language } = useLanguage();
 
   const CARD_WIDTH = 425;
   const GAP = 20;
@@ -33,26 +27,8 @@ export const CityCard_carousel = () => {
   const [index, setIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(3);
   const [withTransition, setWithTransition] = useState(true);
-  const [cityList, setCitiesList] = useState([]);
 
-
-  useEffect(() => {
-    const loadOffers = async () => {
-      try {
-        const res = await locationApi.getPopularCities("week", 10, language);
-        setCitiesList(res.data);
-        console.log("Ответ setCitiesList:", res.data);
-        console.log("Данные:", res.data);
-      } catch (error) {
-        console.warn("API недоступен, используется mock");
-        setCitiesList(cityListMock);
-      }
-    };
-
-    loadOffers();
-  }, [language]);
-
-
+  // ===== Resize (аналог PlaceCard) =====
   useEffect(() => {
     const handleResize = () => {
       if (!viewportRef.current) return;
@@ -73,14 +49,14 @@ export const CityCard_carousel = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-
+  // ===== Extended list =====
   const extendedList = [
     ...cityList.slice(-visibleCount),
     ...cityList,
     ...cityList.slice(0, visibleCount),
   ];
 
-
+  // ===== Loop correction =====
   useEffect(() => {
     if (index >= cityList.length) {
       setTimeout(() => {
@@ -97,7 +73,7 @@ export const CityCard_carousel = () => {
     }
   }, [index]);
 
-
+  // ===== Autoplay =====
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex(prev => prev + 1);
@@ -106,7 +82,7 @@ export const CityCard_carousel = () => {
     return () => clearInterval(interval);
   }, []);
 
-
+  // ===== Offset (ключевая часть) =====
   const getOffset = () => {
     const centerIndex = index + visibleCount;
     const viewportWidth = viewportRef.current?.offsetWidth || 0;
@@ -146,24 +122,19 @@ export const CityCard_carousel = () => {
             gap: `${GAP}px`,
           }}
         >
-          {extendedList.map((city, i) => {
-            const cityPath = `/city/${city.id}-${city.slug.toLowerCase()}`;
-
-            return (
-              <Link
-                key={`${city.id}-${i}`}
-                to={cityPath}
-                className={styles.cardLink}
-                style={{ width: CARD_WIDTH, flexShrink: 0 }}
-              >
-                <CityCard__Popular
-                  imageSrc={city.imageUrl_Main}
-                  title={city.title}
-                />
-              </Link>
-            );
-          })}
-
+          {extendedList.map((city, i) => (
+            <Link
+              key={`${city.id}-${i}`}
+              to={`/city/${city.slug}`}
+              className={styles.cardLink}
+              style={{ width: CARD_WIDTH, flexShrink: 0 }}
+            >
+              <CityCard__Popular
+                imageSrc={city.imageSrc}
+                title={city.title}
+              />
+            </Link>
+          ))}
         </div>
       </div>
     </div>

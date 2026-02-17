@@ -23,7 +23,7 @@ export const CityCard__Popular = ({
             onClick={handleClick}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => {
+            onKeyPress={(e) => {
                 if (e.key === "Enter" || e.key === " ") handleClick();
             }}>
             <div className={styles.card_container} >

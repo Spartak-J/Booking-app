@@ -6,8 +6,6 @@ import { Text } from "../UI/Text/Text.jsx";
 
 import styles from './FilterCategory.module.css';
 
-
-
 export const FilterCategory = ({
   city,
   category,

@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Xml.Linq;
-using UserApiService.Models;
-using UserApiService.Services;
+﻿using Microsoft.AspNetCore.Mvc;
 using UserApiService.Services.Interfaces;
 using UserApiService.View;
 
@@ -16,78 +10,11 @@ namespace UserApiService.Controllers
     {
 
         private readonly IAuthService _authService;
-        private readonly ITokenService _tokenService;
-        private User _user;
-        private static string _token = "";
 
-        private static string _name = "";
-        private static string _email = "";
-
-        private static string _host = "";
-
-        public AuthController(IAuthService authService, ITokenService tokenService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
-            _tokenService = tokenService;
         }
-
-
-
-
-
-
-        [HttpGet("google-login")]
-        public IActionResult GoogleLogin()
-        {
-            var referer = Request.Headers["Referer"].ToString();
-
-
-            _host = string.IsNullOrEmpty(referer) ? Request.Host.ToString() : new Uri(referer).Authority;
-
-
-
-            var redirectUrl = Url.Action("GoogleResponse", "Auth", null, Request.Scheme);
-            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
-
-
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
-        }
-
-        [HttpGet("signin-google")]
-        public async Task<IActionResult> GoogleResponse()
-        {
-
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            var claims = result?.Principal?.Identities.FirstOrDefault()?.Claims;
-
-            if (claims != null)
-            {
-                _email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-                _name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-
-                if (_user.Username == _name && _user.Email == _email)
-                {
-                    _token = _tokenService.GenerateJwtToken(_user);
-                    SaveAdmin();
-
-                    var redirectUrl = $"http://{_host}/admin-dashboard";
-                    return Redirect(redirectUrl);
-                }
-
-            }
-
-
-            return Unauthorized();
-
-        }
-
-
-
-
-
-
-
-
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)

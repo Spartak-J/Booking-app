@@ -31,8 +31,6 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
     const [imagePreviews, setImagePreviews] = useState([]);
     const [uploadedImages, setUploadedImages] = useState([]);
 
-
-
     const [form, setForm] = useState({
         offer: {
             id: -1,
@@ -55,8 +53,10 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
             rentObj: {
                 id: -1,
                 countryId: null,
+                countryTitle: "",
                 regionId: null,
                 cityId: null,
+                cityTitle: "",
                 districtId: null,
                 countryTitle: "",
                 cityTitle: "",
@@ -122,10 +122,9 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
 
 
     const handleCountryChange = (e) => {
-         console.log("handleCountryChange triggered", e.target.value); // проверка вызова
-        const selectedId = Number(e.target.value); 
+        const selectedId = Number(e.target.value); // получаем выбранный id страны
         const selectedCountry = countries.find(c => c.id === selectedId);
-console.log({ SelectCountries: selectedCountry })
+
         setForm(prev => ({
             ...prev,
             offer: {
@@ -133,7 +132,7 @@ console.log({ SelectCountries: selectedCountry })
                 rentObj: {
                     ...prev.offer.rentObj,
                     countryId: selectedId,
-                    countryTitle: selectedCountry ? selectedCountry.title  : hotel? hotel.rentObj[0].countryTitle :"",
+                    countryTitle: selectedCountry ? selectedCountry.title : ""
                 }
             }
         }));
@@ -168,7 +167,7 @@ console.log({ SelectCountries: selectedCountry })
                 rentObj: {
                     ...prev.offer.rentObj,
                     cityId,
-                    cityTitle: selectedCity ? selectedCity.title : hotel? hotel.rentObj[0].cityTitle :"",
+                    cityTitle: selectedCity ? selectedCity.title : "",
                     districtId: null
                 }
             }
@@ -512,10 +511,10 @@ console.log({ SelectCountries: selectedCountry })
     const handleSave = async () => {
         try {
             setUploading(true);
-            // debugger;
+// debugger;
             const payload = buildOfferPayload();
 
-            console.log("!!!!!!!!!!!!!");
+              console.log("!!!!!!!!!!!!!");
 
             console.log("Попытка отправки данных на бек:", JSON.stringify(payload, null, 2));
 
@@ -598,21 +597,6 @@ console.log({ SelectCountries: selectedCountry })
 
                 <fieldset className={styles.fieldset}>
                     <label className={styles.label}>
-                        <div className="flex-left gap-5">
-                            <Text text={t("Host.aboutHousing.housing.description")} type="m_400_s_16" />
-                            <span className={styles.required_fields}>*</span>
-                        </div>
-                    </label>
-                    <textarea
-                        className={styles.textarea}
-                        name="description"
-                        value={form.offer.description}
-                        onChange={handleOfferChange}
-                    />
-                </fieldset>
-
-                <fieldset className={styles.fieldset}>
-                    <label className={styles.label}>
                         <Text text={t("Host.aboutHousing.housing.address")} type="m_400_s_16" />
                         <span className={styles.required_fields}>*</span>
                     </label>
@@ -633,9 +617,7 @@ console.log({ SelectCountries: selectedCountry })
                             </option>
                         ))}
                     </select>
-                </fieldset>
 
-                <fieldset className={styles.fieldset}>
                     <select
                         className={styles.input}
                         value={form.offer.rentObj.regionId ?? ""}
@@ -707,7 +689,20 @@ console.log({ SelectCountries: selectedCountry })
                     </div>
                 </fieldset>
 
-
+                <fieldset className={styles.fieldset}>
+                    <label className={styles.label}>
+                        <div className="flex-left gap-5">
+                            <Text text={t("Host.aboutHousing.housing.description")} type="m_400_s_16" />
+                            <span className={styles.required_fields}>*</span>
+                        </div>
+                    </label>
+                    <textarea
+                        className={styles.textarea}
+                        name="description"
+                        value={form.offer.description}
+                        onChange={handleOfferChange}
+                    />
+                </fieldset>
             </div>
 
             {/* Фото */}

@@ -11,7 +11,6 @@ namespace OfferApiService.View.RentObj
         public int CategoryId { get; set; }
         public ParamValueType ValueType { get; set; } = ParamValueType.Boolean;
         public bool IsFilterable { get; set; }
-        public string? IconName { get; set; } = null;
         public bool? ValueBool { get; set; }
         public int? ValueInt { get; set; }
         public string ValueString { get; set; }
@@ -24,7 +23,6 @@ namespace OfferApiService.View.RentObj
                 CategoryId = request.CategoryId,
                 ValueType = request.ValueType,
                 IsFilterable = request.IsFilterable,
-                IconName = request.IconName,
             };
         }
     }

@@ -5,10 +5,9 @@
   align-items: flex-end;
   text-align: center;
   flex: none;
-  flex-wrap: wrap;          
-  word-wrap: break-word;   
-  overflow-wrap: break-word;
-  max-width: 100%;        
+  order: 0;
+  flex-grow: 0;
+   max-width: none;
 }
 
 .link {
@@ -285,7 +284,6 @@
   font-weight: 700;
   font-size:  64px;
   line-height:  78px;
-  color: var(--color-text-title) !important;
 }
 
 
@@ -352,7 +350,7 @@
 }
 
 .breadcrumbs_link {
-  color: var(--color-text-breadcrumbs);
+  color: var(--color-text-secondary);
   font-family: 'Montserrat Alternates', sans-serif;
   font-weight: 500;
   font-size: clamp(16px, 2vw, 20px);

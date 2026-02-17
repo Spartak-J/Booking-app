@@ -7,8 +7,6 @@ namespace UserApiService.Models
     {
         [Required]
         public string? Username { get; set; }
-
-        public string? Lastname { get; set; }
         [Required]
         public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
 

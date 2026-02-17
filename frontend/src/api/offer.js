@@ -55,8 +55,5 @@ export const offerApi = {
     return http.get(
       `/Bff/search/booking-offer/${id}/${lang}?${params.toString()}`
     );
-  },
-
-
-   getPopularOffers: (period, limit, lang) => http.get(`/Bff/statistic/top/${period}/get/offer/${limit}/${lang}`), 
+  }
 }

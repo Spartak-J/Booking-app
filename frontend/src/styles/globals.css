@@ -273,7 +273,7 @@ body {
    width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 2px solid var(--color-btn-arrow-border);
+  border: 2px solid var(--color-btn-arrow);
   box-sizing: content-box;
   background-color: transparent;
 
@@ -284,7 +284,7 @@ body {
   cursor: pointer;
 }
 .btn_arrow:hover{
-    background-color: var(--color-btn-arrow-hover);
+    background-color: var(--color-btn-arrow);
 }
 .btn_arrow_left_light{
   background-image: url('data:image/svg+xml,<svg width="30" height="15" viewBox="0 0 30 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.06934 14.0002C9.06934 14.0002 1.00037 10.6644 1.00037 7.7455C1.00037 4.82662 9.06934 1.00024 9.06934 1.00024" stroke="%230D2D4A" stroke-width="2" stroke-linecap="round"/><line x1="2" y1="7.17261" x2="28.6897" y2="7.17261" stroke="%230D2D4A" stroke-width="2" stroke-linecap="round"/></svg>');
@@ -319,11 +319,6 @@ body {
 .btn-icon_card{
   border-radius: 50%;
 }
-
-.icon_param_filter {
-  color: var(--color--icon-filter-btn); 
-}
-
 /*===================================================
                     btn__search
 ====================================================*/

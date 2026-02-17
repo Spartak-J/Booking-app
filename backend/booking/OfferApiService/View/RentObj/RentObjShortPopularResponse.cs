@@ -22,7 +22,6 @@ namespace OfferApiService.View.RentObj
             return  new RentObjShortPopularResponse
             {
                     id = model.id,
-                    CityId = model.CityId,
                     MainImageUrl = firstImage != null
                         ? $"{baseUrl}/images/rentobj/{model.id}/{Path.GetFileName(firstImage.Url)}"
                         : null,

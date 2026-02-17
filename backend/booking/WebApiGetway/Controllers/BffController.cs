@@ -1,15 +1,14 @@
 ﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using WebApiGetway.Models.Enum;
 using WebApiGetway.Service.Interfase;
 using WebApiGetway.View;
+using Microsoft.Extensions.Caching.Memory;
+using System.Net.WebSockets;
+using WebApiGetway.Models.Enum;
 
 namespace WebApiGetway.Controllers
 {
@@ -608,25 +607,25 @@ namespace WebApiGetway.Controllers
             {
                 EntityId = offerId,
                 Lang = targetLang,
-
+                Title = await TranslateAsync(
+                    sourceTranslation.Title, sourceLang, targetLang),
+                TitleInfo = await TranslateAsync(
+                    sourceTranslation.TitleInfo, sourceLang, targetLang),
+                Description = await TranslateAsync(
+                    sourceTranslation.Description, sourceLang, targetLang)
             };
-
-            translatedTranslation.Title = await Translator.TranslateAsync(Offer.Title, sourceLang, targetLang);
-            translatedTranslation.TitleInfo = await Translator.TranslateAsync(Offer.TitleInfo, sourceLang, targetLang);
-            translatedTranslation.Description = await Translator.TranslateAsync(Offer.Description, sourceLang, targetLang);
-
 
 
             var sourceTranslationResult = await _gateway.ForwardRequestAsync<object>(
                 "TranslationApiService",
-                $"/api/Offer/create-translations/{sourceLang}",
+                $"/api/Offer/create-translations/{lang}",
                 HttpMethod.Post,
                 sourceTranslation
             );
 
             var translatedTranslationResult = await _gateway.ForwardRequestAsync<object>(
               "TranslationApiService",
-              $"/api/Offer/create-translations/{targetLang}",
+              $"/api/Offer/create-translations/{lang}",
               HttpMethod.Post,
               translatedTranslation
           );
@@ -703,32 +702,33 @@ namespace WebApiGetway.Controllers
             {
                 EntityId = offerId,
                 Lang = targetLang,
-                
+                Title = await TranslateAsync(
+                    sourceTranslation.Title, sourceLang, targetLang),
+                TitleInfo = await TranslateAsync(
+                    sourceTranslation.TitleInfo, sourceLang, targetLang),
+                Description = await TranslateAsync(
+                    sourceTranslation.Description, sourceLang, targetLang)
             };
-
-            translatedTranslation.Title = await Translator.TranslateAsync(Offer.Title, sourceLang, targetLang);
-            translatedTranslation.TitleInfo = await Translator.TranslateAsync(Offer.TitleInfo, sourceLang, targetLang);
-            translatedTranslation.Description = await Translator.TranslateAsync(Offer.Description, sourceLang, targetLang);
 
 
             var sourceTranslationResult = await _gateway.ForwardRequestAsync<object>(
                 "TranslationApiService",
-                $"/api/Offer/update-translations/{offerId}/{lang}",
-                HttpMethod.Put,
+                $"/api/Offer/create-translations/{lang}",
+                HttpMethod.Post,
                 sourceTranslation
             );
 
             var translatedTranslationResult = await _gateway.ForwardRequestAsync<object>(
               "TranslationApiService",
-              $"/api/Offer/update-translations/{lang}",
+              $"/api/Offer/create-translations/{lang}",
               HttpMethod.Post,
               translatedTranslation
           );
 
-          var addToOwnerLink = await _gateway.ForwardRequestAsync<object>(
+            var addToOwnerLink = await _gateway.ForwardRequestAsync<object>(
               "UserApiService",
-             $"/api/Offer/update-translations/{offerId}/{lang}",
-              HttpMethod.Put,
+              $"/api/User/owner/offers/add/{offerId}",
+              HttpMethod.Post,
               null
           );
 
@@ -1682,26 +1682,26 @@ namespace WebApiGetway.Controllers
 
                     BffHelper.UpdateListWithTranslations(CitiesDictList, translationsCity);
 
-                    //foreach (var city in CitiesDictList)
-                    //{
+                    foreach (var city in CitiesDictList)
+                    {
 
-                    //    var DistrictsDictList = city["districts"] as List<Dictionary<string, object>>;
+                        var DistrictsDictList = city["districts"] as List<Dictionary<string, object>>;
 
-                    //    var translateDistrictsListResult =
-                    //    await _gateway.ForwardRequestAsync<object>(
-                    //       "TranslationApiService",
-                    //       $"/api/District/get-all-translations/{lang}",
-                    //       HttpMethod.Get,
-                    //       null);
+                        var translateDistrictsListResult =
+                        await _gateway.ForwardRequestAsync<object>(
+                           "TranslationApiService",
+                           $"/api/District/get-all-translations/{lang}",
+                           HttpMethod.Get,
+                           null);
 
-                    //    if (translateDistrictsListResult is not OkObjectResult okTranslateDistrict)
-                    //        return translateDistrictsListResult;
-                    //    var translationsDistrict = BffHelper.ConvertActionResultToDict(okTranslateDistrict);
+                        if (translateDistrictsListResult is not OkObjectResult okTranslateDistrict)
+                            return translateDistrictsListResult;
+                        var translationsDistrict = BffHelper.ConvertActionResultToDict(okTranslateDistrict);
 
 
-                    //    BffHelper.UpdateListWithTranslations(DistrictsDictList, translationsDistrict);
+                        BffHelper.UpdateListWithTranslations(DistrictsDictList, translationsDistrict);
 
-                    //}
+                    }
                 }
             }
 
@@ -1854,72 +1854,26 @@ namespace WebApiGetway.Controllers
         }
 
 
-
-
-        //===============================================================================================================
-        //                          city за id
-        //===============================================================================================================
-
-        [HttpGet("location/get/city/{id}/{lang}")]
-        public async Task<IActionResult> GetPopularTopCity(
-            [FromRoute] string id,
-            [FromRoute] string lang)
-        {
-          
-            var citiesObjResult = await _gateway.ForwardRequestAsync<object>(
-                  "LocationApiService",
-                  $"/api/City/get/{id}",
-                  HttpMethod.Get,
-                  id);
-            if (citiesObjResult is not OkObjectResult okCities)
-                return citiesObjResult;
-
-            var cityDictList = BffHelper.ConvertActionResultToDict(okCities);
-
-
-            var translateListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-translations/{id}/{lang}", HttpMethod.Get, null);
-            var cityTitle = GetStringFromActionResult(translateListResult, "title");
-            var cityDescription = GetStringFromActionResult(translateListResult, "description");
-            var cityHistory = GetStringFromActionResult(translateListResult, "history");
-
-            if (translateListResult is not OkObjectResult okTranslate)
-                return translateListResult;
-            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
-
-
-            BffHelper.UpdateListWithTranslations(cityDictList, translations);
-
-            return Ok(cityDictList);
-        }
-
-
         //===============================================================================================================
         //                         Топ city за период (week / month / year)
         //===============================================================================================================
 
-        [HttpGet("statistic/top/{period}/get/city/{limit}/{lang}")]
+        [HttpGet("statistic/top/{period}/get/city/{lang}")]
         public async Task<IActionResult> GetPopularTopCity(
-               [FromRoute] string period,
-            [FromRoute] int limit,
-            [FromRoute] string lang)
+            StatisticPeriod period,
+            string lang)
         {
-            var statisticPeriod = period.ToLower() switch
-            {
-                "week" => StatisticPeriod.Week,
-                "month" => StatisticPeriod.Month,
-                "year" => StatisticPeriod.Year,
-                _ => throw new ArgumentOutOfRangeException(nameof(period))
-            };
-            const int entityTypeId = 2; // city
-            //const int limit = 10;
+            const int entityTypeId = 2; // City
+            const int limit = 10;
 
-            var statisticUrl = statisticPeriod switch
+            var statisticUrl = period switch
             {
                 StatisticPeriod.Week => "/api/EntityStatistic/top-week",
                 StatisticPeriod.Month => "/api/EntityStatistic/top-month",
                 StatisticPeriod.Year => "/api/EntityStatistic/top-year",
                 _ => throw new ArgumentOutOfRangeException()
             };
+
             var url =
                 $"{statisticUrl}" +
                 $"?entityType={entityTypeId}" +
@@ -1931,6 +1885,7 @@ namespace WebApiGetway.Controllers
                     url,
                     HttpMethod.Get,
                     null);
+
             if (statisticResult is not OkObjectResult okStatistic)
                 return statisticResult;
             var statisticObjDictList = BffHelper.ConvertActionResultToDict(okStatistic);
@@ -1938,13 +1893,13 @@ namespace WebApiGetway.Controllers
             var idList = new List<int>();
             foreach (var statsOffer in statisticObjDictList)
             {
-                var id = int.Parse(statsOffer["entityId"].ToString());
+                var id = int.Parse(statsOffer["id"].ToString());
                 idList.Add(id);
             }
           
             var citiesObjResult = await _gateway.ForwardRequestAsync<object>(
                   "LocationApiService",
-                  $"/api/City/search/cities/populars",
+                  $"/api/city/search/cities/populars",
                   HttpMethod.Post,
                   idList);
             if (citiesObjResult is not OkObjectResult okCities)
@@ -1974,29 +1929,22 @@ namespace WebApiGetway.Controllers
         //                         Топ offer за период (week / month / year)
         //===============================================================================================================
 
-        [HttpGet("statistic/top/{period}/get/offer/{limit}/{lang}")]
+        [HttpGet("statistic/top/{period}/get/offer/{lang}")]
         public async Task<IActionResult> GetPopularTopOffer(
-            [FromRoute] string period,
-            [FromRoute] int limit,
-            [FromRoute] string lang)
+            StatisticPeriod period,
+            string lang)
         {
-            var statisticPeriod = period.ToLower() switch
-            {
-                "week" => StatisticPeriod.Week,
-                "month" => StatisticPeriod.Month,
-                "year" => StatisticPeriod.Year,
-                _ => throw new ArgumentOutOfRangeException(nameof(period))
-            };
             const int entityTypeId = 3; // Offer
-            //const int limit = 10;
+            const int limit = 10;
 
-            var statisticUrl = statisticPeriod switch
+            var statisticUrl = period switch
             {
                 StatisticPeriod.Week => "/api/EntityStatistic/top-week",
                 StatisticPeriod.Month => "/api/EntityStatistic/top-month",
                 StatisticPeriod.Year => "/api/EntityStatistic/top-year",
                 _ => throw new ArgumentOutOfRangeException()
             };
+
             var url =
                 $"{statisticUrl}" +
                 $"?entityType={entityTypeId}" +
@@ -2017,7 +1965,7 @@ namespace WebApiGetway.Controllers
             var idList = new List<int>();
             foreach (var statsOffer in statisticObjDictList)
             {
-                var id  =int.Parse(statsOffer["entityId"].ToString());
+                var id  =int.Parse(statsOffer["EntityId"].ToString());
                 idList.Add(id);
             }
             //получаем данные
@@ -2031,7 +1979,7 @@ namespace WebApiGetway.Controllers
 
             var statisticOfferDictList = BffHelper.ConvertActionResultToDict(okOffer);
 
-        
+            // Получаем список переводов для title
             var translateListResult =
                 await _gateway.ForwardRequestAsync<object>(
                     "TranslationApiService",
@@ -2045,77 +1993,23 @@ namespace WebApiGetway.Controllers
 
             BffHelper.UpdateListWithTranslations(statisticOfferDictList, translations);
 
-            var translateCityResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-all-translations/{lang}", HttpMethod.Get, null);
-            if (translateCityResult is not OkObjectResult okTranslateCity)
-                return Ok(statisticOfferDictList);
 
-            var translationsCity = BffHelper.ConvertActionResultToDict(okTranslateCity);
+            //заменяем название города
+            foreach (var offer in statisticOfferDictList)
+            {
+                var rentObj = (offer["rentObj"] as List<Dictionary<string, object>>)[0];
 
-            BffHelper. UpdateCityTitlesInOffers(statisticOfferDictList, translationsCity);
+                var cityId = rentObj["cityId"];
 
-            //foreach (var offer in statisticOfferDictList)
-            //{
-            //    var offerRentList = offer["rentObj"] as List<Dictionary<string, object>>;
-            //    if (offerRentList == null || offerRentList.Count == 0)
-            //        continue;
+                var translateCity = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-translations/{cityId}/{lang}", HttpMethod.Get, null);
+                var cityTitle = GetStringFromActionResult(translateCity, "title");
 
-            //    var offerRentObj = offerRentList[0];
-            //    var 
-
-                //if (!offerRentObj.TryGetValue("cityId", out var cityIdRaw))
-                //    continue;
-
-                //var offerCityId = -1;
-                //if (cityIdRaw is JsonElement json)
-                //{
-                //    var str = json.GetString();
-                //    offerCityId = Convert.ToInt32(str);
-                //}
-
-                //foreach(var city in translationsCity)
-                //{
-                //    var transRentList = offer["rentObj"] as List<Dictionary<string, object>>;
-                //    if (transRentList == null || transRentList.Count == 0)
-                //        continue;
-
-                //    var transRentObj = transRentList[0];
-
-                //    if (!transRentObj.TryGetValue("entityId", out var entityIdRaw))
-                //        continue;
-
-                //    var entityId = Convert.ToInt32(entityIdRaw);
-                //    if(offerCityId == entityId)
-                //    {
-                //        offerRentObj["cityTitle"] = transRentObj["title"];
-                //        break;
-                //    }
-                //}
-           // }
-
-
-            //foreach (var offer in statisticOfferDictList)
-            //{
-            //    var rentList = offer["rentObj"] as List<Dictionary<string, object>>;
-            //    if (rentList == null || rentList.Count == 0)
-            //        continue;
-
-            //    var rentObj = rentList[0];
-
-            //    if (!rentObj.TryGetValue("cityId", out var cityIdRaw))
-            //        continue;
-
-            //    var cityId = Convert.ToInt32(cityIdRaw);
-
-            //    if (cityTranslationDict.TryGetValue(cityId, out var cityTitle))
-            //    {
-            //        offer["cityTitle"] = cityTitle;
-            //    }
-            //}
-
+                offer["cityTitle"] = cityTitle;
+            }
             //получаем рейтинг
             var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Post, idList);
             if (ratingObjResult is not OkObjectResult okRating)
-                return Ok(statisticOfferDictList);
+                return ratingObjResult;
             var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
 
             BffHelper.UpdateOfferListWithRating(statisticOfferDictList, ratingDictList);
@@ -2134,66 +2028,53 @@ namespace WebApiGetway.Controllers
         //--------------------------перевод текста-------------------------------------
 
 
-        private class LibreTranslateResponse
+        private async Task<string> TranslateAsync(string text, string fromLang, string toLang)
         {
-            public string TranslatedText { get; set; }
-        }
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
 
-
-        public class TranslateApiResponse
-        {
-            [JsonPropertyName("translated_text")]
-            public string translatedText { get; set; }
-        }
-
-        public class Translator
-        {
-            private static readonly string ApiUrl = "https://api.translateapi.ai/api/v1/translate/";
-            private static readonly string ApiKey = "ta_2e6e006e57caa4c8d35f7f813f813b84f1e020b7029a2b8daef06cdf"; // твой ключ
-
-            public static async Task<string> TranslateAsync(string text, string fromLang, string toLang)
+            try
             {
-                if (string.IsNullOrWhiteSpace(text))
-                    return text;
+                using var httpClient = new HttpClient();
 
-                try
+                // Укажи свой ключ DeepL API
+                var apiKey = "YOUR_DEEPL_API_KEY";
+
+                // Формируем POST запрос в формате x-www-form-urlencoded
+                var content = new FormUrlEncodedContent(new[]
                 {
-                    using var httpClient = new HttpClient();
-                    httpClient.DefaultRequestHeaders.Authorization = 
-                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ApiKey);
+            new KeyValuePair<string, string>("text", text),
+            new KeyValuePair<string, string>("source_lang", fromLang.ToUpper()), // EN, UK
+            new KeyValuePair<string, string>("target_lang", toLang.ToUpper())    // EN, UK
+        });
 
-                    var payload = new
-                    {
-                        text = text,
-                        source_language = fromLang.ToLower(), 
-                        target_language = toLang.ToLower()   
-                    };
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api-free.deepl.com/v2/translate");
+                request.Headers.Add("Authorization", $"DeepL-Auth-Key {apiKey}");
+                request.Content = content;
 
-                    var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                    var content = JsonContent.Create(payload, options: options);
+                var response = await httpClient.SendAsync(request);
 
-                    var response = await httpClient.PostAsync(ApiUrl, content);
-                    var raw = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("TranslateAPI.ai raw response:");
-                    Console.WriteLine(raw);
-
-                    if (!response.IsSuccessStatusCode)
-                        return text;
-
-                    var result = JsonSerializer.Deserialize<TranslateApiResponse>(raw);
-                    return result?.translatedText ?? text;
-                }
-                catch (Exception ex)
+                if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Translate error: {ex.Message}");
-                    return text;
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Ошибка DeepL: {response.StatusCode}");
+                    Console.WriteLine($"Тело ответа: {errorBody}");
+                    return text; // fallback на исходный текст
                 }
+
+                // DeepL возвращает JSON вида { "translations":[{"detected_source_language":"EN","text":"..."}] }
+                var resultJson = await response.Content.ReadFromJsonAsync<DeepLTranslateResponse>();
+
+                return resultJson?.Translations?.FirstOrDefault()?.Text ?? text;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Исключение при переводе: {ex.Message}");
+                return text; 
             }
         }
 
-   
-
+    
         public class DeepLTranslateResponse
         {
             public List<DeepLTranslationItem> Translations { get; set; }

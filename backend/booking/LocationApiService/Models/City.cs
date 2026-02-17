@@ -20,11 +20,7 @@ namespace LocationApiService.Models
 
         public bool? IsTop { get; set; }
 
-        public string? Slug { get; set; }
-        public string? ImageUrl_Main { get; set; }
-        public string? ImageUrl_1 { get; set; }
-        public string? ImageUrl_2 { get; set; }
-        public string? ImageUrl_3 { get; set; }
+        public string? ImageUrl { get; set; }
         public ICollection<District> Districts { get; set; } = new List<District>();
 
     }

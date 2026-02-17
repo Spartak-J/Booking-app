@@ -2,8 +2,6 @@ import React from "react";
 import { useRef } from "react";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { Logo_Oselya_128 } from "../Logo/Logo_Oselya_128.jsx";
 import { Link } from "../UI/Text/Link.jsx"
@@ -16,7 +14,6 @@ import styles from './Info_components.module.css';
 
 export const MoreOffersSection = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const trackRef = useRef(null);
   const { darkMode } = useContext(ThemeContext);
 
@@ -41,14 +38,12 @@ export const MoreOffersSection = () => {
             <MoreOffersSection_card
               title={t("moreOffersSection.right_column.title")}
               text={t("moreOffersSection.right_column.text")}
-               
             />
           </div>
           <div className={styles.moreOffersSection__row_bottom}>
             <MoreOffersSection_card
               title={t("moreOffersSection.left_column.title")}
               text={t("moreOffersSection.left_column.text")}
-               onClick={() => navigate("/attraction")}
             />
             <MoreOffersSection_card showText={false}
               className={styles.moreOffersSection_card__container_right}

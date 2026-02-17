@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 
 import { Logo_Oselya_128 } from "../Logo/Logo_Oselya_128.jsx";
 import { Text } from "../UI/Text/Text.jsx"
@@ -11,7 +10,6 @@ import styles from './Info_components.module.css';
 
 export const TwoColumnInfoSection = () => {
   const { t } = useTranslation();
-const navigate = useNavigate();
 
   return (
     <div className={styles.infoSection}>
@@ -55,10 +53,7 @@ const navigate = useNavigate();
                 <Text text={t("infoSection.right_column.text")} type="m_400_s_20" />
               </div>
               <div className={styles.infoSection__btn}>
-                <ActionButton__Primary 
-                text={t("infoSection.left_column.btn")}
-                 className="btn-br-r-10 btn-w-full btn-h-full "
-                 />
+                <ActionButton__Primary text={t("infoSection.left_column.btn")} className="btn-br-r-10 btn-w-full btn-h-full " />
               </div>
             </div>
           </div>
