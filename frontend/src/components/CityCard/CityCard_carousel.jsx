@@ -146,23 +146,26 @@ export const CityCard_carousel = () => {
             gap: `${GAP}px`,
           }}
         >
-          {extendedList.map((city, i) => {
-            const cityPath = `/city/${city.id}-${city.slug.toLowerCase()}`;
-
-            return (
-              <Link
-                key={`${city.id}-${i}`}
-                to={cityPath}
-                className={styles.cardLink}
-                style={{ width: CARD_WIDTH, flexShrink: 0 }}
-              >
-                <CityCard__Popular
-                  imageSrc={city.imageUrl_Main}
-                  title={city.title}
-                />
-              </Link>
-            );
-          })}
+          {extendedList.length > 0 ? (
+            extendedList.map((city, i) => {
+              const cityPath = `/city/${city.id}-${city.slug.toLowerCase()}`;
+              return (
+                <Link
+                  key={`${city.id}-${i}`}
+                  to={cityPath}
+                  className={styles.cardLink}
+                  style={{ width: CARD_WIDTH, flexShrink: 0 }}
+                >
+                  <CityCard__Popular
+                    imageSrc={city.imageUrl_Main} 
+                    title={city.title}
+                  />
+                </Link>
+              );
+            })
+          ) : (
+            <div>Данные о городах недоступны</div>
+          )}
 
         </div>
       </div>

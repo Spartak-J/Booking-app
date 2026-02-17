@@ -1,5 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useLanguage } from "../../contexts/LanguageContext.jsx";
+import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
@@ -22,7 +23,7 @@ const handleSearchResults = (results) => {
 export const RegisterModal = ({ setIsModalOpen }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { register } = useContext(AuthContext);
+    const { register,googleAuth } = useContext(AuthContext);
     const { locationApi } = useContext(ApiContext);
     const { language } = useLanguage();
     const contentRef = useRef(null);
@@ -213,6 +214,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
     return (
         <div className={styles.registerPage}>
             <IconButtonClose
+            size="30"
                 className={`closeBtn ${hasScroll ? "withScroll" : ""
                     }`}
                 onClick={() => setIsModalOpen(false)}
@@ -232,9 +234,31 @@ export const RegisterModal = ({ setIsModalOpen }) => {
 
                 <form className={`${styles.registerPage__form} gap-30 mt-10`} onSubmit={handleSubmit}>
                     {/* google */}
-                    <span className={`${styles.googleButton__wrapper} flex-center mt-10 mb-50`}>
-                        < GoogleButton text={t("Auth.register.google")} className="btn-w-1165 btn-h-100 btn-br-r-15" />
+                  <span className={`${styles.googleButton__wrapper} flex-center btn-w-full mt-10 mb-50`}>
+                        <GoogleLogin
+                            theme="outline"          // outline | filled_blue | filled_black
+                            size="large"             // small | medium | large
+                            text="signin_with"       // signin_with | signup_with | continue_with | signin
+                            shape="circle"      // rectangular | pill | circle | square
+                            logo_alignment="left"    // left | center
+                             width="1200"
+
+                            onSuccess={async (credentialResponse) => {
+                                console.log("Google login");
+                                const rez = credentialResponse.credential
+                                console.log(rez);
+                                const result = await googleAuth(credentialResponse.credential);
+
+                                if (result.success) {
+                                    setIsModalOpen(false);
+                                } else {
+                                    alert(result.message);
+                                }
+                            }}
+                            onError={() => console.log("Login Failed")}
+                        />
                     </span>
+
 
                     <div className={`${styles.line_wrapper} gap-12`}>
                         <div className={`${styles.line} ${styles.left} `}>

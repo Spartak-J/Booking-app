@@ -20,7 +20,7 @@ import {AttractionPageDetail} from "./pages/public/AttractionPageDetail.jsx";
 import {ProfilePage} from './pages/user/ProfilePage';
 
 import {HostDashboard} from './pages/host/HostDashboard';
-
+import {AdminDashboard} from "./pages/Admin/AdminDashboard.jsx";
 
 // // Админ-панель
 // import AdminDashboard from './pages/admin/AdminDashboard';
@@ -61,8 +61,8 @@ function App() {
             <Route path="/host/bookings" element={<HostBookings />} /> */}
 
             {/* Admin */}
-            {/* <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<UsersAdmin />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            {/* <Route path="/admin/users" element={<UsersAdmin />} />
             <Route path="/admin/hotels" element={<HotelsAdmin />} />
             <Route path="/admin/bookings" element={<BookingsAdmin />} /> */}
 

@@ -1,4 +1,5 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../../contexts/AuthContext.jsx";
@@ -13,11 +14,11 @@ import "../../styles/globals.css";
 import styles from "./LoginModal.module.css";
 
 export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
-    const { login } = useContext(AuthContext);
+    const { login, googleAuth } = useContext(AuthContext);
     const navigate = useNavigate();
     const { t } = useTranslation();
     const contentRef = useRef(null);
-        const [hasScroll, setHasScroll] = useState(false);
+    const [hasScroll, setHasScroll] = useState(false);
 
     const [formData, setFormData] = useState({ login: "", password: "" });
     const [displayPassword, setDisplayPassword] = useState("");
@@ -87,6 +88,8 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
     };
 
 
+
+
     return (
         <div className={styles.loginPage}>
             <IconButtonClose
@@ -94,7 +97,7 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
                     }`}
                 onClick={() => setIsModalOpen(false)}
             />
-              <div
+            <div
                 ref={contentRef}
                 className={`${styles.loginPage__content} p-25`}>
                 <span className={`${styles.loginPage__title_wrapper} mb-30`}>
@@ -136,8 +139,29 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
                         </div>
                     </div>
 
-                    <span className={`${styles.googleButton__wrapper} flex-center mt-10 mb-50`}>
-                        <GoogleButton text={t("Auth.login.google")} className=" btn-h-100 btn-w-full btn-br-r-15" />
+                    <span className={`${styles.googleButton__wrapper} flex-center btn-w-full mt-10 mb-50`}>
+                        <GoogleLogin
+                            theme="outline"          // outline | filled_blue | filled_black
+                            size="large"             // small | medium | large
+                            text="signin_with"       // signin_with | signup_with | continue_with | signin
+                            shape="circle"      // rectangular | pill | circle | square
+                            logo_alignment="left"    // left | center
+                             width="900"
+
+                            onSuccess={async (credentialResponse) => {
+                                console.log("Google login");
+                                const rez = credentialResponse.credential
+                                console.log(rez);
+                                const result = await googleAuth(credentialResponse.credential);
+
+                                if (result.success) {
+                                    setIsModalOpen(false);
+                                } else {
+                                    alert(result.message);
+                                }
+                            }}
+                            onError={() => console.log("Login Failed")}
+                        />
                     </span>
 
                     <span className={`${styles.actionButton__wrapper} flex-center mb-30`}>

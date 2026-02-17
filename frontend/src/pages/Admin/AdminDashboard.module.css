@@ -1,0 +1,106 @@
+.adminDashboard {
+    width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+     gap:50px;
+}
+
+.adminDashboard main {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: space-between;
+
+    width: 100%;           
+    /* max-width: 1920px;      */
+    padding: 0 4%;      
+    box-sizing: border-box; 
+    gap:74px;
+}
+.adminDashboard__container{
+width: 100%;
+  position: relative;
+  z-index: 2;
+  gap: 20px;
+  padding:  80px 119px 80px 123px;
+
+}
+
+
+
+.adminDashboard__columns {
+  width: 100%;
+  min-height: 624px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+gap: 18px;
+
+}
+
+.adminDashboard__column_left{
+  flex: 0 0 425x;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  gap: 40px;
+  background-color: var(  --color--menu-bg);
+}
+
+.adminDashboard__column_right{
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+.adminDashboard__column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+}
+.menu_btn{
+    background-color: transparent !important;
+}
+
+.info_card{
+flex: 0 0 68.5%;
+}
+.card_map{
+flex: 1; 
+    min-width: 0; 
+}
+.hotelDetails {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+
+
+
+.modalOverlay {
+  position: fixed;      /* поверх всего контента */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+   backdrop-filter: blur(8px); /* размытие фона позади */
+  -webkit-backdrop-filter: blur(8px); /* для Safari */
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;        /* чтобы быть выше всего */
+}
+
+
