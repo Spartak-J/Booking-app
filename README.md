@@ -23,3 +23,8 @@ React Native mobile application for hotel booking platform.
 - Payment Integration: LiqPay (via backend)
 
 See PAYMENTS.md and SCREEN_UI_STANDARD.md for detailed documentation.
+
+## CI/CD Status
+
+- Last successful build: February 18, 2026
+- All checks passing ✅
