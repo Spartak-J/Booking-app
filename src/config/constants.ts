@@ -18,3 +18,4 @@ export const DEFAULT_LANG =
   ((Constants.expoConfig?.extra as Record<string, unknown>)?.LANG as string) ||
   process.env.EXPO_PUBLIC_LANG ||
   'en';
+// Updated: 18 фев 2026 г. 18:24:43
