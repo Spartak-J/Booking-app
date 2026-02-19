@@ -2,16 +2,6 @@ import React from "react";
 import {Text} from "../Text/Text.jsx"
 import styles from "./Button.module.css";
 
-type ButtonProps = {
-  text: string;
-  text_2?: string;
-  type?: string;
-  type_2?: string;
-  onClick?: () => void;
-  disabled?: boolean;
-  className?: string;
-};
-
 export const AnimatedButton = ({
   text,
   text_2,
@@ -20,7 +10,7 @@ export const AnimatedButton = ({
   onClick,
   disabled,
   className,
-}: ButtonProps) => {
+}) => {
   return (
     <div className={styles.container}>
       <div className={styles.center}>

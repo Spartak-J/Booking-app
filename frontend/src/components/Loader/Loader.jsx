@@ -3,12 +3,7 @@ import { useTranslation } from "react-i18next";
 import {Text} from "../UI/Text/Text.jsx";
 import styles from "./Loader.module.css";
 
-type LoaderProps = {
-    status: "loading" | "success" | "confirm ";
-};
-
-
-export const Loader = ({ status }: LoaderProps) => {
+export const Loader = ({ status }) => {
       const { t } = useTranslation();
     const [showCheck, setShowCheck] = useState(false);
     const [showConfirmImage, setShowConfirmImage] = useState(false);
