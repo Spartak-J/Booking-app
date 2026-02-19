@@ -72,6 +72,7 @@ Thumbs.db
 docs/
 SCREEN_UI_STANDARD.md
 PAYMENTS.md
+
 # -------------------------
 # idea
 # -------------------------
@@ -79,12 +80,12 @@ PAYMENTS.md
 
 
 # -------------------------
-# Owner
-# -------------------------
-src/screens/Owner
-
-
-# -------------------------
 # Firebase / Google
 # -------------------------
-GoogleService-Info.plistios/
+eslint.config.js
+GoogleService-Info.plist
+
+# -------------------------
+# README
+# -------------------------
+README.md
