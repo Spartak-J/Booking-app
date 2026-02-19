@@ -1,0 +1,439 @@
+{
+  "hello": "Hello",
+  "save": "Save",
+  "menu_home": "Home",
+  "Auth": {
+    "register": {
+      "title": "Sign Up",
+      "welcome_new": "Welcome! Let’s create your account first.",
+      "google": "Sign in with Google",
+      "or": "Or",
+      "name": "Your full name",
+      "country": "Country",
+      "email": "Email",
+      "birthDate": "Date of birth",
+      "phone": "Phone number",
+      "owner": "Property owner",
+      "client": "Guest",
+      "password": "Password",
+      "confirm_password": "Confirm password",
+      "registerButton": "Sign Up"
+    },
+    "login": {
+      "title": "Log in to your account",
+      "welcome_back": "Welcome back!",
+      "google": "Sign in with Google",
+      "signUp": "Enter your phone number",
+      "email": "Enter your email",
+      "password": "Password",
+      "loginButton": "Continue",
+      "noAccount": "Don’t have an account?"
+    }
+  },
+  "header": {
+    "subtitle_header_main": "Find your perfect stay with us"
+  },
+  "DateRangeInput": {
+    "date": "Date"
+  },
+  "Search": {
+    "rooms": "Rooms",
+    "city": "City",
+    "guests": "Guests",
+    "hotel_number": "Room number",
+    "adults": "Adults",
+    "children": "Children",
+    "from_0_to_17": "Ages 0–17",
+    "trip_with_animal": "Traveling with pets?",
+    "searh_btn": "Apply",
+    "search_title_modal": "Please specify the number of rooms and guests"
+  },
+  "sort": {
+    "sort_btn": "Filter"
+  },
+  "languageModal": {
+    "currency": "Currency",
+    "language": "Language",
+    "Choose_a_language": "Choose a language",
+    "Ukrainian_hryvnia_UAH": "Ukrainian Hryvnia",
+    "Pound_GBP": "British Pound",
+    "dollar_USA": "US Dollar",
+    "Euro_EUR": "Euro",
+    "Polish_zloty_PLN": "Polish Zloty",
+    "Turkish_lira_TRY": "Turkish Lira"
+  },
+  "hotel": {
+    "popularCities": "Popular cities",
+    "additionalOffers": "Also offers",
+    "popularHotels": "Recommended hotels",
+    "infoLogo": "We bring you a cozy corner across Ukraine",
+    "infoDescriptionLeft": "Oselya is a Ukrainian accommodation booking website. It specializes in providing a choice of hotels, hostels, private houses, apartments, studios, and rooms in Ukraine.",
+    "infoDescriptionRight": "With us, you can not only find a cozy place for yourself, but also share this comfort with others!\n\nSign up on our website to unlock new, convenient features. You can communicate with other hosts in our dedicated chat.\n\nWe cooperate with many reliable partners and plan to expand, ensuring you can rely on us even abroad.",
+    "more": "Learn more about us",
+    "register": "Register",
+    "info_about_owner": "Owner information",
+    "moreThan100Tours": "Over 100 tours in each country",
+    "infoLogoBottom": "Oselya is expanding to stay with you even abroad",
+    "sections": {
+      "overview": "Overview",
+      "prices": "Pricing information",
+      "services": "Amenities & services",
+      "conditions": "Accommodation conditions",
+      "important": "Important information",
+      "reviews": "Reviews"
+    },
+    "guestCount": "adults",
+    "from": "from"
+  },
+  "menu": {
+    "menu_title": "Menu",
+    "light_tema": "Light theme",
+    "dark_tema": "Dark theme",
+    "about_us": "About us",
+    "help": "Help",
+    "Contacts": "Contacts",
+    "Booking": "Booking"
+  },
+  "footer": {
+    "help": {
+      "title": "Help",
+      "terms": "Terms of Use",
+      "privacy": "Privacy",
+      "faq": "FAQ",
+      "cookies": "Cookie settings"
+    },
+    "about": {
+      "title": "About us",
+      "aboutUs": "About us",
+      "userInfo": "User information",
+      "ownerInfo": "Owner information"
+    },
+    "app": {
+      "title": "Our app",
+      "android": "for Android",
+      "ios": "for iOS"
+    },
+    "contacts": {
+      "title": "Contacts"
+    }
+  },
+  "filters": {
+    "filterTitle": "Filter",
+      "filterBtn": "Apply",
+    "accommodation_type": {
+      "title": "Accommodation type",
+      "hotel": "Hotel",
+      "hostel": "Hostel",
+      "studio": "Studio",
+      "apartment": "Apartment",
+      "house": "Private house",
+      "room": "Room"
+    },
+    "price": {
+      "title": "Prices",
+      "from": "from",
+      "to": "to"
+    },
+    "amenities": {
+      "title": "Amenities",
+      "wifi": "Wi-Fi",
+      "air_conditioner": "Air conditioner",
+      "tv": "TV",
+      "workspace": "Workspace",
+      "pets": "Pets allowed",
+      "parking": "Free parking",
+      "washer": "Washing machine",
+      "iron": "Iron",
+      "kettle": "Electric kettle"
+    },
+    "housing_features": {
+      "title": "Housing with",
+      "balcony": "Balcony",
+      "terrace": "Terrace",
+      "kitchen": "Kitchen",
+      "single_bed": "Single bed",
+      "double_bed": "Double bed"
+    },
+    "rating": {
+      "title": "Property rating",
+      "5": "Fairly good 5+",
+      "7": "Good 7+",
+      "8": "Very good 8+",
+      "9": "Excellent 9+"
+    },
+    "distance_center": {
+      "title": "Lviv: Distance from city center",
+      "<1km": "Less than 1 km",
+      "<3km": "Less than 3 km",
+      "<5km": "Less than 5 km"
+    },
+    "booking_rules": {
+      "title": "Booking rules",
+      "free_cancel": "Free cancellation",
+      "pay_now": "Pay now",
+      "pay_before": "Pay to property before arrival",
+      "pay_on_place": "Pay on-site"
+    },
+    "district": {
+      "title": "District",
+      "center": "Lviv city center",
+      "favorite": "Favorite district",
+      "market_square": "Market Square",
+      "svobody_avenue": "Svobody Avenue"
+    }
+  },
+  "SortMenu": {
+    "recommended": "Our recommendations",
+    "distance": "Closer to city center",
+    "priceAsc": "Price (lowest first)",
+    "priceDesc": "Price (highest first)",
+    "ratingAsc": "Rating (ascending)",
+    "ratingDesc": "Rating (descending)"
+  },
+  "bunner": {
+    "room": "Rooms",
+    "hotel": "Hotels",
+    "guestHouse": "Guest houses"
+  },
+  "infoSection": {
+    "title": "We will give you a warm corner across Ukraine",
+    "left_column": {
+      "icon": "Oselya will give you warmth",
+      "text": "Oselya is a Ukrainian property booking website. It specializes in providing a selection of hotels, hostels, private houses, apartments, studios, and rooms in Ukraine.\n\nIt collaborates with many reliable partners and plans to expand to give you reliability even abroad.",
+      "btn": "Learn more about us"
+    },
+    "right_column": {
+      "icon": "Share your warmth with others",
+      "text": "With us, you can not only find a warm place for yourself but also share this comfort with others!\n\nRegister on our website and unlock new convenient features. You will also be able to communicate with other landlords in our dedicated chat.",
+      "btn": "Register"
+    }
+  },
+  "moreOffersSection": {
+    "title": "We also offer",
+    "btn": "Learn more",
+    "left_column": {
+      "title": "Landmarks",
+      "text": "Discover new unforgettable locations! Explore the rich history of Ukraine with us and see the beauty of this country with your own eyes! We will help you choose the closest accommodation to the landmarks."
+    },
+    "right_column": {
+      "title": "Transfer",
+      "text": "We are with you from the start of your journey to the very end. We will help you reach your destination comfortably. Choose the transport that is convenient for you, which will quickly and safely take you anywhere in the country."
+    }
+  },
+  "hotel-recomented": {
+    "title": "Hotel recommendations",
+    "badgeText": "Offers"
+  },
+  "more_tour": {
+    "title": "expands to be with you even abroad",
+    "spain": "Spain",
+    "poland": "Poland",
+    "france": "France",
+    "italy": "Italy",
+    "czech_republic": "Czech Republic",
+    "germany": "Germany",
+    "note": "Over 100 tours in each country"
+  },
+  "hotel_gallery": {
+    "all_photos": "All photos",
+    "no photos": "No photos"
+  },
+  "hotel_description": {
+    "info_about_hotel": "Information about this hotel"
+  },
+  "hotel_params": {
+    "params": "Amenities"
+  },
+  "hotel_info": {
+    "type_apartment": "Room type",
+    "max_guest": "Number of guests",
+    "price": "Price",
+    "apartment": "Room",
+    "tax": "+ taxes and fees",
+    "sale_promotion": "Great start of the year",
+    "expand": "Expand",
+    "booking": "Book",
+    "more_btn": "Learn more",
+    "deskr": "Improved double room with one bed"
+  },
+  "reviews": {
+    "overall_rating": "Reviews",
+    "cleanliness": "Cleanliness",
+    "amenities": "Amenities",
+    "comfort": "Comfort",
+    "location": "Location",
+    "staff": "Staff",
+    "value_for_money": "Value for money",
+    "btn": "Learn more"
+  },
+  "Modal": {
+    "chooseBtn": "Select",
+    "all_photos": "All photos"
+  },
+  "Attraction": {
+    "find_housing": "Find housing"
+  },
+  "Prrofile": {
+    "title": "My profile",
+    "menu_btn_account": "Account management",
+    "menu_btn_my_travels": "My travels",
+    "menu_btn_my_housing": "My housing",
+    "menu_btn_payment_info": "Payment information",
+    "menu_btn_help": "Help",
+    "menu_btn_logout": "Logout",
+    "menu_btn_privacy": "Privacy",
+    "menu_btn_history": "Saved",
+    "menu_btn_message": "Messages",
+    "my_travel": {
+      "active": "Active",
+      "past": "Past",
+      "cancelled": "Cancelled"
+    },
+    "my_history": {
+      "all": "All hotels",
+      "favorites": "Favorites"
+    },
+    "AccountPanel": {
+      "name": "Name",
+      "birthday": "Date of birth",
+      "email": "Email",
+      "phone": "Phone number",
+      "country": "Country/Territory",
+      "select_country": "Select country/territory",
+      "btn_continue": "Continue",
+      "myself_info": "Personal information",
+      "Security_settings": "Security settings"
+    },
+    "PaymentInfoPanel": {
+      "Method_of_payment": "Payment method",
+      "Transactions": "Transactions",
+      "Add_card_for_payment": "Add a card for payment",
+      "Your_card": "Your card",
+      "Add_card": "Add card",
+      "Select_Method_of_payment": "Select payment method",
+      "Number_card": "Card number",
+      "Cw": "CW",
+      "DataTime": "Date",
+      "Save": "Save",
+      "SaveCardInfo": "Save card information"
+    },
+    "HousingPanel": {
+      "menu_btn_my_housing": "My housing",
+      "menu_btn_settings": "Settings",
+      "menu_btn_add_housing": "Add your housing"
+    },
+    "Reservation_management": "Reservation management",
+    "no_active_travel": "You have no active trips",
+    "no_past_travel": "You have no past trips",
+    "no_cancelled_travel": "You have no cancelled trips",
+    "PastHotel": {
+      "title_page": "Completed",
+      "price": "Price",
+      "hotel_description": {
+        "info_about_hotel": "Information about this hotel"
+      },
+      "hotel_params": {
+        "params": "Amenities"
+      },
+      "reviews": {
+        "title": "Reviews",
+        "cleanliness": "Cleanliness",
+        "amenities": "Amenities",
+        "comfort": "Comfort",
+        "location": "Location",
+        "staff": "Staff",
+        "value_for_money": "Value for money",
+        "btn": "Learn more",
+        "btn_add_reviews": "Add review"
+      }
+    }
+  },
+  "Booking": {
+    "booking_title": "Enter your booking details",
+    "guest_data_title": "Guest information",
+    "name_label": "First name",
+    "surname_label": "Last name",
+    "email_label": "Email",
+    "phone_label": "Phone",
+    "country_city_label": "Country/City",
+    "save_data_checkbox": "Save information for future trips",
+    "booking_details_title": "Booking details",
+    "arrival_date_label": "Arrival date",
+    "departure_date_label": "Departure date",
+    "adults_count_label": "Number of adults",
+    "children_count_label": "Number of children",
+    "trip_purpose_title": "Purpose of your trip",
+    "trip_purpose_vacation": "Vacation",
+    "trip_purpose_business": "Business",
+    "wishes_label": "Special requests",
+    "payment_method_title": "Payment method",
+    "payment_visa_mastercard": "Visa/Mastercard",
+    "payment_paypal": "PayPal",
+    "payment_apple_pay": "Apple Pay",
+    "payment_google_pay": "Google Pay",
+    "payment_on_site": "Pay on-site",
+    "submit_button": "Book",
+    "booking_language_notice": "Please enter your details in English or the hotel’s local language",
+    "required_fields_note": "Required fields",
+    "required_email_note": "A booking confirmation will be sent to this email",
+    "required_phone_note": "To confirm the booking and contact you if necessary",
+    "choise_card": "Select card",
+    "data": "Date",
+    "CVV": "CVV",
+    "Price": "Price",
+    "Choise_btn": "Select",
+    "processing": "Processing booking...",
+    "success": "Booking confirmed!",
+    "success_title": "Success!",
+    "success_message": "We have sent the booking confirmation to your email."
+  },
+  "Host": {
+    "propertyForm": {
+      "title": "Enter your details"
+    },
+    "aboutHousing": {
+      "title": "Housing information",
+      "housing": {
+        "name": "Name",
+        "country": "Country",
+        "region": "Region/Province",
+        "city": "City",
+        "district": "District",
+        "Postcode": "Postal code",
+        "address": "Address",
+        "street": "Street",
+        "number": "Number",
+        "description": "Description",
+        "photo": "Property photo*"
+      }
+    },
+    "dataHousing": {
+      "title": "Housing details",
+      "guestCount": "Number of guests",
+      "roomCount": "Number of rooms",
+      "singleBedsCount": "Single bed",
+      "doubleBedsCount": "Double bed",
+      "pricePerDay": "Price/night",
+      "pricePerWeek": "Price/from 3 nights"
+    },
+    "amenities": {
+      "title": "Amenities",
+      "wifi": "Wi-Fi",
+      "ac": "Air conditioner",
+      "workDesk": "Work desk",
+      "tv": "TV",
+      "windowView": "Window view",
+      "bath": "Private bathroom",
+      "": "Toilet paper",
+      "kitchen": "Kitchen / kitchenette",
+      "washingMachine": "Washing machine",
+      "iron": "Iron",
+      "electricKettle": "Electric kettle",
+      "coffeeTea": "Coffee / tea",
+      "petsAllowed": "Pets allowed",
+      "addYourOwn": "Add your own"
+    },
+    "btn_add": "Add room/unit",
+    "btn_save": "Save"
+  }
+}
