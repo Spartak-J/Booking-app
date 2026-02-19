@@ -23,7 +23,7 @@ namespace UserApiService.Models
         public int CountryId { get; set; } = 1;
 
         [Required]
-        public UserRole RoleName { get; set; } = UserRole.Client;
+        public virtual UserRole RoleName { get; set; } = UserRole.Client;
 
         public DateTime? LastLogin { get; set; }
       

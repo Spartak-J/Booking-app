@@ -134,7 +134,11 @@
 
   /*--------------------admin------------------*/
   --color--menu-bg:#EDE9DF;               /* l-tema_1 */
- /*-------------------bunner-text----------------*/
+   --color--right-column-bg:#EDE5D1;               /* l-tema_2 */
+   --color--input-border: #0D2D4A; 
+   
+  --color--white-btn: #F5F3EE;            /* 01 */ 
+   /*-------------------bunner-text----------------*/
 
   /* --color-booling-success-text: #F5F3EE;              
   --color-primary-rgb: 52, 152, 219;

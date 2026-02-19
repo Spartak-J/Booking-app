@@ -118,6 +118,33 @@ namespace WebApiGetway.Controllers
             return list;
         }
 
+
+        public static List<Dictionary<string, object>> UpdateAttractionsListWithTranslations(List<Dictionary<string, object>> list, List<Dictionary<string, object>> translations,
+          string idFieldName = "id",
+          string translationIdFieldName = "entityId")
+        {
+            foreach (var item in list)
+            {
+                if (!item.TryGetValue(idFieldName, out var idObj)) continue;
+                if (!int.TryParse(idObj.ToString(), out int id)) continue;
+
+
+                var translation = translations.FirstOrDefault(t =>
+                    t.TryGetValue(translationIdFieldName, out var eid) &&
+                    int.TryParse(eid.ToString(), out int eidInt) &&
+                    eidInt == id
+                );
+
+                if (translation != null)
+                {
+                    CopyIfExists(item, translation, "title");
+                    CopyIfExists(item, translation, "description");
+                    CopyIfExists(item, translation, "address");
+                }
+            }
+            return list;
+        }
+
         public static List<Dictionary<string, object>> UpdateListWithCityTranslations(List<Dictionary<string, object>> list, List<Dictionary<string, object>> translations,
          string idFieldName = "id",
          string translationIdFieldName = "entityId")

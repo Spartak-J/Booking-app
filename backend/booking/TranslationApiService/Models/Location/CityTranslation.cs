@@ -9,5 +9,6 @@ namespace TranslationApiService.Models.Location
 
         public string? Description { get; set; }
         public string? History { get; set; }
+        public string? Slug { get; set; }
     }
 }

@@ -8,28 +8,10 @@ import { Footer } from "../../components/Footer/Footer.jsx";
 import { IconButton_Search } from "../../components/UI/Button/IconButton_Search.jsx";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { CitySelector } from "../../components/SearchBar/CitySelector.jsx";
+
 
 import styles from "./AttractionPage.module.css";
-
-
-const Attraction = {
-  id: 1,
-  slug: 'opera-theatre',
-  title: 'Театр опери та балету імені Соломії Крушельницької',
-  description: `Львівський оперний театр входить до списку обов’язкового відвідування усіх туристів та гостей міста. Якщо не послухати оперу чи подивитись балет, то точно хоча б оглянути фасад будівлі.
-Це один із найгарніших театрів не тільки Львова, а й всієї Європи. До слова, ця будівля була збудована всього лише за три роки і вже у 1900 році в ній було презентовано першу виставу. Ще більше вражає ця дата, якщо уточнити, що для будівництва театру спеціально змінювали природний хід річки Полтви. Тепер вона тече під львівською бруківкою.
-Окрім візуальної краси у Львівському оперному театрі можна насолоджуватись високоякісними постановками опер, оперет, балетів: чистим звучанням голосів акторів та довершеними й відточеними рухами балерин та балерунів.
-Репертуар театру складають кращі зразки українського та європейського музичного мистецтва: опери «Аїда», «Травіата» Джузеппе Верді, «Кармен» Жоржа Бізе, «Мадам Баттерфляй» Джакомо Пуччіні, «Орфей і Еврідіка» Крістофа Віллібальда Глюка, українська опера «Запорожець за Дунаєм» Семена Гулака – Артемовського; балет «Лебедине озеро» Петра Чайковського, «Жізель» та «Корсар» Адольфа Адана, «Дон Кіхот» Людвіга Мінкуса, «Ромео і Джульєтта» Сергія Прокоф’єва…`,
-  images: [
-    '/img/city/Kyiv.svg',
-    '/img/city/Kyiv.svg',
-    '/img/city/Kyiv.svg',
-    '/img/city/Kyiv.svg',
-    '/img/city/Kyiv.svg',
-  ],
-};
-
-
 
 export const AttractionPage = () => {
   const { paramsCategoryApi } = useContext(ApiContext);
@@ -39,17 +21,42 @@ export const AttractionPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(true);
 
+  const [locationId, setLocationId] = useState(null);
+  const cityId =  null;
+  const cityName = "";
+  const [location, setLocation] = useState(cityName);
+  const [slug, setSlug] = useState("");
+
   const lat = 48.8566;
   const lng = 2.3522;
   const { t } = useTranslation();
 
+  useEffect(() => {
+    if (cityId) {
+      setLocationId(cityId);
+      const storedCityName = localStorage.getItem("city");
+      if (storedCityName) setLocation(storedCityName);
+    }
+  }, [cityId]);
 
-   const handleSearchClick = () => {
-    navigate("/attractionByCity"); 
+
+  const setLocationInfo = (cityName, cityId,slug) => {
+    setLocation(cityName);
+    setLocationId(cityId);
+    setSlug(slug);
   };
+
+
+  const handleSearchClick = () => {
+    if (!locationId || !slug) return;
+
+  const cityPath = `/attractionByCity/${locationId}-${slug.toLowerCase()}`;
+  navigate(cityPath);
+  };
+
   return (
     <div className={styles.attraction_page}>
-      <Header_Full titleBtn="city" title={Attraction.title} showFilterBtn={false} openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
+      <Header_Full titleBtn="city" title={t("attraction.title")} showFilterBtn={false} openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
 
       <main className={styles.attraction_page__content}>
         <section className="container-fluid my-5">
@@ -63,30 +70,33 @@ export const AttractionPage = () => {
               >
                 <div className="mb-3">
                   <div className="mb-3">
-                    <div className="input-group" style={{ border: '1px solid #ced4da', borderRadius: '0.375rem', overflow: 'hidden' }}>
-                      <input
-                        type="text"
-                        className="form-control border-0"
-                        placeholder="Місто"
-                        aria-label="Місто"
-                        style={{ boxShadow: 'none' }}
-                      />
-                      <button
-                        className="btn btn-outline-secondary border-0"
+                    <div className={`input-group  ${styles.search_form}`}
+                      style={{ border: '1px solid #ced4da', borderRadius: '0.375rem' }}>
+                      <div
+                        className={`${styles.searchBar__wrapper} btn-br-r-10 btn-h-35  flex-center`}
+                      >
+                        <div className={`form-control border-0`}>
+
+
+                          <CitySelector
+                            value={location}
+                            onChange={setLocationInfo}
+                            placeholder={t("Search.city")}
+                          />
+                        </div>
+                      </div>
+
+                      <div
+                        className={`  ${styles.search_btn}`}
                         type="button"
                         aria-label="search"
-                        style={{
-                          pointerEvents: 'auto',
-                          backgroundColor: 'transparent',
-                          boxShadow: 'none',
-                          borderLeft: '1px solid #ced4da',
-                        }}
-                          onClick={handleSearchClick}
+                        
+                        onClick={handleSearchClick}
                         onMouseEnter={e => e.currentTarget.style.backgroundColor = 'transparent'}  // отключаем hover
                         onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         <IconButton_Search icon_name="search" />
-                      </button>
+                      </div>
                     </div>
                   </div>
 

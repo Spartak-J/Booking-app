@@ -35,31 +35,66 @@ const Attraction = {
 
 
 export const AttractionPageDetail = () => {
-  const { paramsCategoryApi } = useContext(ApiContext);
+  const { attractionApi } = useContext(ApiContext);
   const { language } = useLanguage();
   const navigate = useNavigate();
   const [openCityFilterMenu, setOpenCityFilterMenu] = useState(false);
+  const [attraction, setAttraction] = useState({});
+  const [imagesList, setImagesList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [isModalOpen, setIsModalOpen] = useState(true);
-
+  const { attractionSlug } = useParams();
+  
+  const [attractionId, slug] = attractionSlug.split('-');
+  
   const lat = 48.8566;
   const lng = 2.3522;
-const { t } = useTranslation();
+  const { t } = useTranslation();
+
+
+  useEffect(() => {
+    if (!attractionId) return;
+
+    setLoading(true);
+
+    attractionApi.getById(attractionId, language)
+      .then((res) => {
+        console.log("attractions" );
+        console.log(res.data );
+       setAttraction(res.data[0]);
+       setImagesList([
+      res.data[0].imageUrl_Main,
+      res.data[0].imageUrl_1,
+      res.data[0].imageUrl_2,
+      res.data[0].imageUrl_3,
+    ].filter(Boolean));
+    console.log( res.data[0].imageUrl_Main);
+      })
+      .catch((err) => {
+        console.error("Error loading attractions:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+  }, [attractionId, language]);
+
 
   return (
     <div className={styles.cityPage}>
-      <Header_Full titleBtn="city" title ={Attraction.title} showFilterBtn={false} openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
+      <Header_Full titleBtn="city" title ={attraction.title} showFilterBtn={false} openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
 
       <main className={styles.hotel_page__content}>
-        <AttractionGallery images={Attraction.images} />
+       {imagesList.length > 0 && <AttractionGallery images={imagesList} />}
+
         <div className={styles.description_container}>
           <div className={styles.text_column}>
-            <p>{Attraction.description}</p>
+            <p>{attraction.description}</p>
           </div>
           <div className={styles.map_column}>
             <div className={`${styles.card_map} flex-left btn-w-full`} >
               {lat && lng ? (
-                <HotelMap lat={lat} lng={lng} minHeight="280"/>
+                <HotelMap lat={attraction.latitude} lng={attraction.longitude} minHeight="280"/>
               ) : (
                 <div className={styles.mapPlaceholder}>Координаты отсутствуют</div>
               )}

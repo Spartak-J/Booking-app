@@ -15,6 +15,8 @@ namespace AttractionApiService.Controllers
     {
         private readonly string _baseUrl;
         private readonly GeocodingService _geocodingService;
+
+        private IAttractionService _attractionService;
         public AttractionController(
                   IAttractionService attractionService, 
                   IRabbitMqService mqService,
@@ -24,8 +26,12 @@ namespace AttractionApiService.Controllers
         {
             _baseUrl = configuration["AppSettings:BaseUrl"];
             _geocodingService = geocodingService;
+            _attractionService = attractionService;
         }
 
+        //==================================================================================================================
+         //                        
+        //==================================================================================================================
 
         [HttpPost]
         public override async Task<ActionResult<AttractionResponse>> Create(AttractionRequest request)
@@ -52,7 +58,39 @@ namespace AttractionApiService.Controllers
             return Ok(MapToResponse(model));
         }
 
+        //==================================================================================================================
+        //                         получать все достопримечательности города
+        //==================================================================================================================
 
+
+        [HttpGet("get/byCityId/{cityId}")]
+        public async Task<ActionResult<List<AttractionShortResponse>>> GetAttractionByCityId(
+            [FromRoute] int cityId)
+        {
+            var attractions = await _attractionService.GetAttractionByCityId(cityId);
+            var result = attractions.Select(o => AttractionShortResponse.MapToResponse(o, _baseUrl)).ToList();
+
+            return Ok(result);
+        }
+
+        //==================================================================================================================
+        //                         получать  достопримечательности по id
+        //==================================================================================================================
+
+
+
+        [HttpGet("get/byId/{id}")]
+        public async Task<ActionResult<List<AttractionResponse>>> GetAttractionById(
+           [FromRoute] int id)
+        {
+            var attractions = await _attractionService.GetAttractionById(id);
+            var result = attractions.Select(o => AttractionResponse.MapToResponse(o, _baseUrl)).ToList();
+            return Ok(result);
+        }
+
+        //==================================================================================================================
+        //                       
+        //==================================================================================================================
 
 
         [HttpPut("update/{id}")]

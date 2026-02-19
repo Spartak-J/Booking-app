@@ -46,8 +46,8 @@ function App() {
             <Route path="/profile/trips/past/:tripId" element={<Profile_PastHotelPage />} />
             <Route path="/city/:citySlug" element={<CityPage />} />
             <Route path="/attraction" element={<AttractionPage />} />
-            <Route path="/attractionByCity" element={<AttractionCarouselPage />} />
-            <Route path="/attractionDetail" element={<AttractionPageDetail />} />
+            <Route path="/attractionByCity/:citySlug" element={<AttractionCarouselPage />} />
+            <Route path="/attractionDetail/:attractionSlug" element={<AttractionPageDetail />} />
 
              <Route path="/booking/:offerId" element={<BookingDetailsPage />} />
             {/* <Route path="/favorites" element={<FavoritesPage />} />

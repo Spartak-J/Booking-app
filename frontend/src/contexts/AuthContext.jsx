@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       setToken(jwt);
       setUser(userData);
 
-      return { success: true };
+      return { success: true,  response };
     } catch (error) {
       return { success: false, message: 'Неверные данные' };
     }

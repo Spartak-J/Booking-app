@@ -116,8 +116,53 @@ namespace WebApiGetway.Controllers
 
             return Ok(paramDictList);
         }
-        
-        
+
+
+        //=====================================================================================
+        //      получаем список всех обьявлений ( для админа)
+        //=====================================================================================
+
+        [HttpGet("search/offers/all/{lang}")]
+        public async Task<IActionResult> GetAllOffers(
+            string lang)
+        {
+          
+
+            var offerObjResult = await _gateway.ForwardRequestAsync<object>(
+                "OfferApiService",
+                $"/api/offer/search/all",
+                HttpMethod.Get,
+                null);
+
+            if (offerObjResult is not OkObjectResult okOffer)
+                return offerObjResult;
+
+            var offerDictList = BffHelper.ConvertActionResultToDict(okOffer);
+           
+
+            var offerTranslations = await GetTranslationsAsync(lang, "Offer");
+            var updateOfferDictList = BffHelper.UpdateListWithTranslations(offerDictList, offerTranslations);
+
+            var idList = new List<int>();
+            foreach (var offer in offerDictList)
+            {
+                if (!TryGetOfferId(offer, out var offerId))
+                    continue;
+                var id = int.Parse(offer["id"].ToString());
+                idList.Add(id);
+            }
+                //получаем рейтинг
+                var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Get, idList);
+            if (ratingObjResult is not OkObjectResult okRating)
+                return Ok(updateOfferDictList);
+            var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
+
+            BffHelper.UpdateOfferListWithRating(updateOfferDictList, ratingDictList);
+            return Ok(updateOfferDictList);
+        }
+
+
+
         //=====================================================================================
         //      получаем список обьявлений по запросу(город, даты и параметры(если они есть))
         //=====================================================================================
@@ -2124,6 +2169,94 @@ namespace WebApiGetway.Controllers
         }
 
 
+
+
+
+        //===============================================================================================================
+        //                       получать все достопримечательности города
+        //===============================================================================================================
+
+        [HttpGet("attractions/get/byCityId/{cityId}/{lang}")]
+        public async Task<IActionResult> GetAttractionByCityId(
+            [FromRoute] int cityId,
+            [FromRoute] string lang)
+        {
+
+            var attractionsObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "AttractionApiService",
+                  $"/api/attraction/get/byCityId/{cityId}",
+                  HttpMethod.Get,
+                  cityId);
+            if (attractionsObjResult is not OkObjectResult okAttractions)
+                return attractionsObjResult;
+
+            var attractionsDictList = BffHelper.ConvertActionResultToDict(okAttractions);
+
+
+            var translateListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Attraction/get-all-translations/{lang}", HttpMethod.Get, null);
+        
+            if (translateListResult is not OkObjectResult okTranslate)
+                return translateListResult;
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+
+
+            BffHelper.UpdateAttractionsListWithTranslations(attractionsDictList, translations);
+
+            //var translateCityListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-all-translations/{lang}", HttpMethod.Get, null);
+
+            //if (translateCityListResult is not OkObjectResult okCityTranslate)
+            //    return translateCityListResult;
+            //var translationsCityTitle = BffHelper.ConvertActionResultToDict(okCityTranslate);
+
+
+            //BffHelper.UpdateAttractionsListWithTranslations(attractionsDictList, translations);
+
+            return Ok(attractionsDictList);
+        }
+
+
+
+        //===============================================================================================================
+        //                         получать  достопримечательности по id
+        //===============================================================================================================
+
+        [HttpGet("attractions/get/{id}/{lang}")]
+        public async Task<IActionResult> GetAttractionById(
+            [FromRoute] int id,
+            [FromRoute] string lang)
+        {
+
+            var attractionsObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "AttractionApiService",
+                  $"/api/attraction/get/byId/{id}",
+                  HttpMethod.Get,
+                  id);
+            if (attractionsObjResult is not OkObjectResult okAttractions)
+                return attractionsObjResult;
+
+            var attractionsDictList = BffHelper.ConvertActionResultToDict(okAttractions);
+
+
+            var translateListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Attraction/get-all-translations/{lang}", HttpMethod.Get, null);
+
+            if (translateListResult is not OkObjectResult okTranslate)
+                return translateListResult;
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+
+
+            BffHelper.UpdateAttractionsListWithTranslations(attractionsDictList, translations);
+
+            //var translateCityListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-all-translations/{lang}", HttpMethod.Get, null);
+
+            //if (translateCityListResult is not OkObjectResult okCityTranslate)
+            //    return translateCityListResult;
+            //var translationsCityTitle = BffHelper.ConvertActionResultToDict(okCityTranslate);
+
+
+            //BffHelper.UpdateAttractionsListWithTranslations(attractionsDictList, translations);
+
+            return Ok(attractionsDictList);
+        }
         //===============================================================================================================
 
         //                            Вспомогательные методы

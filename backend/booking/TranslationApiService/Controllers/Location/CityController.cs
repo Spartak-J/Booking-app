@@ -29,6 +29,7 @@ namespace TranslationApiService.Controllers
                    Title = request.Title,
                    Description=request.Description,
                    History=request.History,
+                   Slug = request.Slug,
                    Lang = request.Lang
             };
         
@@ -43,6 +44,7 @@ namespace TranslationApiService.Controllers
                 Description=model.Description,
                 History=model.History,
                 EntityId = model.EntityId,
+                Slug = model.Slug,
                 Lang = model.Lang
               
             };

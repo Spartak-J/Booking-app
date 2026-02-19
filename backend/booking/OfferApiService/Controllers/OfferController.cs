@@ -61,6 +61,22 @@ namespace OfferApiService.Controllers
         //  получение обьявлений по параметрам поиска
         //===========================================================================================
 
+        [HttpGet("search/all")]
+        public async Task<ActionResult<List<OfferShortResponse>>> GetAllOffers()
+        {
+
+            var offers = await _offerService.GetEntitiesAsync();
+
+
+            var result = offers.Select(o => OfferShortResponse.MapToShortResponse(o, _baseUrl)).ToList();
+            
+            return Ok(result);
+        }
+
+        //===========================================================================================
+        //  получение обьявлений по параметрам поиска
+        //===========================================================================================
+
         [HttpGet("search/offers")]
         public async Task<ActionResult<List<OfferShortResponse>>> GetSearchOffers(
             [FromQuery] OfferSearchRequestByCityAndCountGuest request,
