@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { create } from 'zustand';
 
 import { User, Role } from '@/types';
-import { USE_MOCKS } from '@/config/constants';
+import { USE_MOCKS_AUTH } from '@/config/constants';
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   baseRole: null,
   guestMode: false,
   hydrate: async () => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_AUTH) {
       await SecureStore.deleteItemAsync(TOKEN_KEY);
       await SecureStore.deleteItemAsync(USER_KEY);
       await SecureStore.deleteItemAsync(ROLE_KEY);

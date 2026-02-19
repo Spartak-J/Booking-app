@@ -1,7 +1,7 @@
 import apiClient from '@/api/client';
 import { Offer, PropertyType } from '@/types';
 import { ENDPOINTS } from '@/config/endpoints';
-import { USE_MOCKS } from '@/config/constants';
+import { USE_MOCKS_SEARCH } from '@/config/constants';
 import { getApiLang, mapOfferFull, mapOfferShort } from '@/utils/apiAdapters';
 import { getAuthState } from '@/store/authStore';
 import { cityService } from '@/services/cityService';
@@ -32,7 +32,7 @@ export type OfferFilters = {
 
 export const offerService = {
   getAll: async (filters: OfferFilters = {}) => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_SEARCH) {
       let items = [...mockOffers];
       if (filters.cityId) {
         items = items.filter((item) => item.city.id === filters.cityId);
@@ -246,7 +246,7 @@ export const offerService = {
     }
   },
   getById: async (id: string) => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_SEARCH) {
       const offer = mockOffers.find((item) => item.id === id);
       if (!offer) throw new Error('Предложение не найдено');
       return offer;
@@ -273,7 +273,7 @@ export const offerService = {
     }
   },
   create: async (payload: Partial<Offer>): Promise<Offer> => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_SEARCH) {
       const offer: Offer = {
         id: `mock-offer-${Date.now()}`,
         title: payload.title ?? 'Новый объект',
@@ -302,7 +302,7 @@ export const offerService = {
     throw new Error('Создание объявлений через мобильное приложение пока не подключено к API');
   },
   update: async (id: string, payload: Partial<Offer>): Promise<Offer> => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_SEARCH) {
       const index = mockOffers.findIndex((item) => item.id === id);
       const existing = index >= 0 ? mockOffers[index] : undefined;
       if (!existing) throw new Error('Предложение не найдено');
@@ -323,7 +323,7 @@ export const offerService = {
     );
   },
   remove: async (id: string): Promise<void> => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_SEARCH) {
       const index = mockOffers.findIndex((item) => item.id === id);
       if (index >= 0) {
         mockOffers.splice(index, 1);

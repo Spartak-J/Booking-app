@@ -1,5 +1,5 @@
 import apiClient from '@/api/client';
-import { USE_MOCKS } from '@/config/constants';
+import { USE_MOCKS_AUTH } from '@/config/constants';
 import { User } from '@/types';
 import { ENDPOINTS } from '@/config/endpoints';
 import { getApiLang, mapUser } from '@/utils/apiAdapters';
@@ -58,7 +58,7 @@ export type AuthResponse = { token: string; user: User };
 
 export const authService = {
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_AUTH) {
       if (payload.password !== MOCK_PASSWORD) {
         throw new Error('Невірний пароль (mock)');
       }
@@ -104,7 +104,7 @@ export const authService = {
     throw toUserFacingApiError(lastError, 'Неверный логин или пароль.');
   },
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_AUTH) {
       if (payload.password !== MOCK_PASSWORD) {
         throw new Error('Невірний пароль (mock)');
       }
@@ -140,7 +140,7 @@ export const authService = {
     }
   },
   resetPassword: async (email: string) => {
-    if (USE_MOCKS) return Promise.resolve();
+    if (USE_MOCKS_AUTH) return Promise.resolve();
     try {
       await apiClient.post(ENDPOINTS.auth.reset, { email });
     } catch (error) {
@@ -148,9 +148,11 @@ export const authService = {
     }
   },
   googleLogin: async (): Promise<AuthResponse> => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_AUTH) {
       return { token: `mock-token-${mockUser.id}`, user: mockUser };
     }
-    throw new Error('Google Login не реализован для боевого API');
+    throw new Error(
+      'Google Login в текущем backend реализован через web redirect flow. Для mobile нужен отдельный endpoint с idToken.',
+    );
   },
 };

@@ -2,12 +2,12 @@ import apiClient from '@/api/client';
 import { City } from '@/types';
 import { ENDPOINTS } from '@/config/endpoints';
 import { getApiLang } from '@/utils/apiAdapters';
-import { USE_MOCKS } from '@/config/constants';
+import { USE_MOCKS_SEARCH } from '@/config/constants';
 import { mockOffers } from '@/utils/mockData';
 
 export const cityService = {
   getAll: async (): Promise<City[]> => {
-    if (USE_MOCKS) {
+    if (USE_MOCKS_SEARCH) {
       const map = new Map<string, City>();
       mockOffers.forEach((offer) => {
         if (!map.has(offer.city.id)) {
