@@ -57,7 +57,7 @@ export const sizes = {
 export const spacingTokens = spacing;
 export const typographyTokens = typography;
 
-// full theme object 
+// full theme object
 export const theme = {
   palette,
   spacing,

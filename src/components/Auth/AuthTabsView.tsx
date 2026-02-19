@@ -82,7 +82,6 @@ export const AuthTabsView = () => {
     setTab('login');
   };
 
-
   const renderTabButton = (key: AuthTab, label: string) => (
     <Button
       key={key}
@@ -126,30 +125,30 @@ export const AuthTabsView = () => {
                   />
                 )}
               />
-            <Controller
-              control={loginForm.control}
-              name="password"
-              render={({ field: { value, onChange, onBlur } }) => (
-                <View style={styles.passwordRow}>
-                  <Input
-                    label={t('auth.password')}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry={!loginShowPassword}
-                    error={loginForm.formState.errors.password?.message}
-                    inputStyle={{ paddingRight: spacing.xl }}
-                  />
-                  <MaterialCommunityIcons
-                    name={loginShowPassword ? 'eye-off-outline' : 'eye-outline'}
-                    size={20}
-                    color={colors.textPrimary}
-                    style={styles.eyeIcon}
-                    onPress={() => setLoginShowPassword((prev) => !prev)}
-                  />
-                </View>
-              )}
-            />
+              <Controller
+                control={loginForm.control}
+                name="password"
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <View style={styles.passwordRow}>
+                    <Input
+                      label={t('auth.password')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!loginShowPassword}
+                      error={loginForm.formState.errors.password?.message}
+                      inputStyle={{ paddingRight: spacing.xl }}
+                    />
+                    <MaterialCommunityIcons
+                      name={loginShowPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={20}
+                      color={colors.textPrimary}
+                      style={styles.eyeIcon}
+                      onPress={() => setLoginShowPassword((prev) => !prev)}
+                    />
+                  </View>
+                )}
+              />
               <Button
                 title={t('auth.submit.login')}
                 onPress={loginForm.handleSubmit(handleLogin)}
@@ -189,30 +188,30 @@ export const AuthTabsView = () => {
                   />
                 )}
               />
-            <Controller
-              control={registerForm.control}
-              name="password"
-              render={({ field: { value, onChange, onBlur } }) => (
-                <View style={styles.passwordRow}>
-                  <Input
-                    label={t('auth.password')}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry={!registerShowPassword}
-                    error={registerForm.formState.errors.password?.message}
-                    inputStyle={{ paddingRight: spacing.xl }}
-                  />
-                  <MaterialCommunityIcons
-                    name={registerShowPassword ? 'eye-off-outline' : 'eye-outline'}
-                    size={20}
-                    color={colors.textPrimary}
-                    style={styles.eyeIcon}
-                    onPress={() => setRegisterShowPassword((prev) => !prev)}
-                  />
-                </View>
-              )}
-            />
+              <Controller
+                control={registerForm.control}
+                name="password"
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <View style={styles.passwordRow}>
+                    <Input
+                      label={t('auth.password')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!registerShowPassword}
+                      error={registerForm.formState.errors.password?.message}
+                      inputStyle={{ paddingRight: spacing.xl }}
+                    />
+                    <MaterialCommunityIcons
+                      name={registerShowPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={20}
+                      color={colors.textPrimary}
+                      style={styles.eyeIcon}
+                      onPress={() => setRegisterShowPassword((prev) => !prev)}
+                    />
+                  </View>
+                )}
+              />
               <Button
                 title={t('auth.submit.register')}
                 onPress={registerForm.handleSubmit(handleRegister)}

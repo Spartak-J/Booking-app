@@ -11,9 +11,7 @@ export const MessagesScreen = () => {
 
   return (
     <AppLayout variant="tab" header={false}>
-      <MessagesScreenView
-        onBack={() => navigation.goBack()}
-      />
+      <MessagesScreenView onBack={() => navigation.goBack()} />
     </AppLayout>
   );
 };

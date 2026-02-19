@@ -46,7 +46,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
   const { colors, tokens } = useTheme();
   const padding = sizePadding[size];
   const styles = getStyles(colors, padding);
-  const iconColor = iconColorOverride ?? (tone === 'inverse' ? tokens.textOnAccent : tokens.textPrimary);
+  const iconColor =
+    iconColorOverride ?? (tone === 'inverse' ? tokens.textOnAccent : tokens.textPrimary);
   const renderedIcon =
     preserveIconColor || !React.isValidElement(icon) || !icon.props
       ? icon
@@ -64,7 +65,9 @@ export const IconButton: React.FC<IconButtonProps> = ({
             : { backgroundColor: colors.transparent },
         bordered && { borderWidth: 2, borderColor: iconColor },
         circular && { borderRadius: 999 },
-        dimension ? { width: dimension, height: dimension, padding: 0, borderRadius: dimension / 2 } : null,
+        dimension
+          ? { width: dimension, height: dimension, padding: 0, borderRadius: dimension / 2 }
+          : null,
         disabled && styles.disabled,
         style,
       ]}

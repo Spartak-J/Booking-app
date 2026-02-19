@@ -75,11 +75,7 @@ export const PastBookingDetails: React.FC<PastBookingDetailsProps> = ({
         <IconButton
           onPress={onLeaveReview}
           icon={
-            <MaterialCommunityIcons
-              name="message-text-outline"
-              size={s(18)}
-              color={palette.icon}
-            />
+            <MaterialCommunityIcons name="message-text-outline" size={s(18)} color={palette.icon} />
           }
           circular
           bordered

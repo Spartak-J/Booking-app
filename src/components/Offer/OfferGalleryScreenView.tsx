@@ -85,10 +85,7 @@ export const OfferGalleryScreenView: React.FC<OfferGalleryScreenViewProps> = ({
         menuStyle={styles.headerMenu}
       />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <Image source={getImage(0)} style={styles.imageLarge} />
         <View style={styles.row}>
           <Image source={getImage(1)} style={styles.imageSmall} />

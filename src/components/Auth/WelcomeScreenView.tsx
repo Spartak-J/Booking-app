@@ -59,10 +59,8 @@ export const WelcomeScreenView = () => {
   const [fallback1 = 'Ласкаво', fallback2 = 'просимо'] = fallbackTitle.split(' ');
   const rawLine1 = t('welcome.titleLine1') || fallback1;
   const rawLine2 = t('welcome.titleLine2') || fallback2;
-  const titleLine1 =
-    rawLine1.includes('.') || rawLine1.includes('welcome.') ? 'Ласкаво' : rawLine1;
-  const titleLine2 =
-    rawLine2.includes('.') || rawLine2.includes('welcome.') ? 'просимо' : rawLine2;
+  const titleLine1 = rawLine1.includes('.') || rawLine1.includes('welcome.') ? 'Ласкаво' : rawLine1;
+  const titleLine2 = rawLine2.includes('.') || rawLine2.includes('welcome.') ? 'просимо' : rawLine2;
 
   const handleContinue = () => {
     if (!role) return;
