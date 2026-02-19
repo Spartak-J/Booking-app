@@ -16,7 +16,8 @@ namespace TranslationApiService.View
         public string? TitleInfo { get; set; }     //  краткая инфа 
 
         public string? Address { get; set; }
-       
+        public string? Slug { get; set; }
+
 
     }
 }

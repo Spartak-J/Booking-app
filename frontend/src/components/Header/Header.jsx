@@ -24,7 +24,7 @@ export const Header = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const { t } = useTranslation();
-  const { language, setLanguage } = useLanguage(); // Контекст языка
+  const { language, setLanguage } = useLanguage(); 
   const [currency, setCurrency] = useState("");
 
   const handleLanguageToggle = () => {

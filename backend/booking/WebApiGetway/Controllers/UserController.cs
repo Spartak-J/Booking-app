@@ -46,6 +46,15 @@ public class UserController : ControllerBase
        _gateway.ForwardRequestAsync<object>("UserApiService", $"/api/user/admin/get/userfullinfo/{email}", HttpMethod.Get, null);
 
 
+
+
+
+
+    [HttpPost("google")]
+    public Task<IActionResult> GoogleLogin([FromBody] object request) =>
+      _gateway.ForwardRequestAsync("UserApiService", $"/api/auth/google", HttpMethod.Post, request);
+
+
     //===========================================================================================
     //  GET METHODS (для авторизованного пользователя) - получить полную информацию о себе
     //===========================================================================================

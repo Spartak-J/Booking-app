@@ -21,16 +21,30 @@ export const CitySelector = ({
   const [search, setSearch] = useState(value || ""); // используем value
   const [suggestions, setSuggestions] = useState([]);
 
-  useEffect(() => {
-    locationApi.getAllCities(language)
-      .then((res) => {
-        setCities(res.data || []);
-        console.log("cities loaded:", res.data);
-      })
-      .catch((err) => {
-        console.error("Error loading cities:", err);
-      });
-  }, []);
+
+  
+useEffect(() => {
+  const storageKey = `cities_${language}`;
+  const cached = localStorage.getItem(storageKey);
+
+  if (cached) {
+    setCities(JSON.parse(cached));
+    return;
+  }
+
+  locationApi.getAllCities(language)
+    .then((res) => {
+      const data = res.data || [];
+      setCities(data);
+      console.log(data);
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    })
+    .catch((err) => {
+      console.error("Error loading cities:", err);
+    });
+}, [language]);
+
+
 
   useEffect(() => {
     if (!value || cities.length === 0) return;
@@ -63,7 +77,7 @@ export const CitySelector = ({
   const handleSelect = (city) => {
     setSearch(city.title);
     setSuggestions([]);
-    if (onChange) onChange(city.title, city.entityId);
+    if (onChange) onChange(city.title, city.entityId,city.slug);
   };
 
   return (

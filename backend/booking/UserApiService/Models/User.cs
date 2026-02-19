@@ -16,11 +16,12 @@ namespace UserApiService.Models
         public string? PhoneNumber { get; set; }
         public DateTime? BirthDate { get; set; }
 
-        public decimal  Discount { get; set; }    
+        public decimal  Discount { get; set; }
 
-        public int CountryId { get; set; }
+        public int CountryId { get; set; } = 1;
+
         [Required]
-        public UserRole RoleName { get; set; } = UserRole.Client;
+        public virtual UserRole RoleName { get; set; } = UserRole.Client;
 
         public DateTime? LastLogin { get; set; }
       

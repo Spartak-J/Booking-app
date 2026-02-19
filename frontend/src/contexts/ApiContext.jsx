@@ -2,6 +2,8 @@ import React, { createContext } from "react";
 import { authApi } from "../api/auth";
 import {userApi} from "../api/userApi";
 import { offerApi } from "../api/offer";
+import { adminApi } from "../api/admin";
+import {attractionApi} from "../api/attraction";
 import { orderApi } from "../api/order";
 import { rentObjApi } from "../api/rentObject";
 import { locationApi } from "../api/location";
@@ -15,6 +17,8 @@ export const ApiProvider = ({ children }) => {
   return (
     <ApiContext.Provider
       value={{
+        adminApi,
+        attractionApi,
         authApi,
         userApi,
         offerApi,

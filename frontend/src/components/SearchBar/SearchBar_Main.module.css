@@ -42,7 +42,7 @@
 
 .searchBar__wrapper {
   background-color: var(--color-search-input-bg);
-  width: calc((100% - 132px) / 3);
+  width: calc((100% - 135px) / 3);
 }
 
 

@@ -41,13 +41,13 @@ export const SearchBar = ({
 
   const [location, setLocation] = useState(cityName);
   const [locationId, setLocationId] = useState(null);
+   const [slug, setSlug] = useState("");
   const [hotels, setHotels] = useState([]);
 
 
   useEffect(() => {
     if (cityId) {
-      setLocationId(cityId); // устанавливаем ID города
-      // Можно найти название города, если нужно обновить location
+      setLocationId(cityId); 
       const storedCityName = localStorage.getItem("city");
       if (storedCityName) setLocation(storedCityName);
     }
@@ -92,10 +92,12 @@ export const SearchBar = ({
   };
 
 
-  const setLocationInfo = (cityName, cityId) => {
+  const setLocationInfo = (cityName, cityId, slug) => {
     setLocation(cityName);
     setLocationId(cityId);
+    setSlug(slug);
   };
+
 
   return (
     <div

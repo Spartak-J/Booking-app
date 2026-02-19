@@ -289,9 +289,9 @@
       "past": "Минулі",
       "cancelled": "Скасовані"
     },
-     "my_history": {
-     "all": "Усі готелі",
-     "favorites": "Обране"
+    "my_history": {
+      "all": "Усі готелі",
+      "favorites": "Обране"
     },
     "AccountPanel": {
       "name": "Ім’я",
@@ -324,8 +324,8 @@
     },
     "Reservation_management": "Управління  бронюванням",
     "no_active_travel": "У вас немає активних поїздок",
-     "no_past_travel": "У вас немає минулих поїздок",
-      "no_cancelled_travel": "У вас немає скасованих поїздок",
+    "no_past_travel": "У вас немає минулих поїздок",
+    "no_cancelled_travel": "У вас немає скасованих поїздок",
     "PastHotel": {
       "title_page": "Реалізовано",
       "price": "Ціна",
@@ -397,10 +397,10 @@
       "housing": {
         "name": "Назва",
         "country": "Країна",
-        "region":"Область/регіон",
-        "city":"Місто",
-         "district":"Район",
-        "Postcode":"Поштовий код",
+        "region": "Область/регіон",
+        "city": "Місто",
+        "district": "Район",
+        "Postcode": "Поштовий код",
         "address": "Адреса",
         "street": "Вулиця",
         "number": "номер",
@@ -436,5 +436,23 @@
     },
     "btn_add": "Додати кімнату/номер",
     "btn_save": "Зберегти"
+  },
+  "admin": {
+    "title": "Привіт, адмін",
+    "menu": {
+      "users": "Користувачі",
+      "offers": "Об’яви",
+      "reviews": "Відгуки",
+      "settings": "Налаштування",
+      "tools": "Інструменти",
+      "contacts": "Контакти"
+    },
+    "input_label": "Введіть e-mail або номер телефону",
+    "sort_btn": "Сортувати",
+    "write":"написати",
+    "blocked":"заблокувати"
+  },
+  "attraction":{
+    "title":"Визначні пам’ятки"
   }
 }

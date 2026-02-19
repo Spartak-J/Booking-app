@@ -13,6 +13,7 @@ export const HotelCardList = ({
   cardWidth = 424,
   gap = 20,
   openFilterMenu = false, 
+  showHeart
 }) => {
   const containerRef = useRef(null);
   const [columns, setColumns] = useState(1);
@@ -56,17 +57,18 @@ useEffect(()=>{
           id={hotel.id}
           title={hotel.title}
           image={hotel.rentObj?.[0]?.mainImageUrl || "-image.jpg"}
-          city={hotel.rentObj.cityTitle}
+          city={hotel.rentObj[0].cityTitle}
           cityId={hotel.rentObj?.[0]?.cityId}
           country={hotel.country}
           distance={hotel.distanceToCenter}
           rating={hotel.rating}
           reviews={hotel.reviews}
-          price={hotel.totalPrice}
+          price={hotel.pricePerDay ?? hotel.totalPrice}
            adults ={adults}
               children={children}
           startDate={startDate}
           endDate={endDate}
+          showHeart = {showHeart}
           onClick={() => {
             console.log ({id: hotel.id})
           }}
