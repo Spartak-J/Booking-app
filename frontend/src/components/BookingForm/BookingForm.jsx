@@ -229,11 +229,11 @@ const buildOfferBooking = () => {
 
       <div className={styles.infoBox}>
         <div className="flex-left gap-5">
-          <span className={styles.language_notice}>!</span>.
+          <span className={styles.language_notice}>!</span>
           <Text text={t("Booking.booking_language_notice")} type="m_400_s_14" />
         </div>
         <div className="flex-left gap-5">
-          <span className={styles.required_fields}>*</span>.
+          <span className={styles.required_fields}>*</span>
           <Text text={t("Booking.required_fields_note")} type="m_400_s_14" />
         </div>
 
@@ -325,7 +325,7 @@ const buildOfferBooking = () => {
 
               {countries.map(country => (
                 <option key={country.id} value={country.id}>
-                  {country.title}  {/* <-- это и отобразится в селекте */}
+                  {country.title}  
                 </option>
               ))}
             </select>
@@ -349,7 +349,7 @@ const buildOfferBooking = () => {
               className={`${styles.input} btn-h-59  btn-br-r-20 p-10`}
             />
             <div className="flex-left gap-5">
-              <span className={styles.required_fields}>*</span>.
+              <span className={styles.required_fields}>*</span>
               <Text text={t("Booking.required_email_note")} type="m_400_s_14" />
             </div>
           </label>
@@ -389,7 +389,7 @@ const buildOfferBooking = () => {
 
 
             <div className="flex-left gap-5">
-              <span className={styles.required_fields}>*</span>.
+              <span className={styles.required_fields}>*</span>
               <Text text={t("Booking.required_phone_note")} type="m_400_s_14" />
             </div>
           </label>

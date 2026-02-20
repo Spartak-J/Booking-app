@@ -116,5 +116,5 @@ line-height: 39px ;
   border-radius: 0 0 10px 10px;
   list-style: none;
   z-index: 1000;
-  background: var(--color-input-form-bg);
+  background: var(--color-city-modal-bg);
 }

@@ -30,6 +30,8 @@ export const HousingPanel = () => {
 
   const [myOffers, setMyOffers] = useState([]);
 
+  const [update, setUpdate] = useState(0);
+
 
 
   const hotelsActive = [
@@ -55,15 +57,21 @@ export const HousingPanel = () => {
 
 
 
-  useEffect(() => {
-    console.log(language)
-    userApi.getMyOffers(language)
-      .then(res => {
-        setMyOffers(res.data)
-        console.log({ MyOffers: res.data })
-      })
-      .catch(err => console.error("Error loading countries:", err));
-  }, [language, showForm]);
+useEffect(() => {
+  document.body.style.cursor = "wait";
+
+  userApi.getMyOffers(language)
+    .then(res => {
+      setMyOffers(res.data);
+      console.log({ MyOffers: res.data });
+    })
+    .catch(err => console.error("Error loading offers:", err))
+    .finally(() => {
+      document.body.style.cursor = "default";
+    });
+
+}, [language, showForm,update]);
+
 
 
   return (
@@ -116,7 +124,13 @@ export const HousingPanel = () => {
           </div>
         )}
         {showForm && selectedOffer && (
-          <HostPropertyForm hotel={selectedOffer} setShowForm={setShowForm}/>
+          <HostPropertyForm
+           hotel={selectedOffer}
+            setShowForm={setShowForm}
+             setActiveKey={ setActiveKey}
+             setShowHostelList={setShowHostelList}
+            update={update}
+            setUpdate={setUpdate}/>
         )}
       </div>
     </div >

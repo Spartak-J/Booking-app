@@ -13,7 +13,7 @@
   overflow: hidden;
 }
 
-.profilePageMenu::after {
+/* .profilePageMenu::after {
   content: "";
   position: absolute;
   top: 0;
@@ -25,7 +25,7 @@
   background-size: contain;
   pointer-events: none;
    z-index: -2;
-}
+} */
 .profilePageMenu::before {
   content: "";
   position: absolute;

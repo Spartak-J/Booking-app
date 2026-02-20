@@ -72,6 +72,7 @@ export const SearchPage = ({ defaultCityId }) => {
 
     const fetchHotels = async () => {
       setLoading(true);
+      document.body.style.cursor = "wait";
 
       try {
         const response = await offerApi.searchOffers({
@@ -91,6 +92,7 @@ export const SearchPage = ({ defaultCityId }) => {
         console.error("Ошибка загрузки:", error);
       } finally {
         setLoading(false);
+        document.body.style.cursor = "default";
       }
     };
 

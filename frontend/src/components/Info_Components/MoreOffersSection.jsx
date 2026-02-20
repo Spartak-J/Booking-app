@@ -22,7 +22,7 @@ export const MoreOffersSection = () => {
 
   const CARD_WIDTH = 370;
   const GAP = 78;
-  const SLIDE_WIDTH = CARD_WIDTH * 2 + GAP; // 818
+  const SLIDE_WIDTH = CARD_WIDTH * 2 + GAP; 
 
 
   return (

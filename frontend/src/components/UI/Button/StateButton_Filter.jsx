@@ -18,12 +18,12 @@ export const StateButton__Filter = ({ text,iconName,sizeX, sizeY,active,classNam
       onClick={handleClick}
       disabled={disabled}
     >
-      <span>
+     
         {iconName &&(
         <ImageSvg name={iconName} sizeX={sizeX} sizeY={sizeY} className={classNameIcon}/>
         )}
         <Text text = {text } type="m_400"/>
-      </span>
+   
     </button>
   );
 };

@@ -352,7 +352,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
                         name="password"
                         value={displayPassword}
                         onChange={handleChange}
-                        placeholder={t("Auth.login.password")}
+                        placeholder={t("Auth.register.password")}
                         className={`${styles.input} btn-h-120 btn-w-1165 btn-br-r-20 p-10`}
                         autoComplete="new-password"
                         required
@@ -381,7 +381,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder={t("Auth.login.confirm_password")}
+                        placeholder={t("Auth.register.confirm_password")}
                         className={`${styles.input} btn-h-120 btn-w-1165 btn-br-r-20 p-10`}
                         required
                     />

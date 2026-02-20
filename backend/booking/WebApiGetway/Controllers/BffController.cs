@@ -707,13 +707,24 @@ namespace WebApiGetway.Controllers
                 null
             );
 
+
             if (isValidResult is not OkObjectResult okIsValid)
                 return isValidResult;
 
             if (okIsValid.Value is not JsonElement json || !json.GetBoolean())
                 return Forbid();
 
-     
+
+            var translateCountry = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Country/get-translations/{Offer.RentObj.CountryId}/{lang}", HttpMethod.Get, null);
+            var countryTitle = GetStringFromActionResult(translateCountry, "title");
+
+
+            var translateCity = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/City/get-translations/{Offer.RentObj.CityId}/{lang}", HttpMethod.Get, null);
+            var cityTitle = GetStringFromActionResult(translateCity, "title");
+
+            Offer.RentObj.CountryTitle= countryTitle;
+            Offer.RentObj.CityTitle = cityTitle;
+
             var offerUpdateResult = await _gateway.ForwardRequestAsync<object>(
                     "OfferApiService",
                     "/api/Offer/update/offer-with-rentobj-with-param-values",

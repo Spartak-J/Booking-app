@@ -82,11 +82,10 @@ export const CityPage = () => {
 
   return (
     <div className={styles.cityPage}>
-      <Header_Full titleBtn="city" openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
+      <Header_Full titleBtn="city" title={city.title} openFilterMenu={openCityFilterMenu} setOpenFilterMenu={setOpenCityFilterMenu} />
 
       <main className={styles.hotel_page__content}>
         <div className="container-fluid">
-          <h2 className="text-center mb-4">{city?.title}</h2>
           <div className="row g-4  align-items-stretch">
             <div className="col-lg-7">
               <div className="mb-3">

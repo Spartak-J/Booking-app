@@ -17,7 +17,7 @@ namespace UserApiService.View
         public string? Token { get; set; }
         public decimal Discount { get; set; }
 
-
+        public bool IsBlocked { get; set; } = false;
         public static UserResponse MapToResponse(User model)
         {
             return new UserResponse
@@ -30,6 +30,7 @@ namespace UserApiService.View
                 CountryId = model.CountryId,
                 Discount = model.Discount,
                 RoleName = model.RoleName.ToString(),
+                IsBlocked = model.IsBlocked,
             };
         }
     }

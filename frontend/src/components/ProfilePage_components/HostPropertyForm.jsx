@@ -14,7 +14,13 @@ import { IconButtonArrow } from '../UI/Button/IconButton_arrow.jsx';
 import { CounterButton } from "../UI/Button/CounterButton.jsx";
 import { IconButtonClose } from "../UI/Button/IconButton_close.jsx";
 
-export const HostPropertyForm = ({ hotel, setShowForm }) => {
+export const HostPropertyForm = ({ 
+    hotel,
+     setShowForm,
+      setUpdate,
+       setActiveKey,
+    setShowHostelList
+}) => {
     const { t } = useTranslation();
     const { locationApi, offerApi, paramsCategoryApi } = useContext(ApiContext);
     const navigate = useNavigate();
@@ -122,10 +128,10 @@ export const HostPropertyForm = ({ hotel, setShowForm }) => {
 
 
     const handleCountryChange = (e) => {
-         console.log("handleCountryChange triggered", e.target.value); // проверка вызова
-        const selectedId = Number(e.target.value); 
+        console.log("handleCountryChange triggered", e.target.value); // проверка вызова
+        const selectedId = Number(e.target.value);
         const selectedCountry = countries.find(c => c.id === selectedId);
-console.log({ SelectCountries: selectedCountry })
+        console.log({ SelectCountries: selectedCountry })
         setForm(prev => ({
             ...prev,
             offer: {
@@ -133,7 +139,7 @@ console.log({ SelectCountries: selectedCountry })
                 rentObj: {
                     ...prev.offer.rentObj,
                     countryId: selectedId,
-                    countryTitle: selectedCountry ? selectedCountry.title  : hotel? hotel.rentObj[0].countryTitle :"",
+                    countryTitle: selectedCountry ? selectedCountry.title : hotel ? hotel.rentObj[0].countryTitle : "",
                 }
             }
         }));
@@ -168,7 +174,7 @@ console.log({ SelectCountries: selectedCountry })
                 rentObj: {
                     ...prev.offer.rentObj,
                     cityId,
-                    cityTitle: selectedCity ? selectedCity.title : hotel? hotel.rentObj[0].cityTitle :"",
+                    cityTitle: selectedCity ? selectedCity.title : hotel ? hotel.rentObj[0].cityTitle : "",
                     districtId: null
                 }
             }
@@ -444,8 +450,8 @@ console.log({ SelectCountries: selectedCountry })
         const rentObj = form.offer.rentObj || {};
         const paramValues = Array.isArray(rentObj.paramValues) ? rentObj.paramValues : [];
 
-        console.log("rentObj.id");
-        console.log(rentObj.id);
+        console.log("rentObj.cityTitle");
+        console.log(rentObj);
 
         const normalizedParamValues = paramValues.map(p => ({
             paramItemId: p.paramItemId ?? 0,
@@ -511,6 +517,7 @@ console.log({ SelectCountries: selectedCountry })
 
     const handleSave = async () => {
         try {
+            document.body.style.cursor = "wait";
             setUploading(true);
             // debugger;
             const payload = buildOfferPayload();
@@ -559,7 +566,11 @@ console.log({ SelectCountries: selectedCountry })
             console.error(error);
             alert("Ошибка при сохранении");
         } finally {
+            document.body.style.cursor = "default";
             setUploading(false);
+            setUpdate(prev => prev + 1);
+            setActiveKey("1");
+            setShowHostelList(true)
             navigate("/profile");
         }
     };
@@ -713,7 +724,7 @@ console.log({ SelectCountries: selectedCountry })
             {/* Фото */}
             <div className={styles.block}>
                 <div className={styles.label}>
-                    <Text text={t("Host.propertyForm.owner.photo")} type="m_400_s_16" />
+                    <Text text={t("Host.aboutHousing.housing.photo")} type="m_400_s_16" />
                 </div>
                 <div className={styles.carousel}>
                     <div className={styles.photosViewport} ref={viewportRef}>

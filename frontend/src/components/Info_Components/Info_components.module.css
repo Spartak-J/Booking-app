@@ -6,6 +6,26 @@
   margin-bottom: 0;
 }
 
+
+.infoSection::before {
+  content: "";
+  position: absolute;
+  top: 143px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: var(--color-bg__2);
+  z-index: -1;
+  border-radius: 20px;
+}
+
+.logo{
+  position: absolute;
+  top: 97px;
+  left: 153px;
+}
+
+
 .infoSection__svg {
   width: 100%;
   min-width: 1920px;
@@ -87,7 +107,7 @@
   }
 
   .infoSection__columns {
-    background-color: var(--color-bg__2);
+    /* background-color: var(--color-bg__2); */
     border-radius: 10px;
   }
 }
@@ -127,8 +147,8 @@
   width: 302px;
   aspect-ratio: 302 / 240;
   border-radius: 20px;
-  background-color: var(--color-primary);
-  color: var(--color-text);
+  background-color: var( --color-btn-text-light);
+  color: var( --color-btn-text-dark);
 }
 
 .infoSection_card__container {
@@ -267,10 +287,10 @@
   border-radius: 20px 0 0 20px !important;
   background: linear-gradient(
     to right,
-    rgba(247, 244, 239, 0) 0%,
-    rgba(247, 244, 239, 0.45) 15%,
-    rgba(247, 244, 239, 0.85) 30%,
-    #f7f4ef 50%
+    rgb(from var(--color-card-bg) r g b / 0) 0%,
+  rgb(from var(--color-card-bg) r g b / 0.45) 15%,
+  rgb(from var(--color-card-bg) r g b / 0.85) 30%,
+  var(--color-card-bg) 50%
   );
   content: "";            
   position: absolute;       
@@ -286,13 +306,13 @@
 
 .moreOffersSection__row_bottom > :last-child::after {
   border-radius: 20px 0 0 20px !important;
-  background: linear-gradient(
-    to left,
-    rgba(247, 244, 239, 0) 0%,
-    rgba(247, 244, 239, 0.45) 15%,
-    rgba(247, 244, 239, 0.85) 30%,
-    #f7f4ef 50%
-  );
+background: linear-gradient(
+  to left,
+  rgb(from var(--color-card-bg) r g b / 0) 0%,
+  rgb(from var(--color-card-bg) r g b / 0.45) 15%,
+  rgb(from var(--color-card-bg) r g b / 0.85) 30%,
+  var(--color-card-bg) 50%
+);
   content: "";              
   position: absolute;      
   inset: 0;                 
@@ -371,7 +391,7 @@
   width: 100%;
   height: 333px;
   border-radius: 20px;
-  background-color: var(--color-primary);
+  background-color: var( --color-card-bg);
   color: var(--color-text);
 }
 

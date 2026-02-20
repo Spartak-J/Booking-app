@@ -116,6 +116,7 @@ export const HotelPage = () => {
 
     const fetchOffer = async () => {
       setLoading(true);
+        document.body.style.cursor = "wait";
       try {
         const res = await offerApi.searchId({
           id,
@@ -143,6 +144,7 @@ export const HotelPage = () => {
         console.error("Error loading offer:", err);
       } finally {
         setLoading(false);
+            document.body.style.cursor = "default";
       }
     };
 

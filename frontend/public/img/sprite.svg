@@ -52,9 +52,11 @@
     </symbol>
 
 
-    <symbol id = "breadcrumbs_next_icon" width="11" height="15" viewBox="0 0 11 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-         <path d="M1 1.00027C1 1.00027 9.16162 4.33614 9.16162 7.25502C9.16162 10.1739 1 14.0003 1 14.0003" stroke="#0D2D4A" stroke-width="2" stroke-linecap="round"/>
-    </symbol>
+   <symbol id="breadcrumbs_next_icon" width="11" height="15" viewBox="0 0 11 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M1 1.00027C1 1.00027 9.16162 4.33614 9.16162 7.25502C9.16162 10.1739 1 14.0003 1 14.0003"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</symbol>
+
     
     <symbol id="heart" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M1.9045 2.20989C3.12231 0.794897 4.77379 0 6.49577 0C8.21775 0 9.86923 0.794897 11.087 2.20989C11.3251 2.48563 11.6317 2.8288 12.0066 3.2394C12.3806 2.8288 12.6867 2.48563 12.9248 2.20989C14.1375 0.807014 15.7776 0.0170826 17.4886 0.0117567C19.1996 0.00643075 20.8433 0.786141 22.0624 2.18144C23.2816 3.57675 23.9777 5.47489 23.9995 7.46337C24.0213 9.45185 23.367 11.37 22.1788 12.8009L12.9235 23.558C12.68 23.841 12.3497 24 12.0053 24C11.6609 24 11.3306 23.841 11.087 23.558L1.83177 12.8024C0.644717 11.3795 -0.0131658 9.47105 0.000199736 7.48915C0.0135653 5.50725 0.698405 3.61099 1.9045 2.20989Z" fill="#F7A960"/>
@@ -75,10 +77,14 @@
         <path d="M13.0183 8.7707C14.0632 2.42243 20.7863 -2.7954 20.061 1.66896C19.3356 6.13332 19.1214 13.2349 24.0036 11.8929C28.8858 10.5509 38.8455 16.6036 33.4332 16.6036C28.021 16.6036 22.553 18.3575 25.8728 22.7397C29.1927 27.1218 28.2999 35.803 25.8728 32.1055C23.4457 28.408 17.7202 21.3193 15.2094 26.0301C12.6985 30.7409 4.59951 33.8758 6.77554 30.2606C8.95157 26.6454 13.8766 18.9411 8.57587 19.8723C3.27518 20.8035 -2.80414 13.045 1.40846 13.2915C5.62105 13.5381 11.9734 15.119 13.0183 8.7707Z" fill="#0D2D4A"/>
     </symbol>
 
-    <symbol id ="close" width="30" height="28" viewBox="0 0 30 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <line x1="2.11987" y1="1.5001" x2="27.9215" y2="25.4587" stroke="#0D2D4A" stroke-width="3" stroke-linecap="round"/>
-        <line x1="1.5" y1="-1.5" x2="36.7099" y2="-1.5" transform="matrix(-0.732794 0.680451 0.680451 0.732794 30 1.57861)" stroke="#0D2D4A" stroke-width="3" stroke-linecap="round"/>
-    </symbol>
+    <symbol id="close" width="30" height="28" viewBox="0 0 30 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <line x1="2.11987" y1="1.5001" x2="27.9215" y2="25.4587"
+        stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  <line x1="1.5" y1="-1.5" x2="36.7099" y2="-1.5"
+        transform="matrix(-0.732794 0.680451 0.680451 0.732794 30 1.57861)"
+        stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+</symbol>
+
 
     <symbol id ="close_red" width="30" height="28" viewBox="0 0 30 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <line x1="2.11987" y1="1.5001" x2="27.9215" y2="25.4587" stroke="red" stroke-width="3" stroke-linecap="round"/>

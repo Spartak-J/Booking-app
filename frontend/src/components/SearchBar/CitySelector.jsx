@@ -22,28 +22,77 @@ export const CitySelector = ({
   const [suggestions, setSuggestions] = useState([]);
 
 
-  
-useEffect(() => {
-  const storageKey = `cities_${language}`;
-  const cached = localStorage.getItem(storageKey);
 
-  if (cached) {
-    setCities(JSON.parse(cached));
-    return;
-  }
+  useEffect(() => {
+    const loadCities = async () => {
+      const keyUk = "cities_uk";
+      const keyEn = "cities_en";
 
-  locationApi.getAllCities(language)
-    .then((res) => {
-      const data = res.data || [];
-      setCities(data);
-      console.log(data);
-      localStorage.setItem(storageKey, JSON.stringify(data));
-    })
-    .catch((err) => {
-      console.error("Error loading cities:", err);
-    });
-}, [language]);
+      let citiesUk = localStorage.getItem(keyUk);
+      let citiesEn = localStorage.getItem(keyEn);
 
+      if (!citiesUk) {
+        const resUk = await locationApi.getAllCities("uk");
+        citiesUk = resUk.data || [];
+        localStorage.setItem(keyUk, JSON.stringify(citiesUk));
+      } else {
+        citiesUk = JSON.parse(citiesUk);
+      }
+
+      if (!citiesEn) {
+        const resEn = await locationApi.getAllCities("en");
+        citiesEn = resEn.data || [];
+        localStorage.setItem(keyEn, JSON.stringify(citiesEn));
+      } else {
+        citiesEn = JSON.parse(citiesEn);
+      }
+
+      const merged = Object.values(
+        [...citiesUk, ...citiesEn].reduce((acc, city) => {
+          const id = city.entityId;
+
+          if (!acc[id]) {
+            acc[id] = {
+              entityId: id,
+              slug: city.slug,
+              titles: {}
+            };
+          }
+
+          citiesUk.forEach(city => {
+            if (!acc[city.entityId]) {
+              acc[city.entityId] = {
+                entityId: city.entityId,
+                slug: city.slug,
+                titles: {}
+              };
+            }
+
+            acc[city.entityId].titles.uk = city.title;
+          });
+
+          citiesEn.forEach(city => {
+            if (!acc[city.entityId]) {
+              acc[city.entityId] = {
+                entityId: city.entityId,
+                slug: city.slug,
+                titles: {}
+              };
+            }
+
+            acc[city.entityId].titles.en = city.title;
+          });
+
+
+          return acc;
+        }, {})
+      );
+
+      setCities(merged);
+    };
+
+    loadCities().catch(console.error);
+  }, []);
 
 
   useEffect(() => {
@@ -59,26 +108,36 @@ useEffect(() => {
 
 
 
- const handleChange = (e) => {
+  const normalize = (str) =>
+    str?.toLowerCase().trim();
+
+  const handleChange = (e) => {
     const val = e.target.value;
     setSearch(val);
 
     if (val.length > 0) {
       const filtered = cities.filter(city =>
-        city.title.toLowerCase().startsWith(val.toLowerCase())
+        Object.values(city.titles).some(title =>
+          normalize(title).startsWith(normalize(val))
+        )
       );
+
       setSuggestions(filtered);
     } else {
       setSuggestions([]);
     }
   };
 
-  
+
   const handleSelect = (city) => {
-    setSearch(city.title);
+    const title = city.titles[language] || city.titles["uk"];
+
+    setSearch(title);
     setSuggestions([]);
-    if (onChange) onChange(city.title, city.entityId,city.slug);
+
+    if (onChange) onChange(title, city.entityId, city.slug);
   };
+
 
   return (
     <div style={{ position: "relative" }} className={`${styles.searchBar__container} ${classTitle} btn-br-r-10  flex-between `}>
@@ -94,7 +153,7 @@ useEffect(() => {
         value={search}
         onChange={handleChange}
       />
-      {suggestions.length > 0 && (
+      {/* {suggestions.length > 0 && (
         <ul className={styles.suggestions_wrapper}>
           {suggestions.map((city) => (
             <li
@@ -105,6 +164,21 @@ useEffect(() => {
               {city.title}
             </li>
           ))}
+        </ul>
+      )} */}
+
+      {suggestions.length > 0 && (
+        <ul className={styles.suggestions_wrapper}>
+          {suggestions.map((city) => (
+            <li
+              key={city.entityId}
+              onClick={() => handleSelect(city)}
+              style={{ padding: "5px", cursor: "pointer" }}
+            >
+              {city.titles[language] || city.titles["uk"]}
+            </li>
+          ))}
+
         </ul>
       )}
     </div>

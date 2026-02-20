@@ -114,7 +114,7 @@ export const SearchBar_Main = () => {
           }
         </div>
 
-        <IconButton_Search onClick={handleSearch} icon_name="search_big" size="48" classTitle="btn-br-r-20 btn-h-72 btn-w-72" />
+        <IconButton_Search onClick={handleSearch} icon_name="search_big" size="48" classTitle="btn-br-r-20 btn-h-72 btn-w-72 btn_search_border" />
       </div>
     </div >
   );

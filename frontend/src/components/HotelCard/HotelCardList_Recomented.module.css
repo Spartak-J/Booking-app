@@ -109,7 +109,7 @@
 }
 
 .badge {
-  color: var(--color--text);
+  color: var(--color-text-title);
   padding: 8px 12px;
   border-radius: 10px;
   position: absolute;
@@ -122,5 +122,5 @@
 .line {
   width: 210px;
   height: 1px;
-  background-color: var(--color-text);
+  background-color: var(--color-text-title);
 }

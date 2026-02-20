@@ -92,10 +92,10 @@ export const AttractionPage = () => {
                         aria-label="search"
                         
                         onClick={handleSearchClick}
-                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'transparent'}  // отключаем hover
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'transparent'}  
                         onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
-                        <IconButton_Search icon_name="search" />
+                        <IconButton_Search icon_name="search"  />
                       </div>
                     </div>
                   </div>

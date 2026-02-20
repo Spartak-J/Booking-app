@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 import { Logo_Oselya_128 } from "../Logo/Logo_Oselya_128.jsx";
 import { Text } from "../UI/Text/Text.jsx";
@@ -23,6 +24,13 @@ export const ProfilePageMenu = ({ user }) => {
 
   const [account, setAccount] = useState(user ? user.roleName : null);
   const [activeKey, setActiveKey] = useState("account");
+
+
+    const { darkMode } = useContext(ThemeContext);
+  
+    const classFooter_bg = darkMode
+      ? "bg_img__dark"
+      : "bg_img__light";
 
   useEffect(() => {
     if (user) {
@@ -81,7 +89,7 @@ export const ProfilePageMenu = ({ user }) => {
   };
 
   return (
-    <div className={styles.profilePageMenu}>
+    <div className={`${styles.profilePageMenu} ${classFooter_bg}`}>
       <div className={styles.logo}><Logo_Oselya_128 /></div>
       <div className={styles.profilePageMenu__title}>
         <Text text={t("Prrofile.title")} type="m_600_s_40" />

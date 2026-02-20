@@ -23,10 +23,11 @@ namespace UserApiService.Models
         public int CountryId { get; set; } = 1;
 
         [Required]
-        public virtual UserRole RoleName { get; set; } = UserRole.Client;
+        public virtual UserRole RoleName { get; set; }
 
         public DateTime? LastLogin { get; set; }
-      
+        public bool IsBlocked { get; set; } = false;
+
     }
 
   
