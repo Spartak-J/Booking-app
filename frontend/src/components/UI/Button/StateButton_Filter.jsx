@@ -4,7 +4,7 @@ import { Text } from "../Text/Text.jsx";
 import { ImageSvg } from "../Image/ImageSvg.jsx";
 import "../../../styles/globals.css";
 
-export const StateButton__Filter = ({ text,iconName,sizeX, sizeY,active,classNameIcon, className = "btn-h-37 btn-br-r-20", onClick, disabled }) => {
+export const StateButton__Filter = ({ text,iconName,iconSrc,sizeX, sizeY,active,classNameIcon, className = "btn-h-37 btn-br-r-20", onClick, disabled }) => {
   const [isActive, setIsActive] = useState(active);
 
   const handleClick = (e) => {
@@ -19,8 +19,8 @@ export const StateButton__Filter = ({ text,iconName,sizeX, sizeY,active,classNam
       disabled={disabled}
     >
      
-        {iconName &&(
-        <ImageSvg name={iconName} sizeX={sizeX} sizeY={sizeY} className={classNameIcon}/>
+        {(iconName || iconSrc) &&(
+        <ImageSvg name={iconName} src={iconSrc} sizeX={sizeX} sizeY={sizeY} className={classNameIcon}/>
         )}
         <Text text = {text } type="m_400"/>
    
