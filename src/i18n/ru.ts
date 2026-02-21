@@ -199,6 +199,8 @@ const ru = {
   'auth.errors.fixFields': 'Исправьте поля формы, чтобы войти',
   'auth.errors.title': 'Ошибка входа',
   'auth.errors.generic': 'Не удалось выполнить вход',
+  'auth.errors.invalidCredentials': 'Пользователь не найден или неверный пароль',
+  'auth.errors.googleNotConfigured': 'Google вход не настроен. Проверьте OAuth Client ID',
   'auth.placeholder.email': 'Введите электронную почту',
   'auth.placeholder.password': 'Введите пароль',
   'auth.placeholder.name': 'Введите фамилию и имя',

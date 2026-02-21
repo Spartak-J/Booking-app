@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import Constants from 'expo-constants';
 
 import { authService } from '@/services/authService';
 import { profileService } from '@/services/profile/profileService';
@@ -7,6 +10,8 @@ import { Role, User } from '@/types';
 
 type LoginPayload = { email: string; password: string };
 type RegisterPayload = { email: string; password: string; name: string };
+
+WebBrowser.maybeCompleteAuthSession();
 
 export const useAuth = () => {
   const {
@@ -21,6 +26,19 @@ export const useAuth = () => {
     leaveGuestMode,
   } = useAuthStore();
   const [loading, setLoading] = useState(false);
+  const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, string | undefined>;
+  const googleAndroidClientId =
+    process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ?? extra.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+  const googleIosClientId =
+    process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? extra.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+  const googleWebClientId =
+    process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? extra.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+
+  const [googleRequest, , promptGoogleAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: googleAndroidClientId,
+    iosClientId: googleIosClientId,
+    webClientId: googleWebClientId,
+  });
 
   const login = async (payload: LoginPayload) => {
     setLoading(true);
@@ -46,7 +64,25 @@ export const useAuth = () => {
   const googleLogin = async () => {
     setLoading(true);
     try {
-      const data = await authService.googleLogin();
+      if (!googleRequest) {
+        throw new Error('Google OAuth не настроен: отсутствуют client IDs.');
+      }
+
+      const result = await promptGoogleAsync();
+      if (result.type !== 'success') {
+        if (result.type === 'cancel' || result.type === 'dismiss') return;
+        throw new Error('Не удалось выполнить вход через Google.');
+      }
+
+      const idToken =
+        (result.params as { id_token?: string } | undefined)?.id_token ??
+        (result.authentication as { idToken?: string } | null)?.idToken;
+
+      if (!idToken) {
+        throw new Error('Google не вернул idToken.');
+      }
+
+      const data = await authService.googleLogin(idToken);
       await setAuth({ ...data, baseRole: data.user.role });
     } finally {
       setLoading(false);

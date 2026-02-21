@@ -35,7 +35,7 @@ type Props = {
 
 export const AuthScreenView: React.FC<Props> = ({ mode }) => {
   const navigation = useNavigation<Navigation>();
-  const { login, register } = useAuth();
+  const { login, register, googleLogin } = useAuth();
   const { tokens } = useTheme();
   const { t } = useTranslation();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -45,28 +45,81 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
 
   const schema = useMemo(() => {
     const base = {
-      email: yup.string().required(),
-      password: yup.string().required(),
+      email: yup.string().email(t('auth.errors.email')).required(t('auth.errors.requiredEmail')),
+      password: yup
+        .string()
+        .min(6, t('auth.errors.passwordLength'))
+        .required(t('auth.errors.requiredPassword')),
     };
     if (mode === 'register') {
-      return yup.object({ ...base, name: yup.string().required() });
+      return yup.object({ ...base, name: yup.string().required(t('auth.errors.requiredName')) });
     }
     return yup.object(base);
-  }, [mode]);
+  }, [mode, t]);
 
-  const { control, handleSubmit } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<FormValues>({
     resolver: yupResolver(schema),
     defaultValues: { name: '', email: '', password: '' },
   });
 
-  const onSubmit = handleSubmit((values) => {
-    if (mode === 'register') {
-      if (!agreed) return;
-      register(values as Required<FormValues>);
-    } else {
-      login(values);
+  const resolveAuthErrorMessage = (error: unknown) => {
+    const raw =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : t('auth.errors.generic');
+    const trimmed = raw.trim();
+    const normalized = trimmed.toLowerCase();
+
+    if (
+      normalized.includes('androidclientid') ||
+      normalized.includes('iosclientid') ||
+      normalized.includes('webclientid') ||
+      normalized.includes('client id') ||
+      normalized.includes('google oauth') ||
+      normalized.includes('idtoken')
+    ) {
+      return t('auth.errors.googleNotConfigured');
+    }
+    if (trimmed.length > 0) return trimmed;
+    return t('auth.errors.generic');
+  };
+
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      clearErrors('password');
+      if (mode === 'register') {
+        if (!agreed) return;
+        await register(values as Required<FormValues>);
+      } else {
+        await login(values);
+      }
+    } catch (error) {
+      setError('password', {
+        type: 'manual',
+        message: resolveAuthErrorMessage(error),
+      });
     }
   });
+
+  const onGooglePress = async () => {
+    try {
+      clearErrors('password');
+      await googleLogin();
+    } catch (error) {
+      setError('password', {
+        type: 'manual',
+        message: resolveAuthErrorMessage(error),
+      });
+    }
+  };
 
   const isRegister = mode === 'register';
 
@@ -83,136 +136,149 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
     >
       <View style={styles.formWrapper}>
         <View style={[styles.card, { minHeight: cardMinHeight }]}>
-        <View style={styles.headerBlock}>
-          <Typography variant="h1" tone="primary" style={styles.title}>
-            {t(isRegister ? 'auth.register.title' : 'auth.login.title')}
-          </Typography>
+          <View style={styles.headerBlock}>
+            <Typography variant="h1" tone="primary" style={styles.title}>
+              {t(isRegister ? 'auth.register.title' : 'auth.login.title')}
+            </Typography>
 
-          <Typography variant="body" tone="primary" style={styles.subtitle}>
-            {t(isRegister ? 'auth.register.subtitle' : 'auth.login.subtitle')}
-          </Typography>
-        </View>
+            <Typography variant="body" tone="primary" style={styles.subtitle}>
+              {t(isRegister ? 'auth.register.subtitle' : 'auth.login.subtitle')}
+            </Typography>
+          </View>
 
-        <View style={styles.fieldsBlock}>
-          {isRegister ? (
+          <View style={styles.fieldsBlock}>
+            {isRegister ? (
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder={t('auth.placeholder.name')}
+                    containerStyle={styles.inputContainer}
+                    inputStyle={styles.input}
+                    error={errors.name?.message}
+                  />
+                )}
+              />
+            ) : null}
+
             <Controller
               control={control}
-              name="name"
+              name="email"
               render={({ field: { value, onChange } }) => (
                 <Input
                   value={value}
-                  onChangeText={onChange}
-                  placeholder={t('auth.placeholder.name')}
+                  onChangeText={(next) => {
+                    clearErrors('password');
+                    onChange(next);
+                  }}
+                  placeholder={t('auth.placeholder.email')}
                   containerStyle={styles.inputContainer}
                   inputStyle={styles.input}
+                  error={errors.email?.message}
                 />
               )}
             />
-          ) : null}
 
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { value, onChange } }) => (
-              <Input
-                value={value}
-                onChangeText={onChange}
-                placeholder={t('auth.placeholder.email')}
-                containerStyle={styles.inputContainer}
-                inputStyle={styles.input}
-              />
-            )}
-          />
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { value, onChange } }) => (
+                <View style={styles.passwordFieldWrap}>
+                  <Input
+                    value={value}
+                    onChangeText={(next) => {
+                      clearErrors('password');
+                      onChange(next);
+                    }}
+                    placeholder={t('auth.placeholder.password')}
+                    secureTextEntry={!showPassword}
+                    containerStyle={styles.inputContainer}
+                    inputStyle={[styles.input, styles.passwordInput]}
+                    error={errors.password?.message}
+                  />
+                  <MaterialCommunityIcons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={20}
+                    color={tokens.textPrimary}
+                    style={styles.eyeIcon}
+                    onPress={() => setShowPassword((prev) => !prev)}
+                  />
+                </View>
+              )}
+            />
 
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { value, onChange } }) => (
-              <View style={styles.passwordFieldWrap}>
-                <Input
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder={t('auth.placeholder.password')}
-                  secureTextEntry={!showPassword}
-                  containerStyle={styles.inputContainer}
-                  inputStyle={[styles.input, styles.passwordInput]}
+            {isRegister ? (
+              <View style={styles.termsRow}>
+                <IconButton
+                  onPress={() => setAgreed((p) => !p)}
+                  variant={agreed ? 'filled' : 'outlined'}
+                  size="sm"
+                  icon={
+                    agreed ? (
+                      <Typography variant="caption" tone="onAccent">
+                        ✓
+                      </Typography>
+                    ) : null
+                  }
                 />
-                <MaterialCommunityIcons
-                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  size={20}
-                  color={tokens.textPrimary}
-                  style={styles.eyeIcon}
-                  onPress={() => setShowPassword((prev) => !prev)}
-                />
+                <Typography variant="caption" tone="primary" style={styles.termsText}>
+                  {t('auth.register.terms')}
+                </Typography>
               </View>
-            )}
-          />
+            ) : null}
 
-          {isRegister ? (
-            <View style={styles.termsRow}>
-              <IconButton
-                onPress={() => setAgreed((p) => !p)}
-                variant={agreed ? 'filled' : 'outlined'}
-                size="sm"
-                icon={agreed ? <Typography variant="caption" tone="onAccent">✓</Typography> : null}
-              />
-              <Typography variant="caption" tone="primary" style={styles.termsText}>
-                {t('auth.register.terms')}
-              </Typography>
+            <View style={styles.ctaContainer}>
+              <Button
+                onPress={onSubmit}
+                disabled={isRegister && !agreed}
+                style={styles.cta}
+                variant="primary"
+              >
+                <Typography variant="buttonMd" tone="onAccent" style={styles.ctaText}>
+                  {t(isRegister ? 'auth.register.continue' : 'auth.login.continue')}
+                </Typography>
+              </Button>
             </View>
-          ) : null}
+          </View>
 
-          <View style={styles.ctaContainer}>
+          <LineWithDots width={s(320)} thickness={2} dotSize={12} style={styles.dividerRow} />
+
+          <View style={styles.socialBlock}>
+            <Typography variant="caption" tone="primary" style={styles.socialTitle}>
+              {t('auth.login.social')}
+            </Typography>
+
             <Button
-              onPress={onSubmit}
-              disabled={isRegister && !agreed}
-              style={styles.cta}
-              variant="primary"
+              variant="ghost"
+              size="large"
+              style={styles.socialOutline}
+              onPress={() => void onGooglePress()}
             >
-              <Typography variant="buttonMd" tone="onAccent" style={styles.ctaText}>
-                {t(isRegister ? 'auth.register.continue' : 'auth.login.continue')}
-              </Typography>
+              <View style={styles.socialContent}>
+                <Image source={googleIcon} style={styles.socialIcon} />
+                <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>
+              </View>
+            </Button>
+
+            <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
+              <View style={styles.socialContent}>
+                <Image source={facebookIcon} style={styles.socialIcon} />
+                <Typography style={styles.socialText}>{t('auth.login.facebook')}</Typography>
+              </View>
             </Button>
           </View>
-        </View>
 
-        <LineWithDots
-          width={s(320)}
-          thickness={2}
-          dotSize={12}
-          style={styles.dividerRow}
-        />
-
-        <View style={styles.socialBlock}>
-          <Typography variant="caption" tone="primary" style={styles.socialTitle}>
-            {t('auth.login.social')}
-          </Typography>
-
-          <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
-            <View style={styles.socialContent}>
-              <Image source={googleIcon} style={styles.socialIcon} />
-              <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>
-            </View>
-          </Button>
-
-          <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
-            <View style={styles.socialContent}>
-              <Image source={facebookIcon} style={styles.socialIcon} />
-              <Typography style={styles.socialText}>{t('auth.login.facebook')}</Typography>
-            </View>
-          </Button>
-        </View>
-
-        <Button
-          variant="ghost"
-          size="small"
-          style={styles.footerRow}
-          textStyle={styles.footerText}
-          title={t(isRegister ? 'auth.register.haveAccount' : 'auth.login.noAccount')}
-          onPress={() =>
-            navigation.navigate(isRegister ? Routes.Login : Routes.Register)
-          }
-        />
+          <Button
+            variant="ghost"
+            size="small"
+            style={styles.footerRow}
+            textStyle={styles.footerText}
+            title={t(isRegister ? 'auth.register.haveAccount' : 'auth.login.noAccount')}
+            onPress={() => navigation.navigate(isRegister ? Routes.Login : Routes.Register)}
+          />
         </View>
       </View>
     </ScreenContainer>

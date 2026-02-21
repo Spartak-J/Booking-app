@@ -82,7 +82,7 @@ export const authService = {
     for (const username of usernames) {
       try {
         const { data } = await apiClient.post<any>(ENDPOINTS.auth.login, {
-          username,
+          login: username,
           password: payload.password,
         });
 
@@ -147,12 +147,19 @@ export const authService = {
       throw toUserFacingApiError(error, 'Не удалось отправить запрос на смену пароля.');
     }
   },
-  googleLogin: async (): Promise<AuthResponse> => {
+  googleLogin: async (idToken: string): Promise<AuthResponse> => {
     if (USE_MOCKS_AUTH) {
       return { token: `mock-token-${mockUser.id}`, user: mockUser };
     }
-    throw new Error(
-      'Google Login в текущем backend реализован через web redirect flow. Для mobile нужен отдельный endpoint с idToken.',
-    );
+    try {
+      const { data } = await apiClient.post<any>(ENDPOINTS.auth.google, { idToken });
+      const token: string =
+        data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
+      if (!token) throw new Error('Токен не получен при Google-входе');
+      const user = await fetchProfile(token);
+      return { token, user };
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось выполнить вход через Google.');
+    }
   },
 };

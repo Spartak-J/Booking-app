@@ -203,6 +203,8 @@ const uk = {
   'auth.errors.fixFields': 'Заповніть коректно поля, щоб увійти',
   'auth.errors.title': 'Помилка входу',
   'auth.errors.generic': 'Не вдалося виконати вхід',
+  'auth.errors.invalidCredentials': 'Користувача не знайдено або пароль невірний',
+  'auth.errors.googleNotConfigured': 'Google вхід не налаштовано. Перевірте OAuth Client ID',
   'auth.placeholder.email': 'Введіть електронну пошту',
   'auth.placeholder.password': 'Введіть пароль',
   'auth.placeholder.name': "Введіть Прізвище та ім'я",

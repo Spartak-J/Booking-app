@@ -84,6 +84,9 @@ PAYMENTS.md
 # -------------------------
 eslint.config.js
 GoogleService-Info.plist
+google-services.json
+client_secret_*.json
+client_*apps_googleusercontent.plist
 
 # -------------------------
 # README

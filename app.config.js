@@ -1,4 +1,12 @@
 import 'dotenv/config';
+import fs from 'fs';
+
+const iosGoogleServicesFilePath =
+  process.env.IOS_GOOGLE_SERVICES_FILE || './GoogleService-Info.plist';
+const androidGoogleServicesFilePath =
+  process.env.ANDROID_GOOGLE_SERVICES_FILE || './google-services.json';
+const hasIosGoogleServicesFile = fs.existsSync(iosGoogleServicesFilePath);
+const hasAndroidGoogleServicesFile = fs.existsSync(androidGoogleServicesFilePath);
 
 export default ({ config }) => ({
   ...config,
@@ -21,12 +29,12 @@ export default ({ config }) => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.booking.like.mobile.ios',
-    googleServicesFile: './GoogleService-Info.plist',
+    ...(hasIosGoogleServicesFile ? { googleServicesFile: iosGoogleServicesFilePath } : {}),
   },
 
   android: {
     package: 'com.booking.like.mobile',
-    googleServicesFile: './google-services.json',
+    ...(hasAndroidGoogleServicesFile ? { googleServicesFile: androidGoogleServicesFilePath } : {}),
     intentFilters: [
       {
         action: 'VIEW',
@@ -64,5 +72,10 @@ export default ({ config }) => ({
     EXPO_PUBLIC_USE_MOCKS_PAYMENT: process.env.EXPO_PUBLIC_USE_MOCKS_PAYMENT,
     USE_MOCKS_PAYMENT: process.env.EXPO_PUBLIC_USE_MOCKS_PAYMENT,
     EXPO_PUBLIC_SENDER_ID: process.env.EXPO_PUBLIC_SENDER_ID,
+    EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    IOS_GOOGLE_SERVICES_FILE: process.env.IOS_GOOGLE_SERVICES_FILE,
+    ANDROID_GOOGLE_SERVICES_FILE: process.env.ANDROID_GOOGLE_SERVICES_FILE,
   },
 });

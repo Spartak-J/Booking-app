@@ -1,6 +1,7 @@
 export const ENDPOINTS = {
   auth: {
     login: '/User/login',
+    google: '/User/google',
     register: '/User/register/client',
     reset: '/User/me/change-password',
   },

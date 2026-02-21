@@ -198,6 +198,8 @@ const en = {
   'auth.errors.fixFields': 'Fix the form fields to continue',
   'auth.errors.title': 'Login failed',
   'auth.errors.generic': 'Unable to sign in',
+  'auth.errors.invalidCredentials': 'User not found or wrong password',
+  'auth.errors.googleNotConfigured': 'Google sign-in is not configured. Check OAuth Client ID',
   'auth.placeholder.email': 'Enter your email',
   'auth.placeholder.password': 'Enter your password',
   'auth.placeholder.name': 'Enter full name',
