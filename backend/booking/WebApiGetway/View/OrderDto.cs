@@ -75,7 +75,7 @@ namespace WebApiGetway.View
                 DiscountPercent = decimal.Parse(offer["discountPercent"].ToString()),
                 DiscountAmount = decimal.Parse(offer["discountAmount"].ToString()),
                // DepositAmount = decimal.Parse(offer["depositAmount"].ToString()),
-                TaxAmount = decimal.Parse(offer["taxAmount"].ToString()),
+               // TaxAmount = decimal.Parse(offer["taxAmount"].ToString()),
                 TotalPrice = decimal.Parse(offer["totalPrice"].ToString()),
                 //FreeCancelEnabled = bool.Parse(offer["freeCancelEnabled"].ToString()),
                // PaidAt = paidAt,

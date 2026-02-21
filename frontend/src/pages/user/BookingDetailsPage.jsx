@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 import { useParams, useLocation, useSearchParams  } from "react-router-dom";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -25,6 +27,7 @@ export const BookingDetailsPage = () => {
 
   const initialHotel = location.state?.hotel || null;
   const initialOffer = location.state?.offer || null;
+const navigate = useNavigate();
 
 
   const [hotel, setHotel] = useState(initialHotel);
@@ -35,7 +38,7 @@ export const BookingDetailsPage = () => {
 
 
  const { offerId } = useParams();
-  // query-параметры (?startDate=...&endDate=...)
+
   const [searchParams] = useSearchParams();
 
   const startDate = searchParams.get("startDate");
@@ -66,12 +69,12 @@ const { id } = useParams();
     console.log("bookingStep:", bookingStep);
   }, [bookingStep]);
 
-  useEffect(() => {
-    if (bookingStep === "loading") {
-      const timer = setTimeout(() => setBookingStep("success"), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [bookingStep]);
+  // useEffect(() => {
+  //   if (bookingStep === "loading") {
+  //     const timer = setTimeout(() => setBookingStep("success"), 3000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [bookingStep]);
 
   useEffect(() => {
     if (bookingStep === "success") {
@@ -81,46 +84,20 @@ const { id } = useParams();
   }, [bookingStep]);
 
 
+  useEffect(() => {
+  if (bookingStep === "confirm") {
+    const timer = setTimeout(() => {
+      navigate("/"); 
+    }, 15000); 
 
-  // await api.book();
-
-  // setBookingStep("success");
-
-  // setTimeout(() => {
-  //   setBookingStep("confirm");
-  // }, 900);
-
-
-  // useEffect(() => {
-  //   if (initialOffer) return;
-
-  //   if (!offerApi || !offerId) return;
-
-  //   offerApi
-  //     .searchId({
-  //       offerId,
-  //       cityId: offerId,
-  //       startDate,
-  //       endDate,
-  //       guests,
-  //       userDiscountPercent: 5,
-  //     })
-  //     .then((res) => {
-  //       const data = res.data[0];
-
-  //       setOffer(data);
-  //       setHotel(data.rentObj[0]);
-  //       setOfferTitle(data.title);
-  //       setImages(data.rentObj[0]?.imagesUrl || []);
-  //       setParamValues(data.rentObj[0]?.paramValues || []);
-  //       console.log("Loaded offer:", data);
-  //       console.log("Loaded hotel:", data.rentObj[0]);
-  //     })
-  //     .catch((err) => console.error("Error loading offer:", err));
-  // }, [id, offerApi, startDate, endDate, guests]);
+    return () => clearTimeout(timer); 
+  }
+}, [bookingStep, navigate]);
 
   return (
     <div className={styles.bookingDetailsPage}>
+
+       
       <Header_Full
         title={bookingStep === "details" ? t("Booking.booking_title") : ""}
         showFilterBtn={false} />
@@ -133,6 +110,8 @@ const { id } = useParams();
             />
           </div>
         )}
+
+ 
         {(bookingStep === "loading" ||
           bookingStep === "success" ||
           bookingStep === "confirm") && (

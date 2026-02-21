@@ -134,7 +134,7 @@ export const CityPage = () => {
                 <p >{city?.description}</p>
 
                 <Text text="Архітектурне та культурне надбання" type="m_600_s_24"/>
-                <p className="text-muted">{city?.history}</p>
+                <p>{city?.history}</p>
               </div>
 
               <div className="mt-auto d-flex justify-content-center">

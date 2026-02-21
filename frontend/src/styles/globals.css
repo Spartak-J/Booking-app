@@ -77,6 +77,66 @@ body {
    z-index: -2;
 }
 
+/* глобальный файл, например global.css */
+
+/* Контрол (само поле) */
+.countrySelect__control {
+  background-color: transparent !important; 
+  border: none !important;                  
+  min-height: 0;                
+  height: 100% !important;                
+  box-shadow: none;            
+  padding: 0;  
+  border-radius: 20px;   
+  overflow: hidden;     
+   color: var(--color--text) !important;     
+}
+
+/* выбранное значение */
+.countrySelect__single-value {
+  color: var(--color--text) !important;
+  line-height: 1.2;
+}
+
+/* Placeholder */
+.countrySelect__placeholder {
+ color: var(--color--text) !important;
+  line-height: 1.2;
+}
+
+/* Открытое меню */
+.countrySelect__menu {
+  background-color: var( --color-card-bg);
+  border: 1px solid #444;
+}
+
+/* Список внутри меню */
+.countrySelect__menu-list {
+  background-color: var( --color-card-bg);
+}
+
+/* Каждая опция */
+.countrySelect__option {
+  background-color: var( --color-card-bg);
+  color: var(--color--text);
+  cursor: pointer;
+   padding: 4px 10px;     
+  min-height: auto;        
+  line-height: 1.2;     
+  font-size: 14px;  
+}
+
+/* Hover опции */
+.countrySelect__option--is-focused {
+  background-color: var(--color--bg-img);
+}
+
+/* Выбранная опция */
+.countrySelect__option--is-selected {
+  background-color: var(   --color-btn-text-dark);
+}
+
+
 /*=================================================
               Buttons 
 ===================================================*/

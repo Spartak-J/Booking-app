@@ -347,7 +347,7 @@ namespace WebApiGetway.Controllers
             var translateParamListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/paramitem/get-all-translations/{lang}", HttpMethod.Get, null);
             var transItemDict = BffHelper.ConvertActionResultToDict(translateParamListResult as OkObjectResult);
 
-            BffHelper.UpdateListWithTranslations(paramItems, transItemDict);
+            BffHelper.UpdateParamListWithTranslations(paramItems, transItemDict);
 
 
             var imagesObjList = (rentObj["images"] as List<Dictionary<string, object>>);
@@ -1155,7 +1155,10 @@ namespace WebApiGetway.Controllers
       
             var rentObj = (offer["rentObj"] as List<Dictionary<string, object>>)[0];
 
-            var mainImg = (rentObj["images?[0]"].ToString());
+            var imgRez = (rentObj["images"] as List<Dictionary<string, object>>)[0];
+
+
+            var mainImg = (imgRez["url"].ToString());
             var countryId = int.Parse(rentObj["countryId"].ToString());
             var cityId = int.Parse(rentObj["cityId"].ToString());
             var street = rentObj["street"].ToString();
