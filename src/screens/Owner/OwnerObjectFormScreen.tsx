@@ -5,6 +5,7 @@ import React, { useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/RootNavigator';
 import { offerService } from '@/services/offerService';
 import { paramService } from '@/services/paramService';
@@ -16,14 +17,15 @@ import { BackButton } from '@/components/BackButton';
 import { formatDate } from '@/utils/date';
 import { Button, Card, Input, Loader, ScreenContainer, Typography } from '@/ui';
 
-type Route = RouteProp<RootStackParamList, 'OwnerObjectForm'>;
+type Route = RouteProp<RootStackParamList, 'OwnerAddHome'>;
+type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 export const OwnerObjectFormScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Navigation>();
   const queryClient = useQueryClient();
   const { params } = useRoute<Route>();
   const offerId = params?.offerId;
-// TODO: move theming to UI layer
+  // TODO: move theming to UI layer
   const { colors } = useTheme();
   const styles = React.useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
@@ -266,7 +268,7 @@ export const OwnerObjectFormScreen = () => {
 };
 
 const getStyles = (colors: any) =>
-// LEGACY STYLES: contains hardcoded typography values
+  // LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
     container: {
       flex: 1,
@@ -300,6 +302,5 @@ const getStyles = (colors: any) =>
       paddingHorizontal: spacing.md,
       borderRadius: radius.md,
     },
-    muted: {
-    },
+    muted: {},
   });

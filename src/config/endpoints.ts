@@ -9,6 +9,8 @@ export const ENDPOINTS = {
     byId: (id: string | number) => `/User/get/${id}`,
     all: '/User/get-all',
     update: '/User/me/update',
+    historyOffers: (lang: string) => `/Bff/me/offers/history/${lang}`,
+    addFavoriteOffer: (offerId: string | number) => `/Bff/favorites/offer/${offerId}`,
   },
   offers: {
     searchShort: (lang: string) => `/Bff/search/offers/${lang}`,

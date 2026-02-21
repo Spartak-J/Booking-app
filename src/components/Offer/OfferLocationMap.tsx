@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Alert, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
-import MapView, { Marker } from 'react-native-maps';
 
 import { useTranslation } from '@/i18n';
 import { useTheme, radius, spacing } from '@/theme';
@@ -81,18 +80,14 @@ export const OfferLocationMap: React.FC<OfferLocationMapProps> = ({ latitude, lo
 
       <Pressable onPress={handleOpenMap} style={styles.preview}>
         {canRenderNativeMap ? (
-          <MapView
-            style={styles.previewMap}
-            initialRegion={{
-              latitude: lat,
-              longitude: lon,
-              latitudeDelta: 0.05,
-              longitudeDelta: 0.05,
-            }}
-            onPress={handleOpenMap}
-          >
-            <Marker coordinate={{ latitude: lat, longitude: lon }} />
-          </MapView>
+          <View style={styles.previewFallback}>
+            <Typography variant="body" tone="primary">
+              {`${lat.toFixed(4)}, ${lon.toFixed(4)}`}
+            </Typography>
+            <Typography variant="caption" tone="secondary">
+              {t('offer.details.openMap')}
+            </Typography>
+          </View>
         ) : (
           <View style={styles.previewFallback}>
             <Typography variant="body" tone="primary">

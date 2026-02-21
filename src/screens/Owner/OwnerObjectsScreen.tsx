@@ -20,7 +20,7 @@ export const OwnerObjectsScreen = () => {
   const owner = useAuthStore((state) => state.user);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const queryClient = useQueryClient();
-// TODO: move theming to UI layer
+  // TODO: move theming to UI layer
   const { colors } = useTheme();
   const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(colors), [colors]);
@@ -41,7 +41,11 @@ export const OwnerObjectsScreen = () => {
   const onDelete = (id: string) =>
     Alert.alert(t('owner.objects.delete'), t('owner.objects.delete'), [
       { text: t('common.cancel'), style: 'cancel' },
-      { text: t('owner.objects.delete'), style: 'destructive', onPress: () => deleteMutation.mutate(id) },
+      {
+        text: t('owner.objects.delete'),
+        style: 'destructive',
+        onPress: () => deleteMutation.mutate(id),
+      },
     ]);
 
   const items = (data?.items ?? []).filter((item) => !owner?.id || item.ownerId === owner.id);
@@ -55,8 +59,18 @@ export const OwnerObjectsScreen = () => {
         </Typography>
       </View>
       <View style={styles.tabRow}>
-        <Button title={t('owner.objects.title')} variant="ghost" style={styles.tabActive} onPress={() => {}} />
-        <Button title={t('profile.menu.settings')} variant="ghost" style={styles.tabInactive} onPress={() => {}} />
+        <Button
+          title={t('owner.objects.title')}
+          variant="ghost"
+          style={styles.tabActive}
+          onPress={() => {}}
+        />
+        <Button
+          title={t('profile.menu.settings')}
+          variant="ghost"
+          style={styles.tabInactive}
+          onPress={() => {}}
+        />
       </View>
       {isLoading && (
         <View style={styles.list}>
@@ -69,7 +83,7 @@ export const OwnerObjectsScreen = () => {
         title={t('owner.objects.create')}
         variant="ghost"
         style={styles.createButton}
-        onPress={() => navigation.navigate('OwnerObjectForm', { offerId: undefined })}
+        onPress={() => navigation.navigate('OwnerAddHome', { offerId: undefined })}
       />
       <FlatList
         data={items}
@@ -78,7 +92,7 @@ export const OwnerObjectsScreen = () => {
           <Button
             variant="ghost"
             style={styles.card}
-            onPress={() => navigation.navigate('OwnerObjectForm', { offerId: item.id })}
+            onPress={() => navigation.navigate('OwnerAddHome', { offerId: item.id })}
           >
             <CachedImage uri={item.images?.[0]} style={styles.cardImage} />
             <View style={styles.cardContent}>
@@ -120,7 +134,7 @@ export const OwnerObjectsScreen = () => {
 };
 
 const getStyles = (colors: any) =>
-// LEGACY STYLES: contains hardcoded typography values
+  // LEGACY STYLES: contains hardcoded typography values
   StyleSheet.create({
     container: {
       flex: 1,
