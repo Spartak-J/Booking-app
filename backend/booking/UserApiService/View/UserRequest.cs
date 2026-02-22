@@ -18,7 +18,7 @@ namespace UserApiService.View
         public string RoleName { get; set; } = string.Empty;
         public string? Token { get; set; }
 
-
+        public bool IsBlocked { get; set; } = false;
 
         public static User MapToModel(UserRequest request)
         {
@@ -33,6 +33,7 @@ namespace UserApiService.View
                 BirthDate = request.BirthDate,
                 CountryId = request.CountryId,
                 Discount = request.Discount,
+                IsBlocked = request.IsBlocked,
                 RoleName = Enum.TryParse<UserRole>(request.RoleName, true, out var role)
                     ? role
                     : UserRole.Client

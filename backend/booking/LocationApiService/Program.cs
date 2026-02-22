@@ -39,6 +39,7 @@ else
 }
 
 app.UseStaticFiles();
+
 app.UseAuthorization();
 
 app.MapControllers();

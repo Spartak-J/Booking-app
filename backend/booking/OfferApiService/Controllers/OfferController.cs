@@ -61,6 +61,22 @@ namespace OfferApiService.Controllers
         //  получение обьявлений по параметрам поиска
         //===========================================================================================
 
+        [HttpGet("search/all")]
+        public async Task<ActionResult<List<OfferShortResponse>>> GetAllOffers()
+        {
+
+            var offers = await _offerService.GetEntitiesAsync();
+
+
+            var result = offers.Select(o => OfferShortResponse.MapToShortResponse(o, _baseUrl)).ToList();
+            
+            return Ok(result);
+        }
+
+        //===========================================================================================
+        //  получение обьявлений по параметрам поиска
+        //===========================================================================================
+
         [HttpGet("search/offers")]
         public async Task<ActionResult<List<OfferShortResponse>>> GetSearchOffers(
             [FromQuery] OfferSearchRequestByCityAndCountGuest request,
@@ -119,9 +135,9 @@ namespace OfferApiService.Controllers
         //  получение обьявлений для списка популярных обьявлений
         //===========================================================================================
 
-        [HttpGet("search/offers/populars")]
+        [HttpPost("search/offers/populars")]
         public async Task<ActionResult<List<OfferShortPopularResponse>>> GetSearchPopularOffers(
-            [FromQuery] List<int> idList)
+            [FromBody] List<int> idList)
         {
 
             
@@ -130,7 +146,7 @@ namespace OfferApiService.Controllers
             {
                 var exists = await _offerService.ExistsEntityAsync(offerId);
                 if (!exists)
-                    return NotFound(new { message = $"offerId {offerId} not found" });
+                    continue;
 
                 var offerRez = await _offerService.GetEntityAsync(offerId);
                 var offer =OfferShortPopularResponse.MapToResponse(offerRez, _baseUrl);
@@ -199,21 +215,21 @@ namespace OfferApiService.Controllers
             var discountAmount = orderPrice * discountPercent / 100;
           
             // Налог на аренду
-            var taxAmount = (response.OrderPrice - discountAmount) * response.Tax / 100;
-            response.TaxAmount = (decimal)taxAmount;
-             response.GuestCount = request.Adults+request.Children;
+            //var taxAmount = (response.OrderPrice - discountAmount) * response.Tax / 100;
+            //response.TaxAmount = (decimal)taxAmount;
+             //response.GuestCount = request.Adults+request.Children;
             response.Adults = request.Adults;
             response.Children = request.Children;
             response.DaysCount = daysCount;
 
-            var totalPrice = orderPrice - discountAmount  + taxAmount;
+            var totalPrice = orderPrice - discountAmount;
 
 
 
             response.OrderPrice = orderPrice;
             response.DiscountPercent = discountPercent;
             response.DiscountAmount = discountAmount;
-            response.TaxAmount = taxAmount;
+           // response.TaxAmount = taxAmount;
             response.TotalPrice = totalPrice;
 
        

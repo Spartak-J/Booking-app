@@ -21,6 +21,34 @@ namespace UserApiService.Services
             _passwordHasher = passwordHasher;
         }
 
+        public async Task<LoginResponse> GoogleLoginAsync(string email, string name)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+            {
+                user = new Client
+                {
+                    Email = email,
+                    Username = name,
+                    RoleName = UserRole.Client
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+            }
+
+            var token = _tokenService.GenerateJwtToken(user);
+
+            return new LoginResponse
+            {
+                Username = user.Username,
+                Token = token,
+                RoleName = user.RoleName.ToString()
+            };
+        }
+
+
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
             //var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
