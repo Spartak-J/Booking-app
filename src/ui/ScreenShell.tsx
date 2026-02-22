@@ -48,9 +48,14 @@ export const ScreenShell: React.FC<Props> = ({
           <IconButton
             onPress={onBack}
             variant="ghost"
+            dimension={spacing.xl + spacing.sm}
             style={styles.headerButton}
             icon={
-              <MaterialCommunityIcons name="arrow-left" size={spacing.xl} color={tokens.textPrimary} />
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={spacing.lg + spacing.xs}
+                color={tokens.textPrimary}
+              />
             }
           />
         ) : (
@@ -65,7 +70,9 @@ export const ScreenShell: React.FC<Props> = ({
           <View style={styles.headerTitle} />
         )}
 
-        <View style={styles.headerRight}>{rightSlot ?? <View style={styles.headerPlaceholder} />}</View>
+        <View style={styles.headerRight}>
+          {rightSlot ?? <View style={styles.headerPlaceholder} />}
+        </View>
       </View>
 
       <View style={[styles.content, contentStyle]}>{children}</View>
@@ -90,7 +97,7 @@ const getStyles = (tokens: any) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: spacing.xl,
-      paddingTop: spacing.xs,
+      paddingTop: 0,
       zIndex: 1,
     },
     headerButton: {

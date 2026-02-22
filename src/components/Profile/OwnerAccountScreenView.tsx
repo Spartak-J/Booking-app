@@ -33,6 +33,7 @@ const OwnerAccountScreenView: React.FC<OwnerAccountScreenViewProps> = ({
       title={t('profile.account.title')}
       onBack={onBack}
       showKeys
+      keysBottomOffset={s(20)}
       contentStyle={styles.shellContent}
       rightSlot={<MaterialCommunityIcons name="magnify" size={s(22)} color={tokens.textPrimary} />}
     >
@@ -104,12 +105,12 @@ const getStyles = (tokens: Record<string, string>) =>
     shellContent: {
       paddingHorizontal: spacing.sm,
       paddingTop: spacing.md,
-      paddingBottom: spacing.xl,
+      paddingBottom: 0,
     },
     content: {
       paddingHorizontal: spacing.sm,
       paddingTop: 0,
-      paddingBottom: spacing.xl,
+      paddingBottom: spacing.sm,
       gap: spacing.lg,
     },
     tabPill: {

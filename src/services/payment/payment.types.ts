@@ -41,3 +41,14 @@ export interface TokenizeCardStatusResult {
   } | null;
   redirectUrl?: string;
 }
+
+export interface SaveTokenizedCardPayload {
+  userId: string;
+  holderName: string;
+  cardToken: string;
+  last4: string;
+  numberMasked: string;
+  brand: string;
+  expiry: string;
+  saveCard: boolean;
+}

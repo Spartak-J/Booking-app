@@ -460,7 +460,103 @@ const baseOffers: Offer[] = [
   },
 ];
 
-export const mockOffers: Offer[] = baseOffers.map((offer, index) => ({
+const generatedAmenities = [
+  ['Wi-Fi', 'Кухня', 'Кондиціонер'],
+  ['Wi-Fi', 'Парковка', 'Сніданок'],
+  ['Wi-Fi', 'Пральна машина', 'Балкон'],
+  ['Wi-Fi', 'Кухня', 'Робочий стіл'],
+  ['Wi-Fi', 'Тераса', 'Парковка'],
+];
+
+const generatedHighlights = [
+  ['Безкоштовна відміна'],
+  ['Оплата на місці'],
+  ['Оплата зараз'],
+  ['Миттєве підтвердження'],
+  ['Пізній заїзд'],
+];
+
+const generatedTitlePool = [
+  'Сучасні апартаменти',
+  'Затишна студія',
+  'Світлий лофт',
+  'Комфортний номер',
+  'Сімейні апартаменти',
+  'Квартира біля центру',
+];
+
+const generatedAddressPool = [
+  'Центральна',
+  'Соборна',
+  'Шевченка',
+  'Незалежності',
+  'Грушевського',
+  'Лесі Українки',
+];
+
+const createGeneratedOffers = (
+  startIndex: number,
+  count: number,
+  city: { id: string; name: string; country: string },
+  ownerOffset: number,
+): Offer[] => {
+  return Array.from({ length: count }, (_, idx) => {
+    const seq = startIndex + idx;
+    const bedroom = (idx % 3) + 1;
+    const guests = bedroom + 1;
+    const ownerNum = ((ownerOffset + idx) % 8) + 1;
+    const type: Offer['type'] = idx % 5 === 0 ? 'hotel' : idx % 4 === 0 ? 'house' : 'apartment';
+
+    return {
+      id: `offer-${seq}`,
+      title: `${generatedTitlePool[idx % generatedTitlePool.length]} ${city.name}`,
+      description: `Комфортне житло у місті ${city.name} для подорожі або роботи.`,
+      city,
+      address: `${generatedAddressPool[idx % generatedAddressPool.length]}, ${10 + idx}`,
+      pricePerNight: 1100 + ((idx * 120) % 1900),
+      rating: 4.1 + (idx % 9) * 0.1,
+      guests,
+      bedrooms: bedroom,
+      amenities: generatedAmenities[idx % generatedAmenities.length],
+      images: [`https://picsum.photos/seed/${city.name.toLowerCase()}-${seq}/600/400`],
+      ownerId: `owner-${ownerNum}`,
+      isActive: true,
+      type,
+      highlights: generatedHighlights[idx % generatedHighlights.length],
+      reviews: [],
+    };
+  });
+};
+
+const kyivGeneratedOffers = createGeneratedOffers(
+  16,
+  15,
+  { id: 'city-kyiv', name: 'Київ', country: 'Україна' },
+  0,
+);
+
+const odesaGeneratedOffers = createGeneratedOffers(
+  31,
+  15,
+  { id: 'city-odesa', name: 'Одеса', country: 'Україна' },
+  2,
+);
+
+const uzhhorodGeneratedOffers = createGeneratedOffers(
+  46,
+  5,
+  { id: 'city-uzhhorod', name: 'Ужгород', country: 'Україна' },
+  4,
+);
+
+const expandedOffers = [
+  ...baseOffers,
+  ...kyivGeneratedOffers,
+  ...odesaGeneratedOffers,
+  ...uzhhorodGeneratedOffers,
+];
+
+export const mockOffers: Offer[] = expandedOffers.map((offer, index) => ({
   ...offer,
   maxGuests: offer.maxGuests ?? offer.guests,
   stock: offer.stock ?? (offer.bedrooms > 1 ? 2 : 1),

@@ -1,6 +1,7 @@
 // Component: HomeDatePickerModal. Used in: HomeScreen.tsx.
 import React, { useMemo } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Button, Modal, Typography } from '@/ui';
 import { radius, withOpacity } from '@/theme';
@@ -57,19 +58,13 @@ export const HomeDatePickerModal: React.FC<HomeDatePickerModalProps> = ({
       <Animated.View style={[styles.dateSheet, sheetAnimatedStyle]}>
         <View style={styles.dateHeader}>
           <Button variant="ghost" style={styles.dateArrow} onPress={onPrevMonth}>
-            <View style={[styles.arrowLine, styles.arrowLineLeft]} />
-            <View style={[styles.arrowLine, styles.arrowLineRight]} />
+            <MaterialCommunityIcons name="chevron-left" size={s(22)} color={palette.text} />
           </Button>
           <Typography variant="calendarTitle" tone="primary">
             {monthLabel}
           </Typography>
-          <Button
-            variant="ghost"
-            style={[styles.dateArrow, styles.dateArrowRight]}
-            onPress={onNextMonth}
-          >
-            <View style={[styles.arrowLine, styles.arrowLineLeft]} />
-            <View style={[styles.arrowLine, styles.arrowLineRight]} />
+          <Button variant="ghost" style={styles.dateArrow} onPress={onNextMonth}>
+            <MaterialCommunityIcons name="chevron-right" size={s(22)} color={palette.text} />
           </Button>
         </View>
         <View style={styles.weekRow}>
@@ -190,22 +185,11 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
       height: s(19),
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    dateArrowRight: {
-      transform: [{ rotate: '180deg' }],
-    },
-    arrowLine: {
-      width: s(17),
-      height: s(2),
-      backgroundColor: palette.text,
-      borderRadius: radius.sm,
-    },
-    arrowLineLeft: {
-      transform: [{ rotate: '35deg' }],
-    },
-    arrowLineRight: {
-      transform: [{ rotate: '-35deg' }],
-      marginTop: s(6),
+      borderWidth: 0,
+      borderColor: palette.transparent,
+      backgroundColor: palette.transparent,
+      paddingHorizontal: 0,
+      paddingVertical: 0,
     },
     weekRow: {
       flexDirection: 'row',

@@ -29,11 +29,23 @@ export default ({ config }) => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.booking.like.mobile.ios',
+    ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY
+      ? { config: { googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY } }
+      : {}),
     ...(hasIosGoogleServicesFile ? { googleServicesFile: iosGoogleServicesFilePath } : {}),
   },
 
   android: {
     package: 'com.booking.like.mobile',
+    ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY
+      ? {
+          config: {
+            googleMaps: {
+              apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY,
+            },
+          },
+        }
+      : {}),
     ...(hasAndroidGoogleServicesFile ? { googleServicesFile: androidGoogleServicesFilePath } : {}),
     intentFilters: [
       {
@@ -75,6 +87,8 @@ export default ({ config }) => ({
     EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY,
+    EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY,
     IOS_GOOGLE_SERVICES_FILE: process.env.IOS_GOOGLE_SERVICES_FILE,
     ANDROID_GOOGLE_SERVICES_FILE: process.env.ANDROID_GOOGLE_SERVICES_FILE,
   },

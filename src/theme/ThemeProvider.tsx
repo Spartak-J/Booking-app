@@ -5,6 +5,7 @@ import { getColorTokens, getThemeColors, ThemeMode } from './tokens';
 
 type ThemeContextValue = {
   mode: ThemeMode;
+  resolvedMode: Exclude<ThemeMode, 'system'>;
   colors: ReturnType<typeof getThemeColors>;
   tokens: ReturnType<typeof getColorTokens>;
   setMode: (mode: ThemeMode) => void;
@@ -38,12 +39,13 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = ({ children }) =
   const value = useMemo(
     () => ({
       mode,
+      resolvedMode,
       colors,
       tokens,
       setMode,
       toggle,
     }),
-    [mode, colors, tokens, toggle],
+    [mode, resolvedMode, colors, tokens, toggle],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

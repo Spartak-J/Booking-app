@@ -106,7 +106,7 @@ const getStyles = (colors: Record<string, string>) =>
       backgroundColor: withOpacity(colors.surface, 0.85),
     },
     header: {
-      marginTop: 0,
+      marginTop: spacing.md,
       paddingHorizontal: spacing.md,
     },
     headerTitle: {

@@ -66,6 +66,7 @@ export const OwnerHomesScreenView: React.FC<OwnerHomesScreenViewProps> = ({
       title={title}
       onBack={onBack}
       contentStyle={styles.content}
+      keysBottomOffset={-s(72)}
       rightSlot={
         <IconButton
           onPress={() => {}}
@@ -200,11 +201,11 @@ const getStyles = (tokens: Record<string, string>) =>
     content: {
       paddingHorizontal: spacing.md,
       paddingTop: spacing.md,
-      paddingBottom: spacing.xl,
+      paddingBottom: spacing.sm,
     },
     list: {
       gap: spacing.md,
-      paddingBottom: spacing.xl,
+      paddingBottom: spacing.xxl + spacing.lg,
     },
     card: {
       gap: spacing.sm,

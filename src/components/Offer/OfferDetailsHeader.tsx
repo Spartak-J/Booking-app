@@ -54,7 +54,7 @@ export const OfferDetailsHeader = ({
 }: OfferDetailsHeaderProps) => {
   const { colors, mode } = useTheme();
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
-  const isDark = mode === 'dark' || colors.background === colors.bgDark;
+  const isDark = mode === 'dark';
   const styles = useMemo(() => getStyles(colors, tokens, isDark), [colors, tokens, isDark]);
   const [showFull, setShowFull] = useState(false);
   const handleSearch = onSearch ?? (() => {});
@@ -62,7 +62,14 @@ export const OfferDetailsHeader = ({
   const handleMenu = onMenu ?? (() => {});
 
   const mainImage = offer.images?.[0];
-  const thumbnails = offer.images?.slice(1, 4) ?? [];
+  const thumbnailImages = useMemo(
+    () =>
+      Array.from({ length: 3 }, (_, index) => {
+        const next = offer.images?.[index + 1];
+        return next ?? mainImage ?? null;
+      }),
+    [offer.images, mainImage],
+  );
 
   return (
     <View>
@@ -101,16 +108,18 @@ export const OfferDetailsHeader = ({
       )}
 
       <View style={styles.galleryRow}>
-        {thumbnails.map((item) => (
-          <CachedImage key={item} uri={item} style={styles.galleryThumb} />
-        ))}
-        <Button
-          title="Галерея"
-          variant="ghost"
-          size="small"
-          style={styles.galleryButton}
-          onPress={handleGallery}
-        />
+        {thumbnailImages.map((item, index) =>
+          item ? (
+            <CachedImage key={`${item}-${index}`} uri={item} style={styles.galleryThumb} />
+          ) : (
+            <View key={`thumb-fallback-${index}`} style={styles.galleryThumbFallback} />
+          ),
+        )}
+        <Button variant="ghost" size="small" style={styles.galleryButton} onPress={handleGallery}>
+          <Typography variant="caption" tone="primary">
+            Галерея
+          </Typography>
+        </Button>
       </View>
 
       <Typography variant="h1" tone="primary" style={styles.title}>
@@ -223,12 +232,20 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
       height: s(45),
       borderRadius: radius.md,
     },
+    galleryThumbFallback: {
+      width: s(80),
+      height: s(45),
+      borderRadius: radius.md,
+      backgroundColor: colors.border,
+    },
     galleryButton: {
       width: s(80),
       height: s(45),
       borderWidth: 1,
       borderColor: tokens.borderStrong,
       borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     title: {
       marginTop: s(20),

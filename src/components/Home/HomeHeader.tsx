@@ -1,12 +1,6 @@
 // Component: HomeHeader. Used in: HomeScreen.tsx.
 import React, { useMemo } from 'react';
-import {
-  ImageBackground,
-  ImageSourcePropType,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ImageBackground, ImageSourcePropType, StyleSheet, TextInput, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -22,6 +16,8 @@ type HomeHeaderProps = {
   heroCityLabel?: string;
   heroCityPlaceholder?: string;
   onChangeCity?: (value: string) => void;
+  onCityFocus?: () => void;
+  onCityBlur?: () => void;
   heroDateLabel?: string;
   heroGuestLabel?: string;
   onOpenMenu?: () => void;
@@ -33,6 +29,7 @@ type HomeHeaderProps = {
   showSearch?: boolean;
   heroImageSource?: ImageSourcePropType;
   heroHeight?: number;
+  topInset?: number;
 };
 
 export const HomeHeader: React.FC<HomeHeaderProps> = ({
@@ -41,6 +38,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   heroCityLabel,
   heroCityPlaceholder,
   onChangeCity,
+  onCityFocus,
+  onCityBlur,
   heroDateLabel,
   heroGuestLabel,
   onOpenMenu,
@@ -52,14 +51,20 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   showSearch = false,
   heroImageSource = heroImage,
   heroHeight = s(132),
+  topInset = 0,
 }) => {
-  const { colors } = useTheme();
-  const isDark = colors.background === colors.bgDark;
+  const { colors, resolvedMode } = useTheme();
+  const isDark = resolvedMode === 'dark';
   const palette = useMemo(() => getPalette(colors, isDark), [colors, isDark]);
-  const styles = useMemo(() => getStyles(palette, heroHeight), [palette, heroHeight]);
+  const styles = useMemo(
+    () => getStyles(palette, heroHeight, topInset),
+    [palette, heroHeight, topInset],
+  );
   const labelTone = isDark ? 'onAccent' : 'primary';
   const isTitleOnly = mode === 'titleOnly';
   const handleChangeCity = onChangeCity ?? (() => {});
+  const handleCityFocus = onCityFocus ?? (() => {});
+  const handleCityBlur = onCityBlur ?? (() => {});
   const handleOpenDatePicker = onOpenDatePicker ?? (() => {});
   const handleOpenGuests = onOpenGuests ?? (() => {});
   const handleSearch = onSearch ?? (() => {});
@@ -107,6 +112,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                       <TextInput
                         value={heroCityLabel}
                         onChangeText={handleChangeCity}
+                        onFocus={handleCityFocus}
+                        onBlur={handleCityBlur}
                         placeholder={heroCityPlaceholder}
                         placeholderTextColor={palette.muted}
                         style={styles.cityInput}
@@ -186,7 +193,7 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
     text,
     surface,
     overlayGradient: isDark
-      ? ([withOpacity(lightSurface, 0), withOpacity(colors.bgDark ?? overlay, 0.9)] as const)
+      ? ([withOpacity(lightSurface, 0), withOpacity(colors.bgDark ?? overlay, 0.62)] as const)
       : ([withOpacity(lightSurface, 0), withOpacity(lightSurface, 0.9)] as const),
     baseGradient: [heroGradientStart, heroGradientEnd] as const,
     searchBorder: isDark ? (colors.surfaceLight ?? colors.onPrimary) : text,
@@ -199,10 +206,10 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
   };
 };
 
-const getStyles = (palette: ReturnType<typeof getPalette>, heroHeight: number) =>
+const getStyles = (palette: ReturnType<typeof getPalette>, heroHeight: number, topInset: number) =>
   StyleSheet.create({
     heroContainer: {
-      width: s(412),
+      width: '100%',
       height: heroHeight,
       alignSelf: 'center',
       marginBottom: s(10),
@@ -236,7 +243,7 @@ const getStyles = (palette: ReturnType<typeof getPalette>, heroHeight: number) =
       position: 'absolute',
       left: s(20),
       right: s(20),
-      top: s(12),
+      top: topInset + s(12),
       height: s(36),
       backgroundColor: 'transparent',
       borderRadius: 0,
@@ -266,7 +273,7 @@ const getStyles = (palette: ReturnType<typeof getPalette>, heroHeight: number) =
       position: 'absolute',
       left: s(20),
       right: s(20),
-      top: s(13),
+      top: topInset + s(13),
       height: s(32),
       backgroundColor: 'transparent',
       borderRadius: 0,
@@ -280,8 +287,8 @@ const getStyles = (palette: ReturnType<typeof getPalette>, heroHeight: number) =
     searchCard: {
       position: 'absolute',
       left: s(20),
-      top: s(76),
-      width: s(372),
+      top: topInset + s(76),
+      right: s(20),
       height: s(50),
       borderRadius: radius.xl,
       borderWidth: 1,

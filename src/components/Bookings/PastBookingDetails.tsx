@@ -67,7 +67,8 @@ export const PastBookingDetails: React.FC<PastBookingDetailsProps> = ({
     [isDark, colors, tokens.accent, tokens.success],
   );
   const styles = useMemo(() => getStyles(palette), [palette]);
-  const visibleReviews = reviews && reviews.length ? (isReviewsOpen ? reviews : reviews.slice(0, 1)) : [];
+  const visibleReviews =
+    reviews && reviews.length ? (isReviewsOpen ? reviews : reviews.slice(0, 1)) : [];
 
   return (
     <ScreenShell title={t('bookingDetails.title')} onBack={onBack} showKeys>

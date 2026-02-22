@@ -66,7 +66,7 @@ export const BookingsScreen = () => {
           city: hotel?.city ?? 'Львів',
           hotelName: hotel?.name ?? 'Jam Hotel Staroyevreyska',
           dates: formatDateRange(activeItem.checkIn, activeItem.checkOut),
-          price: formatPrice(activeItem.totalPrice),
+          price: `UAH ${formatPrice(activeItem.totalPrice, 'UAH', false)}`,
           image: imageMap[activeHotelId] ?? activeTripImage,
         });
       } else {
@@ -88,7 +88,7 @@ export const BookingsScreen = () => {
             title: hotel?.name ?? 'Jam Hotel Staroyevreyska',
             image: imageMap[pastHotelId] ?? pastImage1,
             dates: formatDateRange(item.checkIn, item.checkOut),
-            price: formatPrice(item.totalPrice),
+            price: `UAH ${formatPrice(item.totalPrice, 'UAH', false)}`,
             location: hotel?.address ?? 'вул. Наукова,61',
             rating: hotel?.rating ? hotel.rating.toFixed(1).replace('.', ',') : '8,1',
             infoText: hotel?.description ?? '',

@@ -24,13 +24,22 @@ const AdminAccountScreenView: React.FC<AdminAccountScreenViewProps> = ({
   const [values, setValues] = useState<ProfileFormValues>(initialValues);
 
   return (
-    <ScreenShell title={t('profile.account.title')} onBack={onBack} showKeys>
+    <ScreenShell
+      title={t('profile.account.title')}
+      onBack={onBack}
+      showKeys
+      contentStyle={styles.shellContent}
+    >
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Card variant="filled" style={styles.formCard}>
           <ProfileAccountBaseFields values={values} onChange={setValues} showBirthDate={false} />
         </Card>
 
-        <Button title={t('profile.account.submit')} onPress={() => onSubmit(values)} style={styles.submit} />
+        <Button
+          title={t('profile.account.submit')}
+          onPress={() => onSubmit(values)}
+          style={styles.submit}
+        />
       </ScrollView>
     </ScreenShell>
   );
@@ -38,9 +47,14 @@ const AdminAccountScreenView: React.FC<AdminAccountScreenViewProps> = ({
 
 const getStyles = () =>
   StyleSheet.create({
-    content: {
-      paddingHorizontal: spacing.lg,
+    shellContent: {
+      paddingHorizontal: spacing.sm,
       paddingTop: spacing.sm,
+      paddingBottom: 0,
+    },
+    content: {
+      paddingHorizontal: 0,
+      paddingTop: 0,
       paddingBottom: spacing.lg,
       gap: spacing.lg,
     },

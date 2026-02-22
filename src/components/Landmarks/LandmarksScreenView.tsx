@@ -40,7 +40,6 @@ export const LandmarksScreenView: React.FC<Props> = ({
           title={t('landmarks.title')}
           onBack={onBack}
           onMenu={onMenu}
-          iconColor={colors.black}
           showBack
           showSearch={false}
           showMenu
@@ -102,7 +101,7 @@ const getStyles = (colors: Record<string, string>) =>
       backgroundColor: 'transparent',
     },
     headerTitle: {
-      color: colors.black,
+      color: colors.textPrimary,
     },
     backButton: {
       width: s(24),

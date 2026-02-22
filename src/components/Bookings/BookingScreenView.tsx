@@ -1,14 +1,6 @@
 // Component: BookingScreenView. Used in: BookingScreen.
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  AppState,
-  Dimensions,
-  Linking,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -23,97 +15,15 @@ import { formatPrice } from '@/utils/price';
 import { PaymentType, Offer } from '@/types';
 import { useTranslation } from '@/i18n';
 import { useAuthStore } from '@/store/authStore';
-import { Button, LineWithDots, Loader, Modal, Typography } from '@/ui';
+import { Button, LineWithDots, Loader, Typography } from '@/ui';
 import { radius } from '@/theme';
 import { PaymentRepository } from '@/data/payment';
 import type { PaymentCard } from '@/data/payment/types';
-import { paymentService } from '@/services/payment';
-import type { PaymentMethod as ApiPaymentMethod, PaymentResult } from '@/services/payment';
 
 const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const scale = SCREEN_WIDTH / DESIGN_WIDTH;
 const s = (value: number) => value * scale;
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-const waitForAppReturn = (timeoutMs: number) =>
-  new Promise<void>((resolve) => {
-    if (AppState.currentState === 'active') {
-      resolve();
-      return;
-    }
-
-    let resolved = false;
-    const sub = AppState.addEventListener('change', (state) => {
-      if (state === 'active' && !resolved) {
-        resolved = true;
-        sub.remove();
-        resolve();
-      }
-    });
-
-    setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        sub.remove();
-        resolve();
-      }
-    }, timeoutMs);
-  });
-
-const getHttpStatus = (error: unknown): number | undefined =>
-  typeof error === 'object' && error !== null && 'response' in error
-    ? (error as { response?: { status?: number } }).response?.status
-    : undefined;
-
-const extractPaymentIdFromDeepLink = (url: string): string | undefined => {
-  const tokenMatch = /[?&]token=([^&]+)/i.exec(url);
-  if (tokenMatch?.[1]) {
-    return decodeURIComponent(tokenMatch[1]);
-  }
-
-  const paymentIdMatch = /[?&](paymentId|payment_id|order_id|orderId)=([^&]+)/i.exec(url);
-  if (paymentIdMatch?.[2]) {
-    return decodeURIComponent(paymentIdMatch[2]);
-  }
-
-  return undefined;
-};
-
-const waitForPaymentReturn = (timeoutMs: number) =>
-  new Promise<{ cancelled: boolean; paymentId?: string }>((resolve) => {
-    let resolved = false;
-
-    const finish = (payload: { cancelled: boolean; paymentId?: string }) => {
-      if (resolved) {
-        return;
-      }
-
-      resolved = true;
-      subscription.remove();
-      resolve(payload);
-    };
-
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      const normalized = url.toLowerCase();
-      if (normalized.startsWith('mobileapp://payment/result')) {
-        finish({ cancelled: false, paymentId: extractPaymentIdFromDeepLink(url) });
-        return;
-      }
-
-      if (normalized.startsWith('mobileapp://payment/cancel')) {
-        finish({ cancelled: true });
-      }
-    });
-
-    setTimeout(() => finish({ cancelled: false }), timeoutMs);
-  });
-
-const mapBookingPaymentToApiMethod = (method: PaymentMethod): ApiPaymentMethod => {
-  if (method === 'googlePay') return 'gpay';
-  if (method === 'applePay') return 'apay';
-  if (method === 'paypal') return 'subscribe';
-  return 'pay';
-};
 
 type BookingScreenViewProps = {
   offerId: string;
@@ -126,10 +36,7 @@ type BookingScreenViewProps = {
     offerTitle?: string;
     totalPrice?: number;
   }) => void;
-  onBookingFailure: (payload: { message: string }) => void;
 };
-
-type CardPaymentFlow = 'saved' | 'liqpay';
 
 export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   offerId,
@@ -137,7 +44,6 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   isLoading,
   onBack,
   onBookingSuccess,
-  onBookingFailure,
 }) => {
   const { colors, mode } = useTheme();
   const { t } = useTranslation();
@@ -164,14 +70,8 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   const [country, setCountry] = useState('');
   const [cards, setCards] = useState<PaymentCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | undefined>(undefined);
-  const [isCardPickerOpen, setIsCardPickerOpen] = useState(false);
-  const [cardPaymentFlow, setCardPaymentFlow] = useState<CardPaymentFlow>('liqpay');
   const paymentType: PaymentType =
     paymentMethod === 'cash' ? 'cash' : paymentMethod === 'card' ? 'card' : 'online';
-  const selectedCard = useMemo(
-    () => cards.find((card) => card.id === selectedCardId),
-    [cards, selectedCardId],
-  );
 
   const nights = useMemo(() => {
     const start = new Date(dates.from).getTime();
@@ -189,152 +89,26 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   };
 
   useEffect(() => {
-    PaymentRepository.getCards(userId ?? 'guest')
+    PaymentRepository.getCards()
       .then((list) => {
         setCards(list);
-        setSelectedCardId((prev) => prev ?? list[0]?.id);
-        if (list.length > 0) setCardPaymentFlow('saved');
+        if (list.length > 0 && !selectedCardId) {
+          setSelectedCardId(list[0].id);
+        }
       })
       .catch(() => setCards([]));
-  }, [userId]);
+  }, [selectedCardId]);
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      const totalAmount = Math.max(1, Math.round((offer?.pricePerNight ?? 0) * nights));
-      const useLiqPayFlow =
-        paymentMethod !== 'cash' && !(paymentMethod === 'card' && cardPaymentFlow === 'saved');
-
-      if (paymentMethod === 'card' && cardPaymentFlow === 'saved' && cards.length === 0) {
-        throw new Error(t('profile.payment.noCard'));
-      }
-
-      if (paymentMethod === 'card' && cardPaymentFlow === 'saved') {
-        if (!selectedCardId) {
-          throw new Error(t('profile.payment.noCard'));
-        }
-
-        let savedResult: PaymentResult = await PaymentRepository.chargeSavedCard({
-          userId: userId ?? 'guest',
-          cardId: selectedCardId,
-          bookingId: `draft-${offerId}-${Date.now()}`,
-          amount: totalAmount,
-          currency: 'UAH',
-        });
-
-        if (savedResult.status === 'hold') {
-          savedResult = await paymentService.confirmHold(savedResult.paymentId);
-        }
-
-        if (savedResult.status !== 'paid') {
-          for (let attempt = 0; attempt < 15; attempt += 1) {
-            await wait(2000);
-            savedResult = await paymentService.getStatus(savedResult.paymentId);
-            if (savedResult.status === 'hold') {
-              savedResult = await paymentService.confirmHold(savedResult.paymentId);
-            }
-            if (
-              savedResult.status === 'paid' ||
-              savedResult.status === 'failed' ||
-              savedResult.status === 'cancelled'
-            ) {
-              break;
-            }
-          }
-        }
-
-        if (savedResult.status !== 'paid') {
-          throw new Error('booking.payment.failed');
-        }
-      }
-
-      if (useLiqPayFlow) {
-        const paymentCurrency = 'UAH';
-        const paymentAmount = Math.max(1, Number(totalAmount.toFixed(2)));
-
-        const paymentResult = await paymentService.createPayment({
-          bookingId: `draft-${offerId}-${Date.now()}`,
-          amount: paymentAmount,
-          currency: paymentCurrency,
-          method: mapBookingPaymentToApiMethod(paymentMethod),
-          offerId: Number(offerId),
-          checkIn: dates.from,
-          checkOut: dates.to,
-          guests: guests ?? 1,
-        });
-
-        let latest = paymentResult;
-
-        if (paymentResult.redirectUrl) {
-          await Linking.openURL(paymentResult.redirectUrl);
-          if (paymentMethod === 'paypal') {
-            const paymentReturn = await waitForPaymentReturn(180000);
-            if (paymentReturn.cancelled) {
-              throw new Error('booking.payment.cancelled');
-            }
-            if (paymentReturn.paymentId) {
-              latest = { ...latest, paymentId: paymentReturn.paymentId };
-            } else {
-              await waitForAppReturn(10000);
-            }
-          } else {
-            const paymentReturn = await waitForPaymentReturn(180000);
-            if (paymentReturn.cancelled) {
-              throw new Error('booking.payment.cancelled');
-            }
-            if (paymentReturn.paymentId) {
-              latest = { ...latest, paymentId: paymentReturn.paymentId };
-            } else {
-              await waitForAppReturn(10000);
-            }
-          }
-        }
-
-        if (latest.status === 'hold') {
-          latest = await paymentService.confirmHold(latest.paymentId);
-        }
-
-        if (latest.status !== 'paid') {
-          for (let attempt = 0; attempt < 15; attempt += 1) {
-            await wait(2000);
-            try {
-              latest = await paymentService.getStatus(latest.paymentId);
-            } catch (error) {
-              const httpStatus = getHttpStatus(error);
-              if (paymentMethod === 'paypal' && httpStatus === 404) {
-                continue;
-              }
-              throw error;
-            }
-            if (latest.status === 'hold') {
-              latest = await paymentService.confirmHold(latest.paymentId);
-            }
-            if (
-              latest.status === 'paid' ||
-              latest.status === 'failed' ||
-              latest.status === 'cancelled'
-            ) {
-              break;
-            }
-          }
-        }
-
-        if (latest.status !== 'paid') {
-          if (latest.status === 'failed' || latest.status === 'cancelled') {
-            throw new Error('booking.payment.failed');
-          }
-          throw new Error('booking.payment.processing');
-        }
-      }
-
-      return bookingService.create({
+    mutationFn: () =>
+      bookingService.create({
         offerId,
         checkIn: dates.from,
         checkOut: dates.to,
         guests: guests ?? 1,
         paymentType,
         userId: userId ?? 'user-1',
-      });
-    },
+      }),
     onSuccess: (booking) => {
       queryClient.invalidateQueries({ queryKey: ['bookings', userId ?? ''] });
       queryClient.invalidateQueries({ queryKey: ['owner-bookings'] });
@@ -346,8 +120,8 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
       });
     },
     onError: (err: unknown) => {
-      const message = err instanceof Error ? t(err.message) : t('booking.payment.failed');
-      onBookingFailure({ message });
+      const message = err instanceof Error ? t(err.message) : String(err);
+      Alert.alert(t('booking.error'), message);
     },
   });
 
@@ -409,65 +183,32 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         <BookingPaymentMethod value={paymentMethod} onChange={setPaymentMethod} />
         {paymentMethod === 'card' ? (
           <View style={styles.cardsBlock}>
-            <View style={styles.cardFlowRow}>
-              <Button
-                variant="ghost"
-                onPress={() => setCardPaymentFlow('saved')}
-                style={[
-                  styles.cardFlowButton,
-                  cardPaymentFlow === 'saved' && styles.cardFlowButtonActive,
-                ]}
-              >
-                <Typography variant="caption" tone="primary" style={styles.cardChipText}>
-                  {t('profile.payment.yourCard')}
-                </Typography>
-              </Button>
-              <Button
-                variant="ghost"
-                onPress={() => setCardPaymentFlow('liqpay')}
-                style={[
-                  styles.cardFlowButton,
-                  cardPaymentFlow === 'liqpay' && styles.cardFlowButtonActive,
-                ]}
-              >
-                <Typography variant="caption" tone="primary" style={styles.cardChipText}>
-                  LiqPay
-                </Typography>
-              </Button>
-            </View>
-
-            {cardPaymentFlow === 'saved' ? (
-              <>
-                <Typography variant="body" tone="primary" style={styles.cardsTitle}>
-                  {t('profile.payment.yourCard')}
-                </Typography>
-                {cards.length === 0 ? (
-                  <Typography variant="caption" tone="secondary">
-                    {t('profile.payment.noCard')}
-                  </Typography>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    onPress={() => setIsCardPickerOpen(true)}
-                    style={styles.cardDropdown}
-                  >
-                    <View style={styles.cardDropdownContent}>
-                      <Typography variant="caption" tone="primary" style={styles.cardChipText}>
-                        {selectedCard?.numberMasked ?? selectedCard?.holderName ?? '—'}
-                      </Typography>
-                      <MaterialCommunityIcons
-                        name="chevron-down"
-                        size={s(18)}
-                        color={headerTextColor}
-                      />
-                    </View>
-                  </Button>
-                )}
-              </>
-            ) : (
+            <Typography variant="body" tone="primary" style={styles.cardsTitle}>
+              {t('profile.payment.yourCard')}
+            </Typography>
+            {cards.length === 0 ? (
               <Typography variant="caption" tone="secondary">
-                LiqPay flow відкриється після натискання «{t('booking.book')}».
+                {t('profile.payment.noCard')}
               </Typography>
+            ) : (
+              <View style={styles.cardsRow}>
+                {cards.map((card) => (
+                  <Pressable
+                    key={card.id}
+                    onPress={() => setSelectedCardId(card.id)}
+                    style={[styles.cardChip, selectedCardId === card.id && styles.cardChipActive]}
+                  >
+                    <Typography
+                      variant="caption"
+                      tone="primary"
+                      style={styles.cardChipText}
+                      numberOfLines={1}
+                    >
+                      {card.numberMasked ?? card.holderName}
+                    </Typography>
+                  </Pressable>
+                ))}
+              </View>
             )}
           </View>
         ) : null}
@@ -487,52 +228,6 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
           isLoading={mutation.isPending}
         />
       </ScrollView>
-
-      <Modal
-        visible={isCardPickerOpen}
-        onClose={() => setIsCardPickerOpen(false)}
-        variant="sheet"
-        contentStyle={styles.cardPickerSheet}
-      >
-        <Typography variant="subtitle" tone="primary" style={styles.cardPickerTitle}>
-          {t('profile.payment.yourCard')}
-        </Typography>
-        <View style={styles.cardPickerList}>
-          {cards.map((card) => {
-            const selected = selectedCardId === card.id;
-            return (
-              <Button
-                key={card.id}
-                variant="ghost"
-                onPress={() => {
-                  setSelectedCardId(card.id);
-                  setIsCardPickerOpen(false);
-                }}
-                style={[styles.cardPickerItem, selected && styles.cardPickerItemActive]}
-              >
-                <Typography variant="caption" tone="primary" style={styles.cardChipText}>
-                  {card.numberMasked ?? card.holderName}
-                </Typography>
-              </Button>
-            );
-          })}
-        </View>
-      </Modal>
-
-      <Modal
-        visible={mutation.isPending}
-        onClose={() => {}}
-        variant="dialog"
-        position="center"
-        overlayOpacity={0.55}
-      >
-        <View style={styles.paymentStateContainer}>
-          <Loader variant="spinner" />
-          <Typography variant="body" tone="primary" style={styles.paymentStateText}>
-            {t('booking.payment.processing')}
-          </Typography>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -610,63 +305,28 @@ const getStyles = (colors: any, isDark: boolean, headerTextColor: string) =>
     cardsBlock: {
       gap: s(8),
     },
-    cardFlowRow: {
-      flexDirection: 'row',
-      gap: s(8),
-    },
-    cardFlowButton: {
-      flex: 1,
-      minHeight: s(40),
-      justifyContent: 'center',
-    },
-    cardFlowButtonActive: {
-      borderColor: colors.primary,
-      backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLight,
-    },
     cardsTitle: {
       fontWeight: '600',
     },
-    cardDropdown: {
-      minHeight: s(44),
-      justifyContent: 'center',
-    },
-    cardDropdownContent: {
-      width: '100%',
+    cardsRow: {
       flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    cardChipText: {
-      fontWeight: '600',
-    },
-    cardPickerSheet: {
-      gap: s(12),
-    },
-    cardPickerTitle: {
-      marginBottom: s(4),
-    },
-    cardPickerList: {
+      flexWrap: 'wrap',
       gap: s(8),
     },
-    cardPickerItem: {
-      justifyContent: 'center',
-      alignItems: 'flex-start',
-      minHeight: s(44),
-      paddingHorizontal: s(12),
+    cardChip: {
+      paddingHorizontal: s(10),
+      paddingVertical: s(8),
+      borderRadius: radius.xl,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: isDark ? colors.bgCard : colors.bgPanel,
     },
-    cardPickerItemActive: {
+    cardChipActive: {
       borderColor: colors.primary,
       backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLight,
     },
-    paymentStateContainer: {
-      width: s(280),
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: s(14),
-      paddingVertical: s(8),
-    },
-    paymentStateText: {
-      textAlign: 'center',
+    cardChipText: {
+      fontWeight: '600',
     },
   });
 

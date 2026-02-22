@@ -20,7 +20,8 @@ export const HomeScreen = () => {
   };
 
   const handleOpenCity = async (cityName: string) => {
-    const city = (await landmarkService.findCityByQuery(cityName)) ?? (await landmarkService.getDefaultCity());
+    const city =
+      (await landmarkService.findCityByQuery(cityName)) ?? (await landmarkService.getDefaultCity());
     navigation.navigate(Routes.LandmarksCity, {
       cityId: city?.id,
       cityName: city?.name ?? cityName,
@@ -28,7 +29,7 @@ export const HomeScreen = () => {
   };
 
   return (
-    <AppLayout variant="tab" header={false}>
+    <AppLayout variant="tab" header={false} edges={['left', 'right']}>
       <HomeScreenView
         onSearch={handleSearch}
         onOpenCity={handleOpenCity}

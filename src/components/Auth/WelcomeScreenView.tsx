@@ -83,9 +83,9 @@ export const WelcomeScreenView = () => {
         <Image source={backgroundImageSource} style={styles.backgroundImage} resizeMode="cover" />
       </View>
 
-    <LinearGradient
-       pointerEvents="none"
-       colors={[
+      <LinearGradient
+        pointerEvents="none"
+        colors={[
           withOpacity(colors.surfaceLight, 0.05),
           withOpacity(colors.surfaceLight, 0.75),
           withOpacity(colors.surfaceLight, 0.95),

@@ -71,6 +71,24 @@ export const AddCardScreen = () => {
           if (!statusResult.cardToken) {
             throw new Error('Токен картки не отримано від LiqPay.');
           }
+
+          if (values.saveCard) {
+            const card = statusResult.card;
+            const expiryFromInput = values.expiry;
+            await paymentService.saveTokenizedCard({
+              userId: userId ?? 'guest',
+              holderName: values.holderName,
+              cardToken: statusResult.cardToken,
+              last4: card?.last4 ?? values.cardNumber.replace(/\D/g, '').slice(-4),
+              numberMasked:
+                card?.numberMasked ??
+                `**** **** **** ${values.cardNumber.replace(/\D/g, '').slice(-4)}`,
+              brand: card?.brand ?? 'card',
+              expiry: card?.expiry ?? expiryFromInput,
+              saveCard: true,
+            });
+          }
+
           navigation.navigate(Routes.Main, { screen: Routes.Profile });
           return;
         }

@@ -425,10 +425,10 @@ const ru = {
   'profile.addCard.field.cardNumber': 'Номер карты*',
   'profile.addCard.field.cvv': 'CVV*',
   'profile.addCard.field.expiry': 'Срок*',
-  'profile.addCard.placeholder.name': 'Ирина Брыцкая',
+  'profile.addCard.placeholder.name': 'Iryna Brytska',
   'profile.addCard.placeholder.cardNumber': '0123 4567 5678 9101',
   'profile.addCard.placeholder.cvv': '378',
-  'profile.addCard.placeholder.expiry': '01/2029',
+  'profile.addCard.placeholder.expiry': '01/29',
   'profile.addCard.saveInfo': 'Сохранить информацию карты',
   'profile.addCard.save': 'Сохранить',
 

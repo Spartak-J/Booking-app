@@ -32,8 +32,7 @@ export const OfferOwnerInfo = ({
 }: OfferOwnerInfoProps) => {
   const { colors, mode } = useTheme();
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
-  const isDark = mode === 'dark' || colors.background === colors.bgDark;
-  const styles = useMemo(() => getStyles(colors, tokens, isDark), [colors, tokens, isDark]);
+  const styles = useMemo(() => getStyles(colors, tokens), [colors, tokens]);
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -90,15 +89,17 @@ export const OfferOwnerInfo = ({
   );
 };
 
-const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDark: boolean) =>
+const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>) =>
   StyleSheet.create({
     container: {
       marginTop: s(20),
     },
     headerRow: {
       height: s(43),
-      backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLightDarker,
+      backgroundColor: colors.surface,
       borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: tokens.border,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -125,8 +126,10 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
     },
     infoCard: {
       marginTop: s(12),
-      backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLight,
+      backgroundColor: colors.surface,
       borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: tokens.border,
       padding: s(12),
       minHeight: s(170),
     },

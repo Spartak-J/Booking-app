@@ -429,7 +429,7 @@ const en = {
   'profile.addCard.placeholder.name': 'Iryna Brytska',
   'profile.addCard.placeholder.cardNumber': '0123 4567 5678 9101',
   'profile.addCard.placeholder.cvv': '378',
-  'profile.addCard.placeholder.expiry': '01/2029',
+  'profile.addCard.placeholder.expiry': '01/29',
   'profile.addCard.saveInfo': 'Save card information',
   'profile.addCard.save': 'Save',
 

@@ -22,7 +22,7 @@ type OfferRoomsListProps = {
 export const OfferRoomsList = ({ rooms, onBook }: OfferRoomsListProps) => {
   const { colors, mode } = useTheme();
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
-  const isDark = mode === 'dark' || colors.background === colors.bgDark;
+  const isDark = mode === 'dark';
   const styles = useMemo(() => getStyles(colors, tokens, isDark), [colors, tokens, isDark]);
 
   if (!rooms.length) return null;
@@ -75,7 +75,7 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
       width: '100%',
       height: s(151),
       borderRadius: radius.md,
-      backgroundColor: isDark ? colors.bgCard : colors.surfaceLight,
+      backgroundColor: colors.surface,
       overflow: 'hidden',
       position: 'relative',
     },
@@ -123,7 +123,7 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
       left: s(6),
       flexDirection: 'row',
       gap: s(4),
-      backgroundColor: colors.surfaceWarm,
+      backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceWarm,
       paddingHorizontal: s(6),
       paddingVertical: s(3),
       borderRadius: s(10),
@@ -138,7 +138,7 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
       position: 'absolute',
       right: s(6),
       top: s(6),
-      backgroundColor: colors.accentSoftAlt,
+      backgroundColor: isDark ? colors.bgDarkAlt : colors.accentSoftAlt,
       paddingHorizontal: s(6),
       paddingVertical: s(3),
       borderRadius: radius.sm,

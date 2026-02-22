@@ -52,6 +52,7 @@ export const LandmarksCityScreen = () => {
   const menuAnimation = useMemo(() => new Animated.Value(0), []);
 
   const cityName = city?.name ?? cityNameFromParams ?? '';
+  const guestsLabel = guests ? `${guests} гостя` : '';
   const guestsValue = Number(guests);
   const parsedGuests =
     Number.isFinite(guestsValue) && guestsValue > 0 ? Math.floor(guestsValue) : undefined;
@@ -176,7 +177,7 @@ export const LandmarksCityScreen = () => {
   }
 
   return (
-    <AppLayout variant="stack" header={false}>
+    <AppLayout variant="stack" header={false} edges={['bottom']}>
       <LandmarksCityScreenView
         cityName={cityName}
         guide={guide}
@@ -205,8 +206,11 @@ export const LandmarksCityScreen = () => {
         cityQuery={cityName}
         dateFrom={dateFrom}
         dateTo={dateTo}
-        guests={guests}
-        onGuestsChange={setGuests}
+        guestsLabel={guestsLabel}
+        onGuestsChange={(value) => {
+          const digits = value.replace(/\D/g, '').slice(0, 2);
+          setGuests(digits);
+        }}
         datePickerVisible={datePickerVisible}
         monthLabel={monthLabel}
         weekLabels={weekLabels}

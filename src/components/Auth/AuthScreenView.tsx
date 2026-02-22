@@ -35,7 +35,7 @@ type Props = {
 
 export const AuthScreenView: React.FC<Props> = ({ mode }) => {
   const navigation = useNavigation<Navigation>();
-  const { login, register, googleLogin } = useAuth();
+  const { login, register } = useAuth();
   const { tokens } = useTheme();
   const { t } = useTranslation();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -45,81 +45,28 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
 
   const schema = useMemo(() => {
     const base = {
-      email: yup.string().email(t('auth.errors.email')).required(t('auth.errors.requiredEmail')),
-      password: yup
-        .string()
-        .min(6, t('auth.errors.passwordLength'))
-        .required(t('auth.errors.requiredPassword')),
+      email: yup.string().required(),
+      password: yup.string().required(),
     };
     if (mode === 'register') {
-      return yup.object({ ...base, name: yup.string().required(t('auth.errors.requiredName')) });
+      return yup.object({ ...base, name: yup.string().required() });
     }
     return yup.object(base);
-  }, [mode, t]);
+  }, [mode]);
 
-  const {
-    control,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const { control, handleSubmit } = useForm<FormValues>({
     resolver: yupResolver(schema),
     defaultValues: { name: '', email: '', password: '' },
   });
 
-  const resolveAuthErrorMessage = (error: unknown) => {
-    const raw =
-      error instanceof Error
-        ? error.message
-        : typeof error === 'string'
-          ? error
-          : t('auth.errors.generic');
-    const trimmed = raw.trim();
-    const normalized = trimmed.toLowerCase();
-
-    if (
-      normalized.includes('androidclientid') ||
-      normalized.includes('iosclientid') ||
-      normalized.includes('webclientid') ||
-      normalized.includes('client id') ||
-      normalized.includes('google oauth') ||
-      normalized.includes('idtoken')
-    ) {
-      return t('auth.errors.googleNotConfigured');
-    }
-    if (trimmed.length > 0) return trimmed;
-    return t('auth.errors.generic');
-  };
-
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      clearErrors('password');
-      if (mode === 'register') {
-        if (!agreed) return;
-        await register(values as Required<FormValues>);
-      } else {
-        await login(values);
-      }
-    } catch (error) {
-      setError('password', {
-        type: 'manual',
-        message: resolveAuthErrorMessage(error),
-      });
+  const onSubmit = handleSubmit((values) => {
+    if (mode === 'register') {
+      if (!agreed) return;
+      register(values as Required<FormValues>);
+    } else {
+      login(values);
     }
   });
-
-  const onGooglePress = async () => {
-    try {
-      clearErrors('password');
-      await googleLogin();
-    } catch (error) {
-      setError('password', {
-        type: 'manual',
-        message: resolveAuthErrorMessage(error),
-      });
-    }
-  };
 
   const isRegister = mode === 'register';
 
@@ -158,7 +105,6 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
                     placeholder={t('auth.placeholder.name')}
                     containerStyle={styles.inputContainer}
                     inputStyle={styles.input}
-                    error={errors.name?.message}
                   />
                 )}
               />
@@ -170,14 +116,10 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
               render={({ field: { value, onChange } }) => (
                 <Input
                   value={value}
-                  onChangeText={(next) => {
-                    clearErrors('password');
-                    onChange(next);
-                  }}
+                  onChangeText={onChange}
                   placeholder={t('auth.placeholder.email')}
                   containerStyle={styles.inputContainer}
                   inputStyle={styles.input}
-                  error={errors.email?.message}
                 />
               )}
             />
@@ -189,15 +131,11 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
                 <View style={styles.passwordFieldWrap}>
                   <Input
                     value={value}
-                    onChangeText={(next) => {
-                      clearErrors('password');
-                      onChange(next);
-                    }}
+                    onChangeText={onChange}
                     placeholder={t('auth.placeholder.password')}
                     secureTextEntry={!showPassword}
                     containerStyle={styles.inputContainer}
                     inputStyle={[styles.input, styles.passwordInput]}
-                    error={errors.password?.message}
                   />
                   <MaterialCommunityIcons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
@@ -251,12 +189,7 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
               {t('auth.login.social')}
             </Typography>
 
-            <Button
-              variant="ghost"
-              size="large"
-              style={styles.socialOutline}
-              onPress={() => void onGooglePress()}
-            >
+            <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
               <View style={styles.socialContent}>
                 <Image source={googleIcon} style={styles.socialIcon} />
                 <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>

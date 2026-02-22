@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import { Animated, Easing, ScrollView, StyleSheet, View } from 'react-native';
 
 import { OfferDetailsHeader } from '@/components/Offer/OfferDetailsHeader';
-import { OfferOwnerInfo } from '@/components/Offer/OfferOwnerInfo';
 import { OfferRoomsList } from '@/components/Offer/OfferRoomsList';
 import { OfferReviews } from '@/components/Offer/OfferReviews';
 import HomeMenuSheet from '@/components/Home/HomeMenuSheet';
@@ -79,18 +78,6 @@ export const OfferDetailsScreenView: React.FC<OfferDetailsScreenViewProps> = ({
           onSearch={() => undefined}
           onGallery={() => onOpenGallery(offer.id)}
           onMenu={openMenu}
-          renderOwnerInfo={
-            offer.owner ? (
-              <OfferOwnerInfo
-                name={offer.owner.name}
-                avatar={offer.owner.avatarUrl}
-                reviewsCount={offer.owner.reviewsCount}
-                rating={offer.owner.rating}
-                yearsHosting={offer.owner.yearsHosting}
-                languages={offer.owner.languages}
-              />
-            ) : undefined
-          }
         />
         <OfferReviews reviews={offer.reviews} />
         <OfferRoomsList rooms={rooms} onBook={() => onBook(offer.id)} />

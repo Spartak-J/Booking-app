@@ -10,6 +10,7 @@ import {
   CreatePaymentPayload,
   PaymentStatus,
   PaymentResult,
+  SaveTokenizedCardPayload,
   StartTokenizeCardPayload,
   TokenizeCardStatusResult,
 } from './payment.types';
@@ -20,6 +21,7 @@ type PaymentEndpoints = {
   status: (paymentId: string) => string;
   tokenizeStart: string;
   tokenizeStatus: (paymentId: string) => string;
+  tokenize: string;
 };
 
 type RawPaymentData = {
@@ -43,6 +45,7 @@ const PAYMENT_ENDPOINTS: PaymentEndpoints = {
   tokenizeStatus:
     paymentEndpoints?.tokenizeStatus ??
     ((paymentId: string) => `/Bff/payments/tokenize/status/${paymentId}`),
+  tokenize: paymentEndpoints?.tokenize ?? '/Bff/payments/tokenize',
 };
 
 const normalizeStatus = (status?: string): PaymentStatus => {
@@ -93,6 +96,10 @@ export const paymentServiceApi = {
       card: normalizedData.card ?? null,
       redirectUrl: normalizedData.redirectUrl ?? normalizedData.redirect_url,
     };
+  },
+
+  async saveTokenizedCard(payload: SaveTokenizedCardPayload): Promise<void> {
+    await apiClient.post(PAYMENT_ENDPOINTS.tokenize, payload);
   },
 };
 

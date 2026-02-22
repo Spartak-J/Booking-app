@@ -1,7 +1,7 @@
 // Component: HomeScreenView. Used in: HomeScreen.
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
-import { Animated, Easing, ImageBackground, StyleSheet, View } from 'react-native';
+import { Animated, Easing, Keyboard, ScrollView, StyleSheet, View } from 'react-native';
 import { FiltersModal } from '@/components/FiltersModal';
 import { PopularCities } from '@/components/Home/PopularCities';
 import HomeCountries from '@/components/Home/HomeCountries';
@@ -10,26 +10,37 @@ import SpecialOffers from '@/components/Home/SpecialOffers';
 import HomeHeader from '@/components/Home/HomeHeader';
 import GuestBanner from '@/components/Home/GuestBanner';
 import { cityService } from '@/services/cityService';
-import { OfferFilters } from '@/services/offerService';
+import { offerService, OfferFilters } from '@/services/offerService';
 import { useTheme } from '@/theme';
 import { useAuthStore } from '@/store/authStore';
 import { s } from '@/utils/scale';
 import HomeMenuSheet from '@/components/Home/HomeMenuSheet';
-import {
-  CITY_CARDS,
-  COUNTRY_BUBBLES,
-  OFFER_PROMOS,
-  RECOMMENDATIONS,
-} from '@/components/Home/homeData';
+import { COUNTRY_BUBBLES, OFFER_PROMOS } from '@/components/Home/homeData';
 import { MENU_ITEMS } from '@/components/Home/homeNavigationData';
 import HomeDatePickerModal from '@/components/Home/HomeDatePickerModal';
 import HomeGuestsModal from '@/components/Home/HomeGuestsModal';
 import { useHomeLabels } from '@/components/Home/useHomeLabels';
-import entertainmentImage from '@/assets/images/entertainment.png';
 import { useTranslation } from '@/i18n';
-import { ScreenContainer } from '@/ui';
+import { Button, ScreenContainer, Typography } from '@/ui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getLocalCityGuide } from '@/data/landmarks/cityGuide.local';
+import type { CityCard } from '@/components/Home/types';
+import type { RecommendationCard } from '@/components/Home/types';
+import { mockOffers } from '@/utils/mockData';
 
 const OVERLAY_ANIMATION_DURATION = 250;
+const RECOMMENDED_CITY_NAMES = [
+  'Львів',
+  'Київ',
+  'Одеса',
+  'Яремче',
+  'Ужгород',
+  'Чернівці',
+  'Івано-Франківськ',
+  "Кам'янець-Подільський",
+  'Луцьк',
+  'Буковель',
+] as const;
 
 const animateOverlay = (anim: Animated.Value, open: boolean, onComplete?: () => void) => {
   Animated.timing(anim, {
@@ -67,13 +78,15 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({
   const [childCount, setChildCount] = useState(0);
   const [petsEnabled, setPetsEnabled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { colors } = useTheme();
+  const [isCityInputFocused, setIsCityInputFocused] = useState(false);
+  const { colors, resolvedMode } = useTheme();
   const { t } = useTranslation();
   const guestMode = useAuthStore((s) => s.guestMode);
   const leaveGuestMode = useAuthStore((s) => s.leaveGuestMode);
   const dateAnimation = useMemo(() => new Animated.Value(0), []);
   const guestAnimation = useMemo(() => new Animated.Value(0), []);
   const menuAnimation = useMemo(() => new Animated.Value(0), []);
+  const insets = useSafeAreaInsets();
   const dateSheetAnimatedStyle = useMemo(
     () => ({
       opacity: dateAnimation,
@@ -116,11 +129,66 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({
     }),
     [menuAnimation],
   );
-  const isDark = colors.background === colors.bgDark;
+  const isDark = resolvedMode === 'dark';
   const palette = useMemo(() => getPalette(colors, isDark), [colors, isDark]);
-  const styles = useMemo(() => getStyles(), []);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const contentStyle = useMemo(() => [styles.content], [styles.content]);
   const { data: cities } = useQuery({ queryKey: ['cities'], queryFn: cityService.getAll });
+  const { data: recommendationOffers } = useQuery({
+    queryKey: ['home-recommendation-offers'],
+    queryFn: async () => {
+      const { items } = await offerService.getAll({ onlyActive: true, sort: 'recommended' });
+      return items;
+    },
+  });
+  const popularCityCards = useMemo<CityCard[]>(() => {
+    const apiCities = cities ?? [];
+    return RECOMMENDED_CITY_NAMES.map((cityName) => {
+      const backendCity = apiCities.find(
+        (city) => city.name.trim().toLowerCase() === cityName.trim().toLowerCase(),
+      );
+      const guide = getLocalCityGuide({
+        cityId: backendCity ? String(backendCity.id) : undefined,
+        cityName,
+      });
+      return {
+        id: String(backendCity?.id ?? guide.cityId ?? cityName),
+        name: backendCity?.name ?? cityName,
+        image: guide.heroImage,
+      };
+    });
+  }, [cities]);
+  const citySuggestions = useMemo(() => {
+    const query = keyword.trim().toLowerCase();
+    if (query.length < 1) return [];
+
+    const fromApi = (cities ?? []).map((city) => city.name).filter(Boolean);
+    const uniqueNames = Array.from(new Set([...fromApi, ...RECOMMENDED_CITY_NAMES]));
+
+    return uniqueNames.filter((name) => name.toLowerCase().includes(query)).slice(0, 8);
+  }, [cities, keyword]);
+
+  const fallbackRecommendationOffers = useMemo(() => {
+    return mockOffers.slice(0, 8);
+  }, []);
+
+  const recommendationCards = useMemo<RecommendationCard[]>(() => {
+    const source =
+      (recommendationOffers ?? []).length > 0
+        ? (recommendationOffers ?? [])
+        : fallbackRecommendationOffers;
+
+    return source.slice(0, 8).map((offer) => ({
+      id: `recommendation-${offer.id}`,
+      offerId: offer.id,
+      name: offer.title,
+      rating: offer.rating ? offer.rating.toFixed(1).replace('.', ',') : '0,0',
+      maxGuests: offer.maxGuests ?? offer.guests,
+      image: offer.images?.[0]
+        ? { uri: offer.images[0] }
+        : { uri: 'https://picsum.photos/seed/reco-fallback/400/700' },
+    }));
+  }, [fallbackRecommendationOffers, recommendationOffers]);
 
   const formatDayLabel = (value: number) => String(value).padStart(2, '0');
 
@@ -294,33 +362,55 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({
   return (
     <View style={styles.screen}>
       <ScreenContainer
-        scroll
         style={styles.scroll}
-        contentContainerStyle={contentStyle}
         edges={['left', 'right']}
+        withKeyboardAvoiding={false}
+        contentContainerStyle={styles.containerContent}
       >
-        <ImageBackground
-          source={entertainmentImage}
-          style={styles.backgroundImage}
-          resizeMode="cover"
+        <HomeHeader
+          heroCityLabel={keyword}
+          heroCityPlaceholder={t('home.placeholder')}
+          onChangeCity={setKeyword}
+          onCityFocus={() => setIsCityInputFocused(true)}
+          onCityBlur={() => setIsCityInputFocused(false)}
+          heroDateLabel={heroDateLabel}
+          heroGuestLabel={heroGuestLabel}
+          onOpenMenu={openMenu}
+          onOpenDatePicker={openDatePicker}
+          onOpenGuests={openGuestsModal}
+          onSearch={() => onSearch({ ...filters, cityName: keyword || undefined })}
+          topInset={insets.top}
+          heroHeight={s(132) + insets.top}
         />
-        <View style={styles.contentWrapper}>
-          <HomeHeader
-            heroCityLabel={keyword}
-            heroCityPlaceholder={t('home.placeholder')}
-            onChangeCity={setKeyword}
-            heroDateLabel={heroDateLabel}
-            heroGuestLabel={heroGuestLabel}
-            onOpenMenu={openMenu}
-            onOpenDatePicker={openDatePicker}
-            onOpenGuests={openGuestsModal}
-            onSearch={() => onSearch({ ...filters, cityName: keyword || undefined })}
-          />
+        {isCityInputFocused && citySuggestions.length > 0 ? (
+          <View style={styles.suggestionsWrap}>
+            {citySuggestions.map((name, index) => (
+              <Button
+                key={name}
+                variant="ghost"
+                style={[
+                  styles.suggestionItem,
+                  index === citySuggestions.length - 1 ? styles.suggestionItemLast : null,
+                ]}
+                onPress={() => {
+                  setKeyword(name);
+                  setIsCityInputFocused(false);
+                  Keyboard.dismiss();
+                }}
+              >
+                <Typography variant="body" tone="primary">
+                  {name}
+                </Typography>
+              </Button>
+            ))}
+          </View>
+        ) : null}
 
+        <ScrollView style={styles.bodyScroll} contentContainerStyle={contentStyle}>
           {guestMode && <GuestBanner onPress={leaveGuestMode} />}
 
-          <PopularCities data={CITY_CARDS} onOpenCity={onOpenCity} />
-          <Recommendations data={RECOMMENDATIONS} onOpenOffer={onOpenOffer} />
+          <PopularCities data={popularCityCards} onOpenCity={onOpenCity} />
+          <Recommendations data={recommendationCards} onOpenOffer={onOpenOffer} />
           <SpecialOffers
             data={OFFER_PROMOS}
             onPress={(id) => {
@@ -331,7 +421,7 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({
           />
 
           <HomeCountries data={COUNTRY_BUBBLES} />
-        </View>
+        </ScrollView>
       </ScreenContainer>
 
       <HomeDatePickerModal
@@ -390,37 +480,45 @@ const getPalette = (colors: any, isDark: boolean) => ({
   overlayOpacity: isDark ? 0.7 : 0.5,
 });
 
-const getStyles = () =>
+const getStyles = (colors: Record<string, string>) =>
   StyleSheet.create({
-    // Корневой слой
     screen: {
       flex: 1,
     },
-    // Абсолютный фон-картинка
-    backgroundImageWrap: {
-      ...StyleSheet.absoluteFillObject,
-      zIndex: 0,
-    },
-    backgroundImage: {
-      flex: 1,
-      width: '100%',
-      height: '100%',
-    },
-    // Контент в Scroll
     content: {
       gap: s(18),
       flexGrow: 1,
     },
+    suggestionsWrap: {
+      marginTop: -s(6),
+      marginHorizontal: s(20),
+      borderRadius: s(14),
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.bgPanel,
+      overflow: 'hidden',
+    },
+    suggestionItem: {
+      width: '100%',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      borderRadius: 0,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.transparent,
+      paddingVertical: s(10),
+      paddingHorizontal: s(14),
+    },
+    suggestionItemLast: {
+      borderBottomWidth: 0,
+    },
     scroll: {
       flex: 1,
-      zIndex: 1,
-      position: 'relative',
     },
-    // Обертка контента поверх фона
-    contentWrapper: {
+    containerContent: {
       flex: 1,
-      zIndex: 1,
     },
+    bodyScroll: { flex: 1 },
   });
 
 export default HomeScreenView;

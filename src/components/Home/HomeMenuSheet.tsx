@@ -12,8 +12,6 @@ import { s, SCREEN_WIDTH } from '@/utils/scale';
 import type { MenuItem } from './types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
-import { useCurrencyStore } from '@/store/currencyStore';
-import { SUPPORTED_CURRENCIES } from '@/types/currency';
 
 type HomeMenuSheetProps = {
   visible: boolean;
@@ -35,8 +33,7 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
   const [languageOpen, setLanguageOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('Українська');
-  const selectedCurrency = useCurrencyStore((state) => state.currency);
-  const setCurrency = useCurrencyStore((state) => state.setCurrency);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>('UAH');
 
   const handleClose = () => {
     setLanguageOpen(false);
@@ -166,7 +163,7 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                             ? styles.dropdownItemActive
                             : styles.dropdownItemInactive,
                         ]}
-                        onPress={() => setCurrency(label)}
+                        onPress={() => setSelectedCurrency(label)}
                       >
                         <Typography
                           variant="caption"
@@ -239,7 +236,7 @@ const LANGUAGE_OPTIONS = [
   'Türkçe',
 ];
 
-const CURRENCY_OPTIONS = SUPPORTED_CURRENCIES;
+const CURRENCY_OPTIONS = ['UAH', 'USD', 'EUR', 'GBP', 'PLN', 'CHF', 'CAD'];
 
 const getStyles = (palette: ReturnType<typeof getPalette>) =>
   StyleSheet.create({

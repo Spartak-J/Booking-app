@@ -1,14 +1,16 @@
 import React, { useMemo } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import HomeDatePickerModal from '@/components/Home/HomeDatePickerModal';
 import HomeHeader from '@/components/Home/HomeHeader';
+import OfferLocationMap from '@/components/Offer/OfferLocationMap';
 import { LandmarkCityGuide } from '@/services/landmarkService';
 import { spacing, radius, useTheme } from '@/theme';
 import { Button, Input, Modal, ScreenContainer, Typography } from '@/ui';
 import { useTranslation } from '@/i18n';
 import { s, SCREEN_WIDTH } from '@/utils/scale';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = {
   cityName?: string;
@@ -21,7 +23,7 @@ type Props = {
   cityQuery: string;
   dateFrom: string;
   dateTo: string;
-  guests: string;
+  guestsLabel: string;
   onGuestsChange: (value: string) => void;
   datePickerVisible: boolean;
   monthLabel: string;
@@ -51,7 +53,7 @@ const LandmarksCityScreenView: React.FC<Props> = ({
   cityQuery,
   dateFrom,
   dateTo,
-  guests,
+  guestsLabel,
   onGuestsChange,
   datePickerVisible,
   monthLabel,
@@ -69,9 +71,11 @@ const LandmarksCityScreenView: React.FC<Props> = ({
   onCloseSearchMenu,
   onSearchSubmit,
 }) => {
-  const { colors } = useTheme();
+  const { colors, tokens } = useTheme();
   const { t } = useTranslation();
-  const styles = useMemo(() => getStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => getStyles(colors, tokens), [colors, tokens]);
+  const searchMenuTopOffset = insets.top + s(28);
   const formatIsoToDisplay = (value: string) => {
     const parts = value.split('-');
     if (parts.length !== 3) {
@@ -84,42 +88,52 @@ const LandmarksCityScreenView: React.FC<Props> = ({
     dateFrom && dateTo ? `${formatIsoToDisplay(dateFrom)} - ${formatIsoToDisplay(dateTo)}` : '';
 
   return (
-    <ScreenContainer scroll style={styles.container} edges={[]}>
-      <HomeHeader
-        mode="titleOnly"
-        title={cityName ?? t('landmarks.cityGuideTitle')}
-        onBack={onBack}
-        onOpenMenu={onOpenMenu}
-        showMenu
-        heroImageSource={guide.heroImage}
-        heroHeight={240}
-      />
+    <ScreenContainer
+      style={styles.container}
+      edges={['bottom']}
+      withKeyboardAvoiding={false}
+      contentContainerStyle={styles.containerContent}
+    >
+      <View style={styles.headerFullBleed}>
+        <HomeHeader
+          mode="titleOnly"
+          title={cityName ?? t('landmarks.cityGuideTitle')}
+          onBack={onBack}
+          onOpenMenu={onOpenMenu}
+          showMenu
+          heroImageSource={guide.heroImage}
+          heroHeight={240}
+          topInset={insets.top}
+        />
+      </View>
 
-      <View style={styles.content}>
-        <Typography variant="h2" style={styles.sectionTitle}>
-          {guide.historyTitle}
-        </Typography>
-        <Typography variant="body" style={styles.sectionText}>
-          {guide.historyText}
-        </Typography>
-
-        <Typography variant="h2" style={styles.sectionTitle}>
-          {guide.cultureTitle}
-        </Typography>
-        <Typography variant="body" style={styles.sectionText}>
-          {guide.cultureText}
-        </Typography>
-
-        <Button variant="primary" size="large" style={styles.ctaButton} onPress={onFindStay}>
-          <Typography variant="menu" style={styles.ctaText}>
-            {t('landmarks.findStay')}
+      <ScrollView style={styles.bodyScroll} contentContainerStyle={styles.bodyContent}>
+        <View style={styles.content}>
+          <Typography variant="h2" style={styles.sectionTitle}>
+            {guide.historyTitle}
           </Typography>
-        </Button>
-      </View>
+          <Typography variant="body" style={styles.sectionText}>
+            {guide.historyText}
+          </Typography>
 
-      <View style={styles.bottomImageWrap}>
-        <Image source={guide.bottomImage} style={styles.bottomImage} resizeMode="cover" />
-      </View>
+          <Typography variant="h2" style={styles.sectionTitle}>
+            {guide.cultureTitle}
+          </Typography>
+          <Typography variant="body" style={styles.sectionText}>
+            {guide.cultureText}
+          </Typography>
+
+          <Button variant="primary" size="large" style={styles.ctaButton} onPress={onFindStay}>
+            <Typography variant="menu" style={styles.ctaText}>
+              {t('landmarks.findStay')}
+            </Typography>
+          </Button>
+        </View>
+
+        <View style={styles.mapWrap}>
+          <OfferLocationMap latitude={guide.latitude} longitude={guide.longitude} />
+        </View>
+      </ScrollView>
 
       <Modal
         visible={searchMenuVisible}
@@ -129,7 +143,7 @@ const LandmarksCityScreenView: React.FC<Props> = ({
         overlayOpacity={0.45}
         contentStyle={styles.searchModalContent}
       >
-        <View style={styles.searchMenu}>
+        <View style={[styles.searchMenu, { marginTop: searchMenuTopOffset }]}>
           <View style={styles.searchInputWrap}>
             <MaterialCommunityIcons
               name="city-variant-outline"
@@ -166,7 +180,7 @@ const LandmarksCityScreenView: React.FC<Props> = ({
               style={styles.searchInputIcon}
             />
             <Input
-              value={guests}
+              value={guestsLabel}
               onChangeText={onGuestsChange}
               placeholder={t('common.guestsLabel')}
               keyboardType="number-pad"
@@ -174,7 +188,12 @@ const LandmarksCityScreenView: React.FC<Props> = ({
               inputStyle={styles.searchInput}
             />
           </View>
-          <Button variant="primary" size="large" style={styles.searchAction} onPress={onSearchSubmit}>
+          <Button
+            variant="primary"
+            size="large"
+            style={styles.searchAction}
+            onPress={onSearchSubmit}
+          >
             <Typography variant="guestsApply" style={styles.searchActionText}>
               {t('landmarks.searchAction')}
             </Typography>
@@ -203,16 +222,30 @@ const LandmarksCityScreenView: React.FC<Props> = ({
   );
 };
 
-const getStyles = (colors: Record<string, string>) =>
+const getStyles = (colors: Record<string, string>, tokens: Record<string, string>) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.surface,
     },
+    containerContent: {
+      flex: 1,
+    },
+    headerFullBleed: {
+      width: SCREEN_WIDTH + spacing.lg * 2,
+      alignSelf: 'center',
+      marginHorizontal: -spacing.lg,
+    },
+    bodyScroll: {
+      flex: 1,
+    },
+    bodyContent: {
+      paddingBottom: spacing.xl,
+    },
     content: {
       paddingHorizontal: spacing.lg,
       gap: spacing.md,
-      marginTop: -spacing.md,
+      marginTop: spacing.md,
     },
     sectionTitle: {
       color: colors.textPrimary,
@@ -227,20 +260,9 @@ const getStyles = (colors: Record<string, string>) =>
     ctaText: {
       color: colors.textOnAccent,
     },
-    bottomImageWrap: {
+    mapWrap: {
+      paddingHorizontal: spacing.lg,
       marginTop: spacing.lg,
-      marginHorizontal: spacing.lg,
-      marginBottom: spacing.xl,
-      borderRadius: radius.lg,
-      overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: colors.border,
-      minHeight: 220,
-      backgroundColor: colors.bgCard,
-    },
-    bottomImage: {
-      width: '100%',
-      height: 220,
     },
     searchModalContent: {
       backgroundColor: colors.transparent,
@@ -250,7 +272,6 @@ const getStyles = (colors: Record<string, string>) =>
     },
     searchMenu: {
       width: SCREEN_WIDTH,
-      marginTop: 0,
       backgroundColor: colors.surface,
       borderBottomLeftRadius: radius.xl,
       borderBottomRightRadius: radius.xl,
@@ -281,8 +302,8 @@ const getStyles = (colors: Record<string, string>) =>
       height: s(50),
       borderRadius: radius.xl,
       borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.bgField,
+      borderColor: tokens.border,
+      backgroundColor: tokens.bgField,
       justifyContent: 'center',
       alignItems: 'flex-start',
       paddingLeft: s(42),
@@ -294,6 +315,9 @@ const getStyles = (colors: Record<string, string>) =>
     searchInput: {
       borderRadius: radius.xl,
       height: s(50),
+      borderWidth: 1,
+      borderColor: tokens.border,
+      backgroundColor: tokens.bgField,
       paddingLeft: s(42),
       paddingRight: spacing.md,
       color: colors.textPrimary,

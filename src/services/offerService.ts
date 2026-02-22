@@ -30,173 +30,238 @@ export type OfferFilters = {
   onlyActive?: boolean;
 };
 
+const normalizeText = (value?: string | null) => (value ?? '').trim().toLowerCase();
+
+const debugOfferSource = (message: string, payload?: Record<string, unknown>) => {
+  if (!__DEV__) return;
+  if (payload) {
+    console.debug(`[offerService] ${message}`, payload);
+    return;
+  }
+  console.debug(`[offerService] ${message}`);
+};
+
+const findMockOfferMatch = (offer: Partial<Offer>): Offer | undefined => {
+  const title = normalizeText(offer.title);
+  const cityName = normalizeText(offer.city?.name);
+
+  if (title) {
+    const byTitle = mockOffers.find((item) => normalizeText(item.title) === title);
+    if (byTitle) return byTitle;
+  }
+
+  if (cityName) {
+    const byCity = mockOffers.find(
+      (item) =>
+        normalizeText(item.city.name) === cityName &&
+        (offer.bedrooms ? item.bedrooms === offer.bedrooms : true),
+    );
+    if (byCity) return byCity;
+  }
+
+  return undefined;
+};
+
+const mergeOfferWithMock = (apiOffer: Offer, mockOffer?: Offer): Offer => {
+  if (!mockOffer) return apiOffer;
+
+  return {
+    ...apiOffer,
+    title: apiOffer.title?.trim() ? apiOffer.title : mockOffer.title,
+    description: apiOffer.description?.trim() ? apiOffer.description : mockOffer.description,
+    city: {
+      id: apiOffer.city?.id || mockOffer.city.id,
+      name: apiOffer.city?.name || mockOffer.city.name,
+      country: apiOffer.city?.country || mockOffer.city.country,
+    },
+    address: apiOffer.address?.trim() ? apiOffer.address : mockOffer.address,
+    pricePerNight: apiOffer.pricePerNight > 0 ? apiOffer.pricePerNight : mockOffer.pricePerNight,
+    rating: apiOffer.rating ?? mockOffer.rating,
+    guests: apiOffer.guests > 0 ? apiOffer.guests : mockOffer.guests,
+    maxGuests: (apiOffer.maxGuests ?? 0) > 0 ? apiOffer.maxGuests : mockOffer.maxGuests,
+    stock: (apiOffer.stock ?? 0) > 0 ? apiOffer.stock : mockOffer.stock,
+    bedrooms: apiOffer.bedrooms > 0 ? apiOffer.bedrooms : mockOffer.bedrooms,
+    amenities: apiOffer.amenities?.length ? apiOffer.amenities : mockOffer.amenities,
+    images: apiOffer.images?.length ? apiOffer.images : mockOffer.images,
+    ownerId: apiOffer.ownerId || mockOffer.ownerId,
+    owner: apiOffer.owner ?? mockOffer.owner,
+    highlights: apiOffer.highlights?.length ? apiOffer.highlights : mockOffer.highlights,
+    reviews: apiOffer.reviews?.length ? apiOffer.reviews : mockOffer.reviews,
+    rooms: apiOffer.rooms?.length ? apiOffer.rooms : mockOffer.rooms,
+  };
+};
+
+const getMockOffersByFilters = async (filters: OfferFilters = {}) => {
+  let items = [...mockOffers];
+  if (filters.cityId) {
+    items = items.filter((item) => item.city.id === filters.cityId);
+  } else if (filters.cityName) {
+    items = items.filter(
+      (item) => item.city.name.toLowerCase() === filters.cityName?.toLowerCase(),
+    );
+  }
+  if (filters.guests) {
+    items = items.filter((item) => (item.maxGuests ?? item.guests) >= (filters.guests ?? 1));
+  }
+  if (filters.dates?.from && filters.dates?.to) {
+    const bookings = await BookingRepository.getAll();
+    items = items.filter((item) =>
+      isOfferAvailableForDates(
+        item.id,
+        filters.dates!.from,
+        filters.dates!.to,
+        bookings,
+        item.stock ?? 1,
+      ),
+    );
+  }
+  if (filters.amenities?.length) {
+    const hasAmenity = (offerAmenities: string[] = [], id: string) => {
+      const normalized = offerAmenities.map((value) => value.toLowerCase());
+      const includesAny = (targets: string[]) =>
+        targets.some((target) => normalized.some((value) => value.includes(target)));
+      switch (id) {
+        case 'wifi':
+          return includesAny(['wi-fi', 'wifi']);
+        case 'tv':
+          return includesAny(['тв', 'телев']);
+        case 'washer':
+          return includesAny(['стирал', 'праль']);
+        case 'kettle':
+          return includesAny(['чайник']);
+        case 'iron':
+          return includesAny(['утюг', 'праск']);
+        case 'desk':
+          return includesAny(['рабоч', 'робоч']);
+        case 'pets':
+          return includesAny(['тварин', 'живот']);
+        case 'ac':
+          return includesAny(['кондицион', 'кондиц']);
+        case 'parking':
+          return includesAny(['парков']);
+        default:
+          return true;
+      }
+    };
+    items = items.filter((item) =>
+      filters.amenities?.every((id) => hasAmenity(item.amenities, id)),
+    );
+  }
+  if (filters.priceFrom !== undefined) {
+    items = items.filter((item) => item.pricePerNight >= (filters.priceFrom ?? 0));
+  }
+  if (filters.priceTo !== undefined) {
+    items = items.filter((item) => item.pricePerNight <= (filters.priceTo ?? Infinity));
+  }
+  if (filters.propertyType) {
+    items = items.filter((item) => item.type === filters.propertyType);
+  }
+  if (filters.categoryId) {
+    const categoryMap: Record<string, Offer['type'] | undefined> = {
+      hostel: 'apartment',
+      studio: 'apartment',
+      room: 'apartment',
+    };
+    const mappedType = categoryMap[filters.categoryId];
+    if (mappedType) {
+      items = items.filter((item) => item.type === mappedType);
+    }
+  }
+  if (filters.ratingMin !== undefined) {
+    items = items.filter((item) => (item.rating ?? 0) >= filters.ratingMin!);
+  }
+  if (filters.freeCancellation) {
+    items = items.filter((item) =>
+      (item.highlights ?? []).some(
+        (value) =>
+          value.toLowerCase().includes('бесплат') || value.toLowerCase().includes('безкоштов'),
+      ),
+    );
+  }
+  if (filters.bookingRule) {
+    const highlightMatch = (targets: string[]) => (value: string) =>
+      targets.some((target) => value.includes(target));
+    const normalizedHighlights = (offer: Offer) =>
+      (offer.highlights ?? []).map((value) => value.toLowerCase());
+    const rule = filters.bookingRule;
+    items = items.filter((offer) => {
+      const highlights = normalizedHighlights(offer);
+      if (rule === 'freeCancel') {
+        return highlights.some(highlightMatch(['бесплат', 'безкоштов']));
+      }
+      if (rule === 'payNow') {
+        return highlights.some(highlightMatch(['оплата зараз', 'pay now', 'онлайн']));
+      }
+      if (rule === 'payBefore') {
+        return highlights.some(highlightMatch(['перед приїзд', 'предоплат', 'advance']));
+      }
+      if (rule === 'payOnArrival') {
+        return highlights.some(highlightMatch(['на місці', 'на месте', 'оплата на месте']));
+      }
+      return true;
+    });
+  }
+  if (filters.district) {
+    const textMatch = (item: Offer) =>
+      `${item.title} ${item.description ?? ''} ${item.address ?? ''}`.toLowerCase();
+    const districtTokens: Record<string, string[]> = {
+      center: ['центр', 'centre', 'center'],
+      favorite: ['улюблен', 'любим'],
+      rynok: ['ринок', 'рынок'],
+      svobody: ['свобод', 'svobody'],
+    };
+    const tokens = districtTokens[filters.district] ?? [];
+    if (tokens.length > 0) {
+      items = items.filter((item) => tokens.some((token) => textMatch(item).includes(token)));
+    }
+  }
+  if (filters.distanceKm) {
+    items = items.filter((item) => {
+      const text = `${item.title} ${item.description ?? ''}`.toLowerCase();
+      const distance =
+        text.includes('центр') || text.includes('centre') || text.includes('center')
+          ? 1
+          : text.includes('ринок') || text.includes('рынок')
+            ? 3
+            : 5;
+      return distance <= (filters.distanceKm ?? 5);
+    });
+  }
+  if (filters.lodgingType) {
+    items = items.filter((item) => {
+      if (filters.lodgingType === 'balcony') {
+        return (item.amenities ?? []).some((value) => value.toLowerCase().includes('балкон'));
+      }
+      if (filters.lodgingType === 'terrace') {
+        return (item.description ?? '').toLowerCase().includes('терас');
+      }
+      if (filters.lodgingType === 'kitchen') {
+        return (item.amenities ?? []).some((value) => value.toLowerCase().includes('кухн'));
+      }
+      if (filters.lodgingType === 'single') return (item.bedrooms ?? 0) <= 1;
+      if (filters.lodgingType === 'double') return (item.bedrooms ?? 0) >= 2;
+      return true;
+    });
+  }
+  if (filters.sort === 'priceAsc') {
+    items.sort((a, b) => a.pricePerNight - b.pricePerNight);
+  }
+  if (filters.sort === 'priceDesc') {
+    items.sort((a, b) => b.pricePerNight - a.pricePerNight);
+  }
+  if (filters.sort === 'ratingAsc') {
+    items.sort((a, b) => (a.rating ?? 0) - (b.rating ?? 0));
+  }
+  if (filters.sort === 'ratingDesc') {
+    items.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  }
+  return { items, total: items.length };
+};
+
 export const offerService = {
   getAll: async (filters: OfferFilters = {}) => {
     if (USE_MOCKS_SEARCH) {
-      let items = [...mockOffers];
-      if (filters.cityId) {
-        items = items.filter((item) => item.city.id === filters.cityId);
-      } else if (filters.cityName) {
-        items = items.filter(
-          (item) => item.city.name.toLowerCase() === filters.cityName?.toLowerCase(),
-        );
-      }
-      if (filters.guests) {
-        items = items.filter((item) => (item.maxGuests ?? item.guests) >= (filters.guests ?? 1));
-      }
-      if (filters.dates?.from && filters.dates?.to) {
-        const bookings = await BookingRepository.getAll();
-        items = items.filter((item) =>
-          isOfferAvailableForDates(
-            item.id,
-            filters.dates!.from,
-            filters.dates!.to,
-            bookings,
-            item.stock ?? 1,
-          ),
-        );
-      }
-      if (filters.amenities?.length) {
-        const hasAmenity = (offerAmenities: string[] = [], id: string) => {
-          const normalized = offerAmenities.map((value) => value.toLowerCase());
-          const includesAny = (targets: string[]) =>
-            targets.some((target) => normalized.some((value) => value.includes(target)));
-          switch (id) {
-            case 'wifi':
-              return includesAny(['wi-fi', 'wifi']);
-            case 'tv':
-              return includesAny(['тв', 'телев']);
-            case 'washer':
-              return includesAny(['стирал', 'праль']);
-            case 'kettle':
-              return includesAny(['чайник']);
-            case 'iron':
-              return includesAny(['утюг', 'праск']);
-            case 'desk':
-              return includesAny(['рабоч', 'робоч']);
-            case 'pets':
-              return includesAny(['тварин', 'живот']);
-            case 'ac':
-              return includesAny(['кондицион', 'кондиц']);
-            case 'parking':
-              return includesAny(['парков']);
-            default:
-              return true;
-          }
-        };
-        items = items.filter((item) =>
-          filters.amenities?.every((id) => hasAmenity(item.amenities, id)),
-        );
-      }
-      if (filters.priceFrom !== undefined) {
-        items = items.filter((item) => item.pricePerNight >= (filters.priceFrom ?? 0));
-      }
-      if (filters.priceTo !== undefined) {
-        items = items.filter((item) => item.pricePerNight <= (filters.priceTo ?? Infinity));
-      }
-      if (filters.propertyType) {
-        items = items.filter((item) => item.type === filters.propertyType);
-      }
-      if (filters.categoryId) {
-        const categoryMap: Record<string, Offer['type'] | undefined> = {
-          hostel: 'apartment',
-          studio: 'apartment',
-          room: 'apartment',
-        };
-        const mappedType = categoryMap[filters.categoryId];
-        if (mappedType) {
-          items = items.filter((item) => item.type === mappedType);
-        }
-      }
-      if (filters.ratingMin !== undefined) {
-        items = items.filter((item) => (item.rating ?? 0) >= filters.ratingMin!);
-      }
-      if (filters.freeCancellation) {
-        items = items.filter((item) =>
-          (item.highlights ?? []).some(
-            (value) =>
-              value.toLowerCase().includes('бесплат') || value.toLowerCase().includes('безкоштов'),
-          ),
-        );
-      }
-      if (filters.bookingRule) {
-        const highlightMatch = (targets: string[]) => (value: string) =>
-          targets.some((target) => value.includes(target));
-        const normalizedHighlights = (offer: Offer) =>
-          (offer.highlights ?? []).map((value) => value.toLowerCase());
-        const rule = filters.bookingRule;
-        items = items.filter((offer) => {
-          const highlights = normalizedHighlights(offer);
-          if (rule === 'freeCancel') {
-            return highlights.some(highlightMatch(['бесплат', 'безкоштов']));
-          }
-          if (rule === 'payNow') {
-            return highlights.some(highlightMatch(['оплата зараз', 'pay now', 'онлайн']));
-          }
-          if (rule === 'payBefore') {
-            return highlights.some(highlightMatch(['перед приїзд', 'предоплат', 'advance']));
-          }
-          if (rule === 'payOnArrival') {
-            return highlights.some(highlightMatch(['на місці', 'на месте', 'оплата на месте']));
-          }
-          return true;
-        });
-      }
-      if (filters.district) {
-        const textMatch = (item: Offer) =>
-          `${item.title} ${item.description ?? ''} ${item.address ?? ''}`.toLowerCase();
-        const districtTokens: Record<string, string[]> = {
-          center: ['центр', 'centre', 'center'],
-          favorite: ['улюблен', 'любим'],
-          rynok: ['ринок', 'рынок'],
-          svobody: ['свобод', 'svobody'],
-        };
-        const tokens = districtTokens[filters.district] ?? [];
-        if (tokens.length > 0) {
-          items = items.filter((item) => tokens.some((token) => textMatch(item).includes(token)));
-        }
-      }
-      if (filters.distanceKm) {
-        items = items.filter((item) => {
-          const text = `${item.title} ${item.description ?? ''}`.toLowerCase();
-          const distance =
-            text.includes('центр') || text.includes('centre') || text.includes('center')
-              ? 1
-              : text.includes('ринок') || text.includes('рынок')
-                ? 3
-                : 5;
-          return distance <= (filters.distanceKm ?? 5);
-        });
-      }
-      if (filters.lodgingType) {
-        items = items.filter((item) => {
-          if (filters.lodgingType === 'balcony') {
-            return (item.amenities ?? []).some((value) => value.toLowerCase().includes('балкон'));
-          }
-          if (filters.lodgingType === 'terrace') {
-            return (item.description ?? '').toLowerCase().includes('терас');
-          }
-          if (filters.lodgingType === 'kitchen') {
-            return (item.amenities ?? []).some((value) => value.toLowerCase().includes('кухн'));
-          }
-          if (filters.lodgingType === 'single') return (item.bedrooms ?? 0) <= 1;
-          if (filters.lodgingType === 'double') return (item.bedrooms ?? 0) >= 2;
-          return true;
-        });
-      }
-      if (filters.sort === 'priceAsc') {
-        items.sort((a, b) => a.pricePerNight - b.pricePerNight);
-      }
-      if (filters.sort === 'priceDesc') {
-        items.sort((a, b) => b.pricePerNight - a.pricePerNight);
-      }
-      if (filters.sort === 'ratingAsc') {
-        items.sort((a, b) => (a.rating ?? 0) - (b.rating ?? 0));
-      }
-      if (filters.sort === 'ratingDesc') {
-        items.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-      }
-      return { items, total: items.length };
+      return getMockOffersByFilters(filters);
     }
     const lang = getApiLang();
     const params: Record<string, string | number> = {};
@@ -238,11 +303,28 @@ export const offerService = {
         params: token ? params : { ...params, userDiscountPercent: 0 },
       });
       const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-      const items = list.map(mapOfferShort);
+      if (list.length === 0) {
+        return getMockOffersByFilters(filters);
+      }
+      const items = list.map((raw) => {
+        const mapped = mapOfferShort(raw);
+        const mockMatch = findMockOfferMatch(mapped);
+        const merged = mergeOfferWithMock(mapped, mockMatch);
+        debugOfferSource('getAll item resolved', {
+          offerId: merged.id,
+          mode: mockMatch ? 'api+mock-merge' : 'api',
+          hasApiImages: Boolean(mapped.images?.length),
+          hasMergedImages: Boolean(merged.images?.length),
+        });
+        return merged;
+      });
       return { items, total: items.length };
     } catch (error) {
-      console.warn('[offerService.getAll] API fallback to empty list', error);
-      return { items: [], total: 0 };
+      console.warn('[offerService.getAll] API fallback to mock list', error);
+      debugOfferSource('getAll fallback to mock list (api error)', {
+        reason: 'api_error',
+      });
+      return getMockOffersByFilters(filters);
     }
   },
   getById: async (id: string) => {
@@ -267,8 +349,28 @@ export const offerService = {
       const { data } = await apiClient.get<any>(ENDPOINTS.offers.fullById(id, lang), { params });
       const payload = Array.isArray(data) ? data[0] : (data?.data?.[0] ?? data?.data ?? data);
       if (!payload) throw new Error('Предложение не найдено');
-      return mapOfferFull(payload);
+      const mapped = mapOfferFull(payload);
+      const mockMatch = mockOffers.find((item) => item.id === id) ?? findMockOfferMatch(mapped);
+      const merged = mergeOfferWithMock(mapped, mockMatch);
+      debugOfferSource('getById resolved', {
+        offerId: id,
+        mode: mockMatch ? 'api+mock-merge' : 'api',
+        hasApiRooms: Boolean(mapped.rooms?.length),
+        hasMergedRooms: Boolean(merged.rooms?.length),
+        hasApiAmenities: Boolean(mapped.amenities?.length),
+        hasMergedAmenities: Boolean(merged.amenities?.length),
+      });
+      return merged;
     } catch (error) {
+      const mockOffer = mockOffers.find((item) => item.id === id);
+      if (mockOffer) {
+        console.warn('[offerService.getById] API fallback to mock offer', error);
+        debugOfferSource('getById fallback to mock offer (api error)', {
+          offerId: id,
+          reason: 'api_error',
+        });
+        return mockOffer;
+      }
       throw toUserFacingApiError(error, 'Не удалось загрузить предложение.');
     }
   },

@@ -22,7 +22,7 @@ export const OfferReviews = ({ reviews = [] }: OfferReviewsProps) => {
   const { colors, mode } = useTheme();
   const { t } = useTranslation();
   const tokens = useMemo(() => getColorTokens(colors, mode), [colors, mode]);
-  const isDark = mode === 'dark' || colors.background === colors.bgDark;
+  const isDark = mode === 'dark';
   const styles = useMemo(() => getStyles(colors, tokens, isDark), [colors, tokens, isDark]);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
@@ -99,7 +99,7 @@ const getStyles = (colors: any, tokens: ReturnType<typeof getColorTokens>, isDar
     reviewCard: {
       height: s(150),
       borderRadius: radius.lg,
-      backgroundColor: isDark ? colors.bgCard : colors.surfaceLight,
+      backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLight,
       paddingHorizontal: s(12),
       paddingVertical: s(12),
       gap: s(8),

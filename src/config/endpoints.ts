@@ -27,6 +27,11 @@ export const ENDPOINTS = {
     cities: (lang: string) => `/get/cities/${lang}`,
     cityTranslations: (lang: string) => `/Bff/city/get-all-translations/${lang}`,
   },
+  attractions: {
+    byCity: (cityId: string | number, lang: string) =>
+      `/Bff/attractions/get/byCityId/${cityId}/${lang}`,
+    byId: (id: string | number, lang: string) => `/Bff/attractions/get/${id}/${lang}`,
+  },
   booking: {
     create: (lang: string) => `/Bff/create/booking-order/${lang}`,
     updateStatus: (orderId: string | number) => `/Bff/update_status/booking/${orderId}`,
