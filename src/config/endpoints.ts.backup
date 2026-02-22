@@ -1,0 +1,46 @@
+export const ENDPOINTS = {
+  auth: {
+    login: '/api/User/login',
+    register: '/api/User/register/client',
+    reset: '/api/User/me/change-password',
+  },
+  user: {
+    me: (lang: string) => `/api/User/me`,
+    byId: (id: string | number) => `/api/User/get/${id}`,
+    all: '/api/User/get-all',
+    update: '/api/User/me/update',
+  },
+  offers: {
+    searchShort: (lang: string) => `/api/Offer/get-all`,
+    searchPublic: (lang: string) => `/api/Offer/get-all`,
+    fullById: (id: string | number, lang: string) => `/api/Offer/get/${id}`,
+    allRaw: '/api/Offer/get-all',
+  },
+  params: {
+    categories: (lang: string) => `/api/Category/get-all`,
+    items: (lang: string) => `/api/Param/get-all`,
+  },
+  locations: {
+    cities: '/api/City/get-all-cities',
+    cityTranslations: (lang: string) => `/api/City/get-all`,
+  },
+  booking: {
+    create: '/api/Order/create',
+    updateStatus: (orderId: string | number) => `/api/Order/update-status/${orderId}`,
+    all: '/api/Order/get-all',
+    byId: (id: string | number) => `/api/Order/get/${id}`,
+  },
+  reviews: {
+    byOffer: (offerId: string | number, lang: string) =>
+      `/api/Review/by-offer/${offerId}`,
+    byUser: (lang: string) => `/api/Review/by-user`,
+    create: (orderId: string | number) => `/api/Review/create`,
+    update: (orderId: string | number, reviewId: string | number, lang: string) =>
+      `/api/Review/update/${reviewId}`,
+    delete: (userId: string | number, orderId: string | number, reviewId: string | number) =>
+      `/api/Review/delete/${reviewId}`,
+  },
+  notifications: {
+    register: '/api/Notification/register',
+  },
+};
