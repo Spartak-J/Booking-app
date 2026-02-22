@@ -1,23 +1,33 @@
-# Booking Oselya Mobile App
+# ��� Booking App
 
-React Native (Expo) mobile application for booking housing.
+Система бронирования гостиничных номеров
 
-## Stack
-- React Native + Expo
-- TypeScript
-- React Navigation
-- Zustand
-- Axios
-
-## Run
-```bash
-npm install
-npx expo start
+## ��� Структура
+```
+booking-app/
+├── frontend/     # React приложение
+├── backend/      # FastAPI API
+└── docs/         # Документация
 ```
 
-## API
-The app works through BFF/Gateway.
-Configure base URL via environment:
+## ��� Автор
 
-- `EXPO_PUBLIC_API_URL`
-- `EXPO_PUBLIC_USE_MOCKS=false`
+Artem (Spartak-J) - Дипломный проект
+
+## ��� Быстрый старт
+
+### Backend
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
