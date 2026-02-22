@@ -1,0 +1,68 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - devops/frontend-deployment
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - { name: user-api, dockerfile: booking/UserApiService/Dockerfile }
+          - { name: offer-api, dockerfile: booking/OfferApiService/Dockerfile }
+          - { name: order-api, dockerfile: booking/OrderApiService/Dockerfile }
+          - { name: attraction-api, dockerfile: booking/AttractionApiService/Dockerfile }
+          - { name: location-api, dockerfile: booking/LocationApiService/Dockerfile }
+          - { name: rentobject-api, dockerfile: booking/RentObjectApiService/Dockerfile }
+          - { name: review-api, dockerfile: booking/ReviewApiService/Dockerfile }
+          - { name: statistic-api, dockerfile: booking/StatisticApiService/Dockerfile }
+          - { name: translation-api, dockerfile: booking/TranslationApiService/Dockerfile }
+          - { name: webapi-gateway, dockerfile: booking/WebApiGetway/Dockerfile }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: spartakj
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push
+        working-directory: ./backend
+        run: |
+          docker build \
+            -f ${{ matrix.service.dockerfile }} \
+            -t spartakj/booking-${{ matrix.service.name }}:latest \
+            -t spartakj/booking-${{ matrix.service.name }}:${{ github.sha }} \
+            .
+          docker push spartakj/booking-${{ matrix.service.name }}:latest
+          docker push spartakj/booking-${{ matrix.service.name }}:${{ github.sha }}
+
+      - name: Summary
+        run: |
+          echo "### ✅ ${{ matrix.service.name }} built!" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: booking-oselya.pp.ua
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/Booking-infrastructure
+            docker compose pull
+            docker compose up -d
+            echo "Deploy completed"
