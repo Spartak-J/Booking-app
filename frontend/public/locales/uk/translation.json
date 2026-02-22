@@ -434,7 +434,20 @@
       "addYourOwn": "Додати своє"
     },
     "btn_add": "Додати кімнату/номер",
-    "btn_save": "Зберегти"
+    "btn_save": "Зберегти",
+    "my_housing":{
+      "menu_btn_edit":"Редагувати",
+      "menu_btn_read_reviews":"Читати відгуки",
+      "menu_btn_booking":"Бронювання"
+    },
+    
+    "booking": {
+      "apartment": "Апартаменти / квартира",
+      "user": "Гості",
+      "Status": "Статус замовлення",
+      "Date": "Дата замовлення",
+      "confirm_order": "Підтвердити"
+    }
   },
   "admin": {
     "title": "Привіт, адмін",

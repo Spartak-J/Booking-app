@@ -14,11 +14,11 @@ import { IconButtonArrow } from '../UI/Button/IconButton_arrow.jsx';
 import { CounterButton } from "../UI/Button/CounterButton.jsx";
 import { IconButtonClose } from "../UI/Button/IconButton_close.jsx";
 
-export const HostPropertyForm = ({ 
+export const HostPropertyForm = ({
     hotel,
-     setShowForm,
-      setUpdate,
-       setActiveKey,
+    setView,
+    setUpdate,
+    setActiveKey,
     setShowHostelList
 }) => {
     const { t } = useTranslation();
@@ -560,7 +560,7 @@ export const HostPropertyForm = ({
             }
 
             alert("Объявление и фото успешно сохранены!");
-            setShowForm(false);
+            setView("list");
             navigate("/profile");
         } catch (error) {
             console.error(error);

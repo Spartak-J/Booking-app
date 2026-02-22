@@ -138,7 +138,11 @@
   --color--hotel-review-btn:#EDE5D1;        /* l-tema_2 */
  --color--hotel-review-bg: #EDE9DF;;        /* l-tema_1 */
  --color--hotel-review-text: #F5F3EE;            /* 01 */
- 
+
+  /*------------------host-housing-card-----------------------*/
+
+  --color-host-housing-card-bg: #EDE9DF;                 /* l-tema_1 */
+
  
 /*--------------------booking-------------------*/
 --color--booking-card-bg:#EDE9DF;                 /* l-tema
@@ -205,7 +209,7 @@
   --color--btn-action-secondary-hover: #FFDB8A;       /* 06 */
   --color--btn-action-secondary-onclick: #FFDB8A;     /* 06 */
 
-  --color--btn-state:  #0E1E2C;                 /* d-tema_ */
+  --color--btn-state: #0D2D4A;                   /* 02 */
   --color--btn-state-hover: #FFEDC3;       /* 05 */
   --color--btn-state-onclick: #FFDB8A;     /* 06 */
   --color--btn-state-border:  #F5F3EE;            /* 01 */
@@ -299,7 +303,11 @@
  --color--hotel-review-bg:  #0E1E2C;           /* t-tema_1 */
  --color--hotel-review-text: #F5F3EE;            /* 01 */
  
+ /*------------------host-housing-card-----------------------*/
 
+  --color-host-housing-card-bg: #0E1E2C;           /* t-tema_1 */
+
+ 
  /*--------------------booking-------------------*/
 --color--booking-card-bg:#0E1E2C;           /* t-tema_1 */
 

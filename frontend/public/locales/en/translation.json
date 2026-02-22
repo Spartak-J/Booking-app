@@ -434,24 +434,35 @@
       "addYourOwn": "Add your own"
     },
     "btn_add": "Add room/unit",
-    "btn_save": "Save"
-  },
-  "admin": {
-    "title": "Hello, Admin",
-    "menu": {
-      "users": "Users",
-      "offers": "Listings",
-      "reviews": "Reviews",
-      "settings": "Settings",
-      "tools": "Tools",
-      "contacts": "Contacts"
+    "btn_save": "Save",
+    "my_housing": {
+      "menu_btn_edit": "Edit",
+      "menu_btn_read_reviews": "Read reviews",
+      "menu_btn_booking": "Booking"
     },
-    "input_label": "Enter email or phone number",
-    "sort_btn": "Sort",
-    "write": "Write",
-    "blocked": "Block"
-  },
-  "attraction": {
-    "title": "Attractions"
+    "booking": {
+      "apartment": "Apartment",
+      "user": "Guest",
+      "Status": "Order status",
+      "Date": "Order data",
+     "confirm_order": "Confirm order"
+    },
+    "admin": {
+      "title": "Hello, Admin",
+      "menu": {
+        "users": "Users",
+        "offers": "Listings",
+        "reviews": "Reviews",
+        "settings": "Settings",
+        "tools": "Tools",
+        "contacts": "Contacts"
+      },
+      "input_label": "Enter email or phone number",
+      "sort_btn": "Sort",
+      "write": "Write",
+      "blocked": "Block"
+    },
+    "attraction": {
+      "title": "Attractions"
+    }
   }
-}

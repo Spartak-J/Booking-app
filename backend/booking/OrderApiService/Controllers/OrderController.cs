@@ -95,6 +95,21 @@ namespace OrderApiService.Controllers
         }
 
         //===========================================================================================
+
+        [HttpGet("get/byOfferId/{offerId}")]
+        public async Task<ActionResult<List<OrderResponse>>> GetOrdersByOfferIdAsync(
+        int offerId)
+        {
+
+            var orders = await _orderService.GetOrdersByOfferIdAsync(offerId);
+
+            if (orders == null)
+                return NotFound();
+
+            return Ok(orders);
+        }
+
+        //===========================================================================================
         [HttpPost("{offerId}/valid/date-time")]
         public async Task<ActionResult<bool>> HasDateConflict(
            int offerId,

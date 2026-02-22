@@ -1341,7 +1341,51 @@ namespace WebApiGetway.Controllers
 
         }
 
-       
+
+
+
+        //===============================================================================================================
+        //                                         получение броней заказа
+        //===============================================================================================================
+
+        [HttpGet("offer/{offerId}/orders/{lang}")]
+        [Authorize]
+        public async Task<IActionResult> GetOrdersByOfferId(
+           [FromRoute] int offerId,
+            [FromRoute] string lang)
+        {
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+
+            var ordersObjResult = await _gateway.ForwardRequestAsync<object>(
+                  "OrderApiService",
+                  $"/api/order/get/byOfferId/{offerId}",
+                  HttpMethod.Get,
+                  null);
+
+
+            if (ordersObjResult is not OkObjectResult okOrders)
+                return ordersObjResult;
+            var orderDictList = BffHelper.ConvertActionResultToDict(okOrders);
+
+            // Получаем список переводов
+            var translateListResult = await _gateway.ForwardRequestAsync<object>("TranslationApiService", $"/api/Order/get-all-translations/{lang}", HttpMethod.Get, null);
+            if (translateListResult is not OkObjectResult okTranslate)
+
+                return Ok(orderDictList);
+            var translations = BffHelper.ConvertActionResultToDict(okTranslate);
+
+            BffHelper.UpdateListWithTranslations(orderDictList, translations);
+
+
+            return Ok(orderDictList);
+
+
+        }
+
+
         //===============================================================================================================
         //                                         создание отзыва
         //======================================+=========================================================================
@@ -1467,10 +1511,10 @@ namespace WebApiGetway.Controllers
         //                                         получение отзывoв обьявления
         //===============================================================================================================
 
-        [HttpPost("offer/{offerId}/reviews/get/{lang}")]
+        [HttpGet("offer/{offerId}/reviews/{lang}")]
         public async Task<IActionResult> GetReviewByOffer(
              [FromRoute] int offerId,
-             string lang)
+            [FromRoute] string lang)
         {
 
 
