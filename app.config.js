@@ -37,15 +37,11 @@ export default ({ config }) => ({
 
   android: {
     package: 'com.booking.like.mobile',
-    ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY
-      ? {
-          config: {
-            googleMaps: {
-              apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY,
-            },
-          },
-        }
-      : {}),
+    config: {
+      googleMaps: {
+        apiKey: '${GOOGLE_MAPS_API_KEY}',
+      },
+    },
     ...(hasAndroidGoogleServicesFile ? { googleServicesFile: androidGoogleServicesFilePath } : {}),
     intentFilters: [
       {
