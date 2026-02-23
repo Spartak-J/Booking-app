@@ -67,7 +67,7 @@ export default ({ config }) => ({
     favicon: './assets/favicon.png',
   },
 
-  plugins: ['expo-secure-store', 'expo-notifications'],
+  plugins: ['expo-secure-store', 'expo-notifications', 'expo-splash-screen'],
 
   extra: {
     EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL,

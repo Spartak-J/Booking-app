@@ -8,7 +8,7 @@ export const colors = {
   surfaceAccent: '#FFEDC3',
   heroGradientStart: '#837E7E',
   heroGradientEnd: '#1D1C1C',
-  secondary: '#0E1E2C', // Using bgCard as secondary for now
+  secondary: '#0E1E2C',
   primary_old: '#003580',
   primaryDark: '#001f4d',
   accent: '#006ce4',

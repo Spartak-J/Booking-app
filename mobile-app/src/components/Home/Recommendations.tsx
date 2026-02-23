@@ -4,7 +4,7 @@ import { ImageBackground, Pressable, ScrollView, StyleSheet, View } from 'react-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { IconButton, Typography } from '@/ui';
-import { radius, withOpacity, useTheme } from '@/theme';
+import { radius, typography, withOpacity, useTheme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { s } from '@/utils/scale';
 import type { RecommendationCard } from './types';
@@ -37,7 +37,7 @@ export const Recommendations: React.FC<RecommendationsProps> = ({ data, onOpenOf
 
   return (
     <View style={styles.block}>
-      <Typography variant="h2" style={{ color: tokens.textPrimary }}>
+      <Typography variant="h2" style={styles.title}>
         {t('home.recommendationsTitle')}
       </Typography>
       <ScrollView
@@ -105,6 +105,7 @@ const getPalette = (colors: Record<string, string>, tokens: Record<string, strin
   textOverlay: colors.onPrimary ?? tokens.textOnAccent,
   badgeBg: withOpacity(tokens.overlay, 0.45),
   border: tokens.textPrimary,
+  title: tokens.textPrimary,
 });
 
 const getStyles = (palette: ReturnType<typeof getPalette>) =>
@@ -112,6 +113,10 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
     block: {
       gap: s(10),
       marginHorizontal: s(20),
+    },
+    title: {
+      color: palette.title,
+      fontFamily: typography.h1.fontFamily,
     },
     list: {
       gap: s(10),

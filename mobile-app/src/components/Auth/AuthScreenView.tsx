@@ -54,17 +54,31 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
     return yup.object(base);
   }, [mode]);
 
-  const { control, handleSubmit } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<FormValues>({
     resolver: yupResolver(schema),
     defaultValues: { name: '', email: '', password: '' },
   });
 
-  const onSubmit = handleSubmit((values) => {
-    if (mode === 'register') {
-      if (!agreed) return;
-      register(values as Required<FormValues>);
-    } else {
-      login(values);
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      if (mode === 'register') {
+        if (!agreed) return;
+        await register(values as Required<FormValues>);
+      } else {
+        await login(values);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : 'Не вдалося виконати вхід. Спробуйте ще раз.';
+      setError('password', { type: 'server', message });
     }
   });
 
@@ -116,7 +130,10 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
               render={({ field: { value, onChange } }) => (
                 <Input
                   value={value}
-                  onChangeText={onChange}
+                  onChangeText={(nextValue) => {
+                    onChange(nextValue);
+                    if (errors.password) clearErrors('password');
+                  }}
                   placeholder={t('auth.placeholder.email')}
                   containerStyle={styles.inputContainer}
                   inputStyle={styles.input}
@@ -131,11 +148,15 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
                 <View style={styles.passwordFieldWrap}>
                   <Input
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(nextValue) => {
+                      onChange(nextValue);
+                      if (errors.password) clearErrors('password');
+                    }}
                     placeholder={t('auth.placeholder.password')}
                     secureTextEntry={!showPassword}
                     containerStyle={styles.inputContainer}
                     inputStyle={[styles.input, styles.passwordInput]}
+                    error={errors.password?.message}
                   />
                   <MaterialCommunityIcons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}

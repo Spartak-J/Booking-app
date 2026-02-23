@@ -28,11 +28,13 @@ export const LandmarksSearchResultsScreen = () => {
   });
 
   const resolvedCity = useMemo(() => {
-    const byId = cities.find((city) => city.id === route.params?.cityId);
+    const cityIdParam = String(route.params?.cityId ?? '');
+    const cityNameParam = String(route.params?.cityName ?? '');
+    const byId = cities.find((city) => String(city.id) === cityIdParam);
     if (byId) return byId;
-    const byName = cities.find((city) => city.name === route.params?.cityName);
+    const byName = cities.find((city) => city.name === cityNameParam);
     if (byName) return byName;
-    return cities.find((city) => city.id === 'city-2') ?? cities[0];
+    return cities.find((city) => city.id === '13') ?? cities[0];
   }, [cities, route.params?.cityId, route.params?.cityName]);
 
   const { data: landmarks = [] } = useQuery({

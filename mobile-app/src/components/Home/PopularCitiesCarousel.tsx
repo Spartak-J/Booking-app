@@ -1,6 +1,7 @@
 // Component: PopularCitiesCarousel. Used in: PopularCities.tsx.
 import React, { useMemo, useRef, useCallback } from 'react';
 import { Animated, Image, StyleSheet, View, ViewStyle } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useTheme, withOpacity } from '@/theme';
 import { Button, Typography } from '@/ui';
@@ -29,6 +30,15 @@ export const PopularCitiesCarousel: React.FC<PopularCitiesCarouselProps> = ({
   const scrollXValue = useMemo(() => new Animated.Value(0), []);
   const listRef = useRef<Animated.FlatList<CityCard>>(null);
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const gradientColors = useMemo(
+    () =>
+      [
+        withOpacity(colors.black, 0),
+        withOpacity(colors.black, 0.2),
+        withOpacity(colors.black, 0.64),
+      ] as const,
+    [colors.black],
+  );
 
   const loopedData = useMemo(() => {
     if (data.length === 0) {
@@ -79,6 +89,7 @@ export const PopularCitiesCarousel: React.FC<PopularCitiesCarouselProps> = ({
       <Animated.View style={[styles.cardWrapper, { transform: [{ scaleX }, { scaleY }, { translateY }] }]}>
         <Button variant="ghost" onPress={() => onOpenCity(item.name)} style={styles.cardButton}>
           <Image source={item.image} style={styles.cardImage} />
+          <LinearGradient colors={gradientColors} style={styles.cardGradient} />
           <View style={styles.cardLabel}>
             <Typography variant="subtitle" style={styles.cardLabelText}>
               {item.name}
@@ -171,7 +182,10 @@ const getStyles = (colors: any) =>
       right: 0,
       bottom: 0,
       paddingVertical: s(8),
-      backgroundColor: withOpacity(colors.black, 0.45),
+      backgroundColor: 'transparent',
+    },
+    cardGradient: {
+      ...StyleSheet.absoluteFillObject,
     },
     cardLabelText: {
       textAlign: 'center',

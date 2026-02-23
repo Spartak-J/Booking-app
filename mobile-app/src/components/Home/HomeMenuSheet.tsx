@@ -12,6 +12,9 @@ import { s, SCREEN_WIDTH } from '@/utils/scale';
 import type { MenuItem } from './types';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
+import { useLanguageStore, type Language } from '@/store/languageStore';
+import { useCurrencyStore } from '@/store/currencyStore';
+import type { CurrencyCode } from '@/types/currency';
 
 type HomeMenuSheetProps = {
   visible: boolean;
@@ -28,12 +31,14 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
 }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { colors, mode, setMode } = useTheme();
+  const language = useLanguageStore((state) => state.language);
+  const setLanguage = useLanguageStore((state) => state.setLanguage);
+  const currency = useCurrencyStore((state) => state.currency);
+  const setCurrency = useCurrencyStore((state) => state.setCurrency);
   const palette = useMemo(() => getPalette(colors, mode === 'dark'), [colors, mode]);
   const styles = useMemo(() => getStyles(palette), [palette]);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('Українська');
-  const [selectedCurrency, setSelectedCurrency] = useState<string>('UAH');
 
   const handleClose = () => {
     setLanguageOpen(false);
@@ -47,6 +52,7 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
       onClose={handleClose}
       variant="dialog"
       position="top"
+      overlayColor={palette.overlayColor}
       overlayOpacity={palette.overlayOpacity}
       contentStyle={styles.modalContent}
     >
@@ -124,28 +130,33 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                 </Button>
                 {isLanguage && languageOpen && (
                   <View style={styles.dropdownPanel}>
-                    {LANGUAGE_OPTIONS.map((label) => (
+                    {LANGUAGE_OPTIONS.map((option) => (
                       <Button
-                        key={label}
+                        key={option.code}
                         variant="ghost"
                         style={[
                           styles.dropdownItem,
-                          label === selectedLanguage
+                          option.code === language
                             ? styles.dropdownItemActive
                             : styles.dropdownItemInactive,
                         ]}
-                        onPress={() => setSelectedLanguage(label)}
+                        onPress={() => {
+                          setLanguageOpen(false);
+                          void setLanguage(option.code).catch((error) =>
+                            console.warn('[HomeMenuSheet] setLanguage failed', error),
+                          );
+                        }}
                       >
                         <Typography
                           variant="menuOption"
                           style={
-                            label === selectedLanguage
+                            option.code === language
                               ? styles.dropdownItemTextActive
                               : styles.dropdownItemText
                           }
                           numberOfLines={1}
                         >
-                          {label}
+                          {option.label}
                         </Typography>
                       </Button>
                     ))}
@@ -153,28 +164,33 @@ export const HomeMenuSheet: React.FC<HomeMenuSheetProps> = ({
                 )}
                 {isCurrency && currencyOpen && (
                   <View style={[styles.dropdownPanel, styles.currencyPanel]}>
-                    {CURRENCY_OPTIONS.map((label) => (
+                    {CURRENCY_OPTIONS.map((option) => (
                       <Button
-                        key={label}
+                        key={option}
                         variant="ghost"
                         style={[
                           styles.dropdownItemWide,
-                          label === selectedCurrency
+                          option === currency
                             ? styles.dropdownItemActive
                             : styles.dropdownItemInactive,
                         ]}
-                        onPress={() => setSelectedCurrency(label)}
+                        onPress={() => {
+                          setCurrencyOpen(false);
+                          void setCurrency(option).catch((error) =>
+                            console.warn('[HomeMenuSheet] setCurrency failed', error),
+                          );
+                        }}
                       >
                         <Typography
                           variant="caption"
                           style={
-                            label === selectedCurrency
+                            option === currency
                               ? styles.dropdownItemTextActive
                               : styles.dropdownItemText
                           }
                           numberOfLines={1}
                         >
-                          {label}
+                          {option}
                         </Typography>
                       </Button>
                     ))}
@@ -197,6 +213,7 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
   const overlay = colors.overlay ?? colors.bgDark ?? text;
   const shadow = colors.bgDark ?? text;
   const sheetLight = colors.surfaceWarm ?? colors.surfaceLightDarker ?? surface;
+  const lightOverlay = colors.surfaceWarm ?? colors.surfaceLight ?? surface;
   const dropdown = isDark
     ? (colors.bgCard ?? colors.bgDark ?? surface)
     : (colors.surfaceAccent ?? colors.surfaceLight ?? surface);
@@ -208,6 +225,7 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
     text,
     accent: colors.primary,
     overlay,
+    overlayColor: isDark ? overlay : lightOverlay,
     overlayOpacity: isDark ? 0.7 : 0.5,
     menuSheetBg: isDark ? (colors.bgDark ?? surface) : sheetLight,
     dropdownBg: dropdown,
@@ -224,19 +242,19 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
   };
 };
 
-const LANGUAGE_OPTIONS = [
-  'Українська',
-  'English',
-  'Deutsch',
-  'Polski',
-  'Español',
-  'Italiano',
-  'Français',
-  'Čeština',
-  'Türkçe',
+const LANGUAGE_OPTIONS: Array<{ code: Language; label: string }> = [
+  { code: 'uk', label: 'Українська' },
+  { code: 'en', label: 'English' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'pl', label: 'Polski' },
+  { code: 'sp', label: 'Español' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'fr', label: 'Français' },
+  { code: 'ce', label: 'Čeština' },
+  { code: 'tr', label: 'Türkçe' },
 ];
 
-const CURRENCY_OPTIONS = ['UAH', 'USD', 'EUR', 'GBP', 'PLN', 'CHF', 'CAD'];
+const CURRENCY_OPTIONS: CurrencyCode[] = ['UAH', 'USD', 'EUR', 'GBP', 'PLN', 'CHF', 'CAD', 'TRY'];
 
 const getStyles = (palette: ReturnType<typeof getPalette>) =>
   StyleSheet.create({

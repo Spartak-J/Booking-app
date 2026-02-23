@@ -22,9 +22,47 @@ export const getApiLang = () => {
 
 export const mapRole = (role?: string): Role => {
   const normalized = (role ?? '').toLowerCase();
-  if (normalized === 'owner') return 'owner';
-  if (normalized === 'admin' || normalized === 'superadmin') return 'admin';
+  if (!normalized) return 'user';
+  if (normalized.includes('owner') || normalized.includes('host')) return 'owner';
+  if (normalized.includes('admin')) return 'admin';
+  if (normalized === 'superadmin') return 'admin';
   return 'user';
+};
+
+const extractRoleFromValue = (value: any): string | undefined => {
+  if (!value) return undefined;
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const nested = extractRoleFromValue(item);
+      if (nested) return nested;
+    }
+    return undefined;
+  }
+  if (typeof value === 'object') {
+    return (
+      value.roleName ??
+      value.role ??
+      value.name ??
+      value.title ??
+      value.code ??
+      value.value ??
+      undefined
+    );
+  }
+  return undefined;
+};
+
+const resolveUserRole = (input: any): Role => {
+  const rawRole =
+    extractRoleFromValue(input?.roleName) ??
+    extractRoleFromValue(input?.role) ??
+    extractRoleFromValue(input?.roles) ??
+    extractRoleFromValue(input?.userRole) ??
+    extractRoleFromValue(input?.userRoles) ??
+    extractRoleFromValue(input?.permissions);
+
+  return mapRole(rawRole);
 };
 
 export const mapUser = (input: any): User => ({
@@ -32,7 +70,7 @@ export const mapUser = (input: any): User => ({
   email: input?.email ?? input?.username ?? '',
   name: input?.username ?? input?.name ?? 'User',
   phone: input?.phoneNumber,
-  role: mapRole(input?.roleName),
+  role: resolveUserRole(input),
 });
 
 const pickNumber = (value: any, fallback = 0) => {

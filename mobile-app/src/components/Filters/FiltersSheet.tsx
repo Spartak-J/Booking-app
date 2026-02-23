@@ -480,13 +480,13 @@ export const FiltersSheet: React.FC<Props> = ({ filters, onChange, onApply, onCl
             />
           </View>
         </View>
-      </ScrollView>
 
-      <View style={styles.applyBar}>
-        <Pressable onPress={onApply} style={styles.applyButton}>
-          <Text style={styles.applyText}>{t('dateRange.apply')}</Text>
-        </Pressable>
-      </View>
+        <View style={styles.applySection}>
+          <Pressable onPress={onApply} style={styles.applyButton}>
+            <Text style={styles.applyText}>{t('dateRange.apply')}</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -552,7 +552,7 @@ const getStyles = (palette: {
       borderTopRightRadius: radius.lg,
       paddingHorizontal: s(16),
       paddingTop: s(18),
-      paddingBottom: s(110),
+      paddingBottom: s(24),
       gap: s(18),
     },
     section: {
@@ -670,15 +670,11 @@ const getStyles = (palette: {
     checkboxActive: {
       backgroundColor: palette.checkboxActive,
     },
-    applyBar: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      paddingBottom: s(24),
-      paddingTop: s(12),
-      backgroundColor: palette.headerBg,
+    applySection: {
+      width: '100%',
       alignItems: 'center',
+      paddingTop: s(8),
+      paddingBottom: s(8),
     },
     applyButton: {
       width: s(188),
