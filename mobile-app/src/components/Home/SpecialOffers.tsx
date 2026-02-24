@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 
 import { Button, Typography } from '@/ui';
-import { radius, withOpacity, useTheme } from '@/theme';
+import { radius, typography, withOpacity, useTheme } from '@/theme';
 import { s } from '@/utils/scale';
 import type { OfferPromo } from './types';
 
@@ -70,6 +70,7 @@ const getPalette = (colors: Record<string, string>) => ({
   transparent: colors.transparent,
   surfaceGlass: withOpacity(colors.black ?? '#000', 0.35),
   textOverlay: colors.white ?? '#FFFFFF',
+  title: colors.textPrimary ?? colors.text,
 });
 
 const getStyles = (palette: ReturnType<typeof getPalette>) =>
@@ -81,7 +82,8 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
       height: s(200),
     },
     headerText: {
-      color: palette.textOverlay,
+      color: palette.title,
+      fontFamily: typography.h1.fontFamily,
     },
     headerRow: {
       position: 'absolute',

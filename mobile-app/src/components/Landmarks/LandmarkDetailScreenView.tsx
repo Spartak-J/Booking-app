@@ -1,127 +1,157 @@
 import React, { useMemo } from 'react';
-import { Image, ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
 
+import HomeHeader from '@/components/Home/HomeHeader';
+import OfferLocationMap from '@/components/Offer/OfferLocationMap';
 import { Landmark } from '@/services/landmarkService';
 import { spacing, radius } from '@/theme';
-import { useTheme, withOpacity } from '@/theme';
-import { Button, HeaderBar, ScreenContainer, Typography } from '@/ui';
-import backgroundFallback from '@/assets/images/landmarks_bg.jpg';
+import { useTheme } from '@/theme';
+import { Button, ScreenContainer, Typography } from '@/ui';
 import { useTranslation } from '@/i18n';
+import { SCREEN_WIDTH } from '@/utils/scale';
+import fallbackCardImage from '@/assets/images/1.png';
+import lvivBeerImage from '@/assets/images/lviv/beer.jpeg';
+import lvivCostelImage from '@/assets/images/lviv/costel.jpeg';
+import lvivHighImage from '@/assets/images/lviv/high.jpeg';
+import lvivItalianImage from '@/assets/images/lviv/italian.jpeg';
+import lvivRatushaImage from '@/assets/images/lviv/ratusha.jpeg';
+import lvivTheaterImage from '@/assets/images/lviv/theater.jpeg';
+import lvivToysImage from '@/assets/images/lviv/toys.jpeg';
 
 type Props = {
   landmark?: Landmark;
   cityName?: string;
+  fallbackLatitude?: number;
+  fallbackLongitude?: number;
   onBack: () => void;
   onFindStay: () => void;
+};
+
+const normalizeTitle = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/['’`"]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const resolveLandmarkImage = (cityName?: string, title?: string, remoteImage?: Landmark['image']) => {
+  const safeTitle = title ?? '';
+  const safeCity = cityName ?? '';
+  const isLviv = safeCity.toLowerCase().includes('льв') || safeCity.toLowerCase().includes('lviv');
+
+  if (isLviv) {
+    const normalized = normalizeTitle(safeTitle);
+    if (normalized.includes('музей') && normalized.includes('пив')) return lvivBeerImage;
+    if ((normalized.includes('костел') || normalized.includes('кстел')) && normalized.includes('ельжб'))
+      return lvivCostelImage;
+    if (normalized.includes('висок') && normalized.includes('замок')) return lvivHighImage;
+    if (normalized.includes('італій') && normalized.includes('дворик')) return lvivItalianImage;
+    if (normalized.includes('ратуш')) return lvivRatushaImage;
+    if (normalized.includes('театр') && (normalized.includes('опер') || normalized.includes('балет')))
+      return lvivTheaterImage;
+    if (normalized.includes('дворик') && normalized.includes('іграш')) return lvivToysImage;
+    return lvivBeerImage;
+  }
+
+  return remoteImage ?? fallbackCardImage;
 };
 
 export const LandmarkDetailScreenView: React.FC<Props> = ({
   landmark,
   cityName,
+  fallbackLatitude,
+  fallbackLongitude,
   onBack,
   onFindStay,
 }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const resolvedImageSource = useMemo(
+    () => resolveLandmarkImage(cityName, landmark?.title, landmark?.image),
+    [cityName, landmark?.image, landmark?.title],
+  );
 
   return (
-    <ScreenContainer scroll style={styles.container} edges={[]}>
-      <View style={styles.heroWrapper}>
-        <ImageBackground
-          source={landmark?.image ?? backgroundFallback}
-          style={styles.hero}
-          resizeMode="cover"
-        >
-          <View style={styles.gradientTop} />
-          <View style={styles.gradientBottom} />
-          <HeaderBar
+    <ImageBackground source={resolvedImageSource} style={styles.background} resizeMode="cover">
+      <ScreenContainer
+        style={styles.container}
+        edges={[]}
+        withBackground={false}
+        withKeyboardAvoiding={false}
+        contentContainerStyle={styles.containerContent}
+      >
+        <View style={styles.headerFullBleed}>
+          <HomeHeader
+            mode="titleOnly"
             title={cityName ?? t('landmarks.title')}
             onBack={onBack}
-            style={styles.header}
-            titleStyle={styles.headerTitle}
-            backStyle={styles.backButton}
+            showMenu={false}
+            showSearch={false}
+            heroImageSource={resolvedImageSource}
+            heroHeight={240}
+            topInset={0}
           />
-        </ImageBackground>
-      </View>
-
-      <View style={styles.content}>
-        <Typography variant="h2" style={styles.title} numberOfLines={2}>
-          {landmark?.title}
-        </Typography>
-
-        {landmark?.description ? (
-          <Typography variant="body" style={styles.description}>
-            {landmark.description}
-          </Typography>
-        ) : null}
-
-        <Button style={styles.cta} variant="primary" onPress={onFindStay}>
-          <Typography variant="menu" style={styles.ctaText}>
-            {t('landmarks.findStayNearby')}
-          </Typography>
-        </Button>
-
-        <View style={styles.mapCard}>
-          <Typography variant="subtitle" style={styles.mapTitle}>
-            {cityName ? `${t('landmarks.mapPrefix')} ${cityName}` : t('landmarks.map')}
-          </Typography>
-          <Image source={backgroundFallback} style={styles.mapImage} resizeMode="cover" />
-          <View style={styles.mapOverlay}>
-            <Typography variant="menu" style={styles.mapOverlayText}>
-              {t('landmarks.objectLocation')}
-            </Typography>
-          </View>
         </View>
-      </View>
-    </ScreenContainer>
+
+        <ScrollView style={styles.bodyScroll} contentContainerStyle={styles.bodyContent}>
+          <View style={styles.content}>
+            <Typography variant="h2" style={styles.title} numberOfLines={2}>
+              {landmark?.title}
+            </Typography>
+
+            {landmark?.description ? (
+              <Typography variant="body" style={styles.description}>
+                {landmark.description}
+              </Typography>
+            ) : null}
+
+            <Button style={styles.cta} variant="primary" onPress={onFindStay}>
+              <Typography variant="menu" style={styles.ctaText}>
+                {t('landmarks.findStayNearby')}
+              </Typography>
+            </Button>
+          </View>
+
+          <View style={styles.mapWrap}>
+            <OfferLocationMap
+              latitude={landmark?.latitude ?? fallbackLatitude}
+              longitude={landmark?.longitude ?? fallbackLongitude}
+            />
+          </View>
+        </ScrollView>
+      </ScreenContainer>
+    </ImageBackground>
   );
 };
 
 const getStyles = (colors: Record<string, string>) =>
   StyleSheet.create({
+    background: {
+      flex: 1,
+    },
     container: {
       flex: 1,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.transparent,
     },
-    heroWrapper: {
-      height: 340,
-      width: '100%',
-    },
-    hero: {
+    containerContent: {
       flex: 1,
-      justifyContent: 'flex-start',
     },
-    gradientTop: {
-      ...StyleSheet.absoluteFillObject,
-      height: 160,
-      backgroundColor: withOpacity(colors.surface, 0.05),
+    headerFullBleed: {
+      width: SCREEN_WIDTH + spacing.lg * 2,
+      alignSelf: 'center',
+      marginHorizontal: -spacing.lg,
     },
-    gradientBottom: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      height: 140,
-      backgroundColor: withOpacity(colors.surface, 0.85),
+    bodyScroll: {
+      flex: 1,
     },
-    header: {
-      marginTop: spacing.md,
-      paddingHorizontal: spacing.md,
-    },
-    headerTitle: {
-      color: colors.textPrimary,
-    },
-    backButton: {
-      backgroundColor: withOpacity(colors.bgCard, 0.6),
-      borderRadius: radius.round,
+    bodyContent: {
+      paddingBottom: spacing.xl,
     },
     content: {
       paddingHorizontal: spacing.lg,
-      paddingBottom: spacing.xl,
-      paddingTop: spacing.lg,
+      marginTop: spacing.md,
       gap: spacing.md,
-      marginTop: -spacing.xl,
     },
     title: {
       color: colors.textPrimary,
@@ -137,31 +167,9 @@ const getStyles = (colors: Record<string, string>) =>
     ctaText: {
       color: colors.textOnAccent,
     },
-    mapCard: {
+    mapWrap: {
+      paddingHorizontal: spacing.lg,
       marginTop: spacing.lg,
-      borderRadius: radius.lg,
-      overflow: 'hidden',
-      backgroundColor: colors.bgCard,
-      borderWidth: 1,
-      borderColor: colors.border,
-      minHeight: 220,
-    },
-    mapTitle: {
-      padding: spacing.md,
-      color: colors.textPrimary,
-    },
-    mapImage: {
-      width: '100%',
-      height: 170,
-    },
-    mapOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: withOpacity(colors.black, 0.2),
-      justifyContent: 'flex-end',
-      padding: spacing.md,
-    },
-    mapOverlayText: {
-      color: colors.surfaceLight,
     },
   });
 

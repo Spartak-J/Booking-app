@@ -18,20 +18,28 @@ export const LandmarkDetailScreen = () => {
 
   const { data: landmark } = useQuery({
     queryKey: ['landmark', route.params?.landmarkId],
-    queryFn: () => landmarkService.getLandmarkById(route.params?.landmarkId),
+    queryFn: async () => (await landmarkService.getLandmarkById(route.params?.landmarkId)) ?? null,
   });
 
   const { data: city } = useQuery({
     queryKey: ['landmark-city', landmark?.cityId],
-    queryFn: () => landmarkService.findCityById(landmark?.cityId),
+    queryFn: async () => (await landmarkService.findCityById(landmark?.cityId)) ?? null,
+    enabled: Boolean(landmark?.cityId),
+  });
+
+  const { data: cityGuide } = useQuery({
+    queryKey: ['landmark-city-guide', landmark?.cityId],
+    queryFn: () => landmarkService.getCityGuideByCityId(landmark?.cityId),
     enabled: Boolean(landmark?.cityId),
   });
 
   return (
-    <AppLayout variant="stack" header={false}>
+    <AppLayout variant="stack" header={false} edges={['left', 'right']}>
       <LandmarkDetailScreenView
-        landmark={landmark}
-        cityName={city?.name}
+        landmark={landmark ?? undefined}
+        cityName={city?.name ?? undefined}
+        fallbackLatitude={cityGuide?.latitude}
+        fallbackLongitude={cityGuide?.longitude}
         onBack={() => navigation.goBack()}
         onFindStay={() =>
           navigation.navigate(Routes.SearchResults, {

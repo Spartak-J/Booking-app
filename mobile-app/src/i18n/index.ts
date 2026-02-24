@@ -6,11 +6,24 @@ type Dictionary = Record<string, string>;
 
 import uk from './uk';
 import en from './en';
-import ru from './ru';
-const translations: Record<Language, Dictionary> = {
+import de from './de';
+import it from './it';
+import pl from './pl';
+import tr from './tr';
+import ce from './ce';
+import sp from './sp';
+import fr from './fr';
+
+const translations: Partial<Record<Language, Dictionary>> = {
   uk,
   en,
-  ru,
+  de,
+  it,
+  pl,
+  tr,
+  ce,
+  sp,
+  fr,
 };
 
 
@@ -20,7 +33,7 @@ export const useTranslation = () => {
   const t = useMemo(
     () =>
       (key: string) =>
-        (translations[lang] as Dictionary)[key] ?? (translations.uk as Dictionary)[key] ?? key,
+        translations[lang]?.[key] ?? translations.uk?.[key] ?? key,
     [lang],
   );
 

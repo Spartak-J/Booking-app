@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { Typography } from '@/ui';
 import { useTranslation } from '@/i18n';
 import { s } from '@/utils/scale';
+import { typography } from '@/theme';
 import { PopularCitiesCarousel } from '@/components/Home/PopularCitiesCarousel';
 import type { CityCard } from './types';
 
@@ -17,7 +18,7 @@ export const PopularCities: React.FC<PopularCitiesProps> = ({ data, onOpenCity }
   const { t } = useTranslation();
   return (
     <View style={styles.block}>
-      <Typography variant="h2" tone="primary">
+      <Typography variant="h2" tone="primary" style={styles.title}>
         {t('home.popularCities')}
       </Typography>
       <PopularCitiesCarousel data={data} onOpenCity={onOpenCity} />
@@ -29,6 +30,9 @@ const styles = StyleSheet.create({
   block: {
     gap: s(10),
     marginHorizontal: s(20),
+  },
+  title: {
+    fontFamily: typography.h1.fontFamily,
   },
 });
 

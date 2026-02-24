@@ -1,7 +1,7 @@
 // Component: HomeScreenView. Used in: HomeScreen.
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
-import { Animated, Easing, Keyboard, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Easing, ImageBackground, Keyboard, ScrollView, StyleSheet, View } from 'react-native';
 import { FiltersModal } from '@/components/FiltersModal';
 import { PopularCities } from '@/components/Home/PopularCities';
 import HomeCountries from '@/components/Home/HomeCountries';
@@ -27,6 +27,7 @@ import { getLocalCityGuide } from '@/data/landmarks/cityGuide.local';
 import type { CityCard } from '@/components/Home/types';
 import type { RecommendationCard } from '@/components/Home/types';
 import { mockOffers } from '@/utils/mockData';
+import homeBackgroundImage from '@/assets/images/entertainment.png';
 
 const OVERLAY_ANIMATION_DURATION = 250;
 const RECOMMENDED_CITY_NAMES = [
@@ -360,10 +361,11 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({
   });
 
   return (
-    <View style={styles.screen}>
+    <ImageBackground source={homeBackgroundImage} style={styles.screen} resizeMode="cover">
       <ScreenContainer
         style={styles.scroll}
-        edges={['left', 'right']}
+        edges={[]}
+        withBackground={false}
         withKeyboardAvoiding={false}
         contentContainerStyle={styles.containerContent}
       >
@@ -471,7 +473,7 @@ export const HomeScreenView: React.FC<HomeScreenViewProps> = ({
         animatedStyle={menuSheetAnimatedStyle}
         items={MENU_ITEMS}
       />
-    </View>
+    </ImageBackground>
   );
 };
 

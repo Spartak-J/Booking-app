@@ -1,13 +1,21 @@
 import React, { useMemo } from 'react';
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import HomeMenuSheet from '@/components/Home/HomeMenuSheet';
 import { MENU_ITEMS } from '@/components/Home/homeNavigationData';
 import { Landmark } from '@/services/landmarkService';
-import { spacing, radius, useTheme, withOpacity } from '@/theme';
-import { Button, HeaderBar, ScreenContainer, Typography } from '@/ui';
+import { spacing, radius, useTheme } from '@/theme';
+import { HeaderBar, MediaOverlayCard, ScreenContainer, Typography } from '@/ui';
 import { s } from '@/utils/scale';
-import backgroundLandmarks from '@/assets/images/landmarks_bg.jpg';
+import fallbackCardImage from '@/assets/images/1.png';
+import lvivBeerImage from '@/assets/images/lviv/beer.jpeg';
+import lvivCostelImage from '@/assets/images/lviv/costel.jpeg';
+import lvivHighImage from '@/assets/images/lviv/high.jpeg';
+import lvivItalianImage from '@/assets/images/lviv/italian.jpeg';
+import lvivRatushaImage from '@/assets/images/lviv/ratusha.jpeg';
+import lvivTheaterImage from '@/assets/images/lviv/theater.jpeg';
+import lvivToysImage from '@/assets/images/lviv/toys.jpeg';
 import { useTranslation } from '@/i18n';
 
 type Props = {
@@ -22,6 +30,30 @@ type Props = {
   onOpenLandmark: (landmarkId: string) => void;
 };
 
+const normalizeTitle = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/['’`"]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const getLvivShowcaseImage = (cityName: string, title: string) => {
+  const isLviv = cityName.toLowerCase().includes('льв') || cityName.toLowerCase().includes('lviv');
+  if (!isLviv) return undefined;
+
+  const normalized = normalizeTitle(title);
+  if (normalized.includes('музей') && normalized.includes('пив')) return lvivBeerImage;
+  if ((normalized.includes('костел') || normalized.includes('кстел')) && normalized.includes('ельжб'))
+    return lvivCostelImage;
+  if (normalized.includes('висок') && normalized.includes('замок')) return lvivHighImage;
+  if (normalized.includes('італій') && normalized.includes('дворик')) return lvivItalianImage;
+  if (normalized.includes('ратуш')) return lvivRatushaImage;
+  if (normalized.includes('театр') && (normalized.includes('опер') || normalized.includes('балет')))
+    return lvivTheaterImage;
+  if (normalized.includes('дворик') && normalized.includes('іграш')) return lvivToysImage;
+  return lvivBeerImage;
+};
+
 export const LandmarksSearchResultsScreenView: React.FC<Props> = ({
   cityName,
   landmarks,
@@ -33,40 +65,39 @@ export const LandmarksSearchResultsScreenView: React.FC<Props> = ({
   onCloseMenu,
   onOpenLandmark,
 }) => {
-  const { colors, mode } = useTheme();
+  const { colors, tokens } = useTheme();
   const { t } = useTranslation();
-  const isDark = mode === 'dark';
+  const headerTop = s(6);
+  const cityTop = headerTop + s(41);
+  const listTop = cityTop + s(36);
   const palette = useMemo(
     () => ({
-      screenBg: isDark ? colors.bgDark : colors.surfaceLight,
-      text: isDark ? colors.surfaceLight : colors.textPrimary,
-      cardLabelBg: withOpacity(colors.black, 0.1),
-      cardLabelText: colors.surfaceLight,
-      footerBg: isDark ? colors.bgDark : colors.surfaceLight,
-      footerIcon: isDark ? colors.surfaceLight : colors.black,
+      screenBg: tokens.bgScreen,
+      text: tokens.textPrimary,
+      icon: tokens.textPrimary,
     }),
-    [colors, isDark],
+    [tokens],
   );
   const styles = useMemo(() => getStyles(colors), [colors]);
 
   return (
     <ScreenContainer style={[styles.container, { backgroundColor: palette.screenBg }]} edges={[]}>
-      <Image source={backgroundLandmarks} style={styles.background} />
       <HeaderBar
         title={t('landmarks.title')}
         onBack={onBack}
         onSearch={onSearch}
         onMenu={onOpenMenu}
-        style={styles.header}
+        style={[styles.header, { top: headerTop }]}
         titleStyle={styles.headerTitle}
         backStyle={styles.backButton}
         searchStyle={styles.searchButton}
         menuStyle={styles.menuButton}
+        iconColor={palette.icon}
       />
 
       <Typography
         variant="h2"
-        style={[styles.cityLabel, { color: palette.text }]}
+        style={[styles.cityLabel, { color: palette.text, top: cityTop }]}
         numberOfLines={1}
         ellipsizeMode="tail"
       >
@@ -76,35 +107,28 @@ export const LandmarksSearchResultsScreenView: React.FC<Props> = ({
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-        style={styles.list}
+        style={[styles.list, { marginTop: listTop }]}
       >
-        {landmarks.map((item) => (
-          <Button
+        {landmarks.map((item) => {
+          const lvivImage = getLvivShowcaseImage(cityName, item.title);
+          return (
+          <MediaOverlayCard
             key={item.id}
-            variant="ghost"
+            title={item.title}
+            imageSource={lvivImage ?? item.image}
+            fallbackImageSource={lvivImage ?? fallbackCardImage}
             onPress={() => onOpenLandmark(item.id)}
             style={styles.card}
-          >
-            <Image source={item.image} style={styles.cardImage} />
-            <View style={[styles.cardLabel, { backgroundColor: palette.cardLabelBg }]}>
-              <Typography
-                variant="subtitle"
-                style={[styles.cardLabelText, { color: palette.cardLabelText }]}
-                numberOfLines={2}
-                ellipsizeMode="tail"
-              >
-                {item.title}
-              </Typography>
-            </View>
-          </Button>
-        ))}
+            topRightAccessory={
+              <MaterialCommunityIcons name="heart-outline" size={s(16)} color={palette.icon} />
+            }
+            bottomRightAccessory={
+              <MaterialCommunityIcons name="dots-vertical" size={s(16)} color={palette.icon} />
+            }
+          />
+          );
+        })}
       </ScrollView>
-
-      <View style={[styles.bottomNav, { backgroundColor: palette.footerBg }]}>
-        <View style={[styles.navBack, { backgroundColor: palette.footerIcon }]} />
-        <View style={[styles.navHome, { backgroundColor: palette.footerIcon }]} />
-        <View style={[styles.navOverview, { backgroundColor: palette.footerIcon }]} />
-      </View>
 
       <HomeMenuSheet
         visible={menuOpen}
@@ -121,17 +145,11 @@ const getStyles = (colors: Record<string, string>) =>
     container: {
       flex: 1,
     },
-    background: {
-      ...StyleSheet.absoluteFillObject,
-      resizeMode: 'cover',
-      zIndex: 0,
-    },
     header: {
       position: 'absolute',
       width: '100%',
       height: s(36),
       left: 0,
-      top: s(43),
       zIndex: 2,
     },
     backButton: {
@@ -142,8 +160,7 @@ const getStyles = (colors: Record<string, string>) =>
       height: s(24),
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: withOpacity(colors.bgCard, 0.6),
-      borderRadius: radius.round,
+      borderRadius: 0,
     },
     headerTitle: {
       position: 'absolute',
@@ -172,70 +189,19 @@ const getStyles = (colors: Record<string, string>) =>
     },
     cityLabel: {
       position: 'absolute',
-      top: s(94),
       alignSelf: 'center',
       zIndex: 1,
     },
-    list: {
-      marginTop: s(130),
-    },
+    list: {},
     listContent: {
-      paddingHorizontal: s(19),
-      paddingBottom: s(80),
-      gap: spacing.sm,
+      paddingHorizontal: 0,
+      paddingBottom: spacing.xl,
+      gap: s(10),
     },
     card: {
       width: s(371),
       height: s(188),
-      borderRadius: radius.lg,
-      overflow: 'hidden',
-      backgroundColor: colors.bgCard,
-    },
-    cardImage: {
-      ...StyleSheet.absoluteFillObject,
-      resizeMode: 'cover',
-    },
-    cardLabel: {
-      position: 'absolute',
-      left: s(7),
-      bottom: s(6),
-      borderRadius: radius.md,
-      paddingVertical: spacing.xs,
-      paddingHorizontal: spacing.sm,
-    },
-    cardLabelText: {
-      fontSize: s(14),
-      lineHeight: s(17),
-    },
-    bottomNav: {
-      position: 'absolute',
-      width: s(412),
-      height: s(48),
-      left: 0,
-      bottom: 0,
-    },
-    navBack: {
-      position: 'absolute',
-      width: s(44),
-      height: s(44),
-      left: s(136),
-      top: s(2),
-    },
-    navHome: {
-      position: 'absolute',
-      width: s(44),
-      height: s(44),
-      left: s(182),
-      top: s(2),
-      borderRadius: radius.round,
-    },
-    navOverview: {
-      position: 'absolute',
-      width: s(16),
-      height: s(16),
-      left: s(276),
-      top: s(16),
-      borderRadius: s(2),
+      alignSelf: 'center',
     },
   });
 

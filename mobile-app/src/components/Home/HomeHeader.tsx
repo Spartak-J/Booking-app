@@ -8,7 +8,7 @@ import { Button, HeaderBar, IconButton, Typography } from '@/ui';
 import { radius, typography, withOpacity } from '@/theme';
 import { useTheme } from '@/theme';
 import { s } from '@/utils/scale';
-import heroImage from '@/assets/images/1.png';
+import heroImage from '@/assets/images/search.png';
 
 type HomeHeaderProps = {
   mode?: 'search' | 'titleOnly';
@@ -79,7 +79,11 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
           style={styles.heroImage}
           imageStyle={styles.heroImageStyle}
         >
-          <LinearGradient colors={palette.overlayGradient} style={styles.heroOverlay} />
+          <LinearGradient
+            colors={palette.photoFadeGradient}
+            locations={palette.photoFadeLocations}
+            style={styles.heroOverlay}
+          />
           {isTitleOnly ? (
             <HeaderBar
               title={title}
@@ -185,16 +189,16 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
   const surface = colors.surface;
   const overlay = colors.overlay ?? colors.bgDark ?? text;
   const lightSurface = colors.surfaceLight ?? surface;
-  const lightSurfaceDarker = colors.surfaceLightDarker ?? surface;
   const darkSurface = colors.bgCard ?? overlay;
-  const heroGradientStart = colors.heroGradientStart ?? lightSurfaceDarker;
-  const heroGradientEnd = colors.heroGradientEnd ?? darkSurface;
+  const heroGradientStart = '#837E7E';
+  const heroGradientEnd = '#1D1C1C';
   return {
     text,
     surface,
-    overlayGradient: isDark
-      ? ([withOpacity(lightSurface, 0), withOpacity(colors.bgDark ?? overlay, 0.62)] as const)
-      : ([withOpacity(lightSurface, 0), withOpacity(lightSurface, 0.9)] as const),
+    photoFadeGradient: isDark
+      ? ([withOpacity(colors.bgDark ?? overlay, 0), withOpacity(colors.bgDark ?? overlay, 0), colors.bgDark ?? overlay] as const)
+      : ([withOpacity(lightSurface, 0), withOpacity(lightSurface, 0), lightSurface] as const),
+    photoFadeLocations: [0, 0.626, 0.9362] as const,
     baseGradient: [heroGradientStart, heroGradientEnd] as const,
     searchBorder: isDark ? (colors.surfaceLight ?? colors.onPrimary) : text,
     searchBg: isDark ? withOpacity(darkSurface, 0.4) : withOpacity(lightSurface, 0.4),
@@ -202,7 +206,7 @@ const getPalette = (colors: Record<string, string>, isDark: boolean) => {
     menuIcon: isDark ? (colors.surfaceLight ?? colors.onPrimary) : text,
     divider: isDark ? (colors.surfaceLight ?? colors.onPrimary) : text,
     muted: colors.textSecondary ?? colors.muted ?? text,
-    backgroundFallback: isDark ? (colors.bgDark ?? overlay) : lightSurfaceDarker,
+    backgroundFallback: isDark ? (colors.bgDark ?? overlay) : lightSurface,
   };
 };
 

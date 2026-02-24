@@ -90,7 +90,9 @@ export const authService = {
           data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
         if (!token) throw new Error('Токен не получен при логине');
         const user = await fetchProfile(token);
-        return { token, user };
+        const forcedRole = resolveRoleByEmail(payload.email);
+        const resolvedUser: User = forcedRole ? { ...user, role: forcedRole } : user;
+        return { token, user: resolvedUser };
       } catch (error: any) {
         const status = error?.response?.status;
         if (status === 401) {
