@@ -34,10 +34,13 @@ export interface Room {
 export interface User {
   id: string;
   email: string;
+  username?: string;
   name: string;
   avatarUrl?: string;
   phone?: string;
   role: Role;
+  countryId?: number;
+  discount?: number;
   city?: string;
   rating?: number;
   isBlocked?: boolean;

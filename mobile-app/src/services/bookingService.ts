@@ -50,6 +50,12 @@ type CreateBookingPayload = {
   checkIn: string;
   checkOut: string;
   guests: number;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  country?: string;
+  comment?: string;
+  isBusinessTrip?: boolean;
   paymentType?: PaymentType;
   userId?: string;
 };
@@ -96,55 +102,73 @@ const matchesOffer = (booking: Booking, filters?: OwnerBookingsFilters) => {
   return booking.offerId === filters.offerId;
 };
 
+const isNumericId = (value: string) => /^\d+$/.test(String(value).trim());
+
+const createLocalBooking = async (payload: CreateBookingPayload) => {
+  const offer = mockOffers.find((item) => item.id === payload.offerId);
+  const allBookings = await BookingRepository.getAll();
+  const isAvailable = isOfferAvailableForDates(
+    payload.offerId,
+    payload.checkIn,
+    payload.checkOut,
+    allBookings,
+    offer?.stock ?? 1,
+  );
+  if (!isAvailable) {
+    throw new Error('booking.unavailable');
+  }
+  const hotel = await findHotelForOffer(offer);
+  const nights = Math.max(
+    1,
+    Math.ceil(
+      (new Date(payload.checkOut).getTime() - new Date(payload.checkIn).getTime()) /
+        (1000 * 60 * 60 * 24),
+    ),
+  );
+  const booking: Booking = {
+    id: `mock-booking-${Date.now()}`,
+    offerId: payload.offerId,
+    hotelId: hotel?.id,
+    userId: payload.userId ?? 'user-1',
+    checkIn: payload.checkIn,
+    checkOut: payload.checkOut,
+    guests: payload.guests,
+    totalPrice: (offer?.pricePerNight ?? 100) * nights,
+    status: 'pending',
+    paymentType: payload.paymentType ?? 'card',
+  };
+  await BookingRepository.addBooking(booking);
+  return booking;
+};
+
 export const bookingService = {
   create: async (payload: CreateBookingPayload) => {
-    if (USE_MOCKS) {
-      const offer = mockOffers.find((item) => item.id === payload.offerId);
-      const allBookings = await BookingRepository.getAll();
-      const isAvailable = isOfferAvailableForDates(
-        payload.offerId,
-        payload.checkIn,
-        payload.checkOut,
-        allBookings,
-        offer?.stock ?? 1,
-      );
-      if (!isAvailable) {
-        throw new Error('booking.unavailable');
-      }
-      const hotel = await findHotelForOffer(offer);
-      const nights = Math.max(
-        1,
-        Math.ceil(
-          (new Date(payload.checkOut).getTime() - new Date(payload.checkIn).getTime()) /
-            (1000 * 60 * 60 * 24),
-        ),
-      );
-      const booking: Booking = {
-        id: `mock-booking-${Date.now()}`,
-        offerId: payload.offerId,
-        hotelId: hotel?.id,
-        userId: payload.userId ?? 'user-1',
-        checkIn: payload.checkIn,
-        checkOut: payload.checkOut,
-        guests: payload.guests,
-        totalPrice: (offer?.pricePerNight ?? 100) * nights,
-        status: 'pending',
-        paymentType: payload.paymentType ?? 'card',
-      };
-      await BookingRepository.addBooking(booking); // сохраняем в мок-репозиторий, чтобы показать в "Мої бронювання"
-      return booking;
+    if (USE_MOCKS || !isNumericId(payload.offerId)) {
+      return createLocalBooking(payload);
     }
     const lang = getApiLang();
     const adults = Math.max(1, payload.guests);
     const children = 0;
+    const [mainGuestFirstName, ...lastNameParts] = (payload.fullName ?? '').trim().split(/\s+/);
+    const mainGuestLastName = lastNameParts.join(' ').trim();
+    const noteParts = [
+      payload.comment?.trim() ? `Comment: ${payload.comment.trim()}` : '',
+      payload.email?.trim() ? `Email: ${payload.email.trim()}` : '',
+      payload.phone?.trim() ? `Phone: ${payload.phone.trim()}` : '',
+      payload.country?.trim() ? `Country: ${payload.country.trim()}` : '',
+    ].filter(Boolean);
     const request = {
       offerId: Number(payload.offerId),
       guests: payload.guests,
       adults,
       children,
+      mainGuestFirstName: mainGuestFirstName || undefined,
+      mainGuestLastName: mainGuestLastName || undefined,
       startDate: payload.checkIn,
       endDate: payload.checkOut,
-      clientNote: '',
+      clientNote: noteParts.join(' | '),
+      isBusinessTrip: payload.isBusinessTrip ?? false,
+      paymentMethod: payload.paymentType,
     };
     try {
       const { data } = await apiClient.post<any>(ENDPOINTS.booking.create(lang), request);
@@ -169,16 +193,19 @@ export const bookingService = {
       );
       return { items, total: items.length };
     }
+    const local = (await BookingRepository.getAll()).filter((item) => item.userId === userId);
     try {
       const { data } = await apiClient.get<any>(ENDPOINTS.booking.all);
       const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-      const items = list
+      const fromApi = list
         .filter((order) => String(order?.clientId ?? order?.userId) === userId)
         .map(mapBooking);
-      return { items, total: items.length };
+      const merged = [...local, ...fromApi];
+      const unique = Array.from(new Map(merged.map((item) => [item.id, item])).values());
+      return { items: unique, total: unique.length };
     } catch (error) {
       console.warn('[bookingService.getUserBookings] API fallback to empty list', error);
-      return { items: [], total: 0 };
+      return { items: local, total: local.length };
     }
   },
   getOwnerBookings: async (ownerId: string, filters?: OwnerBookingsFilters) => {

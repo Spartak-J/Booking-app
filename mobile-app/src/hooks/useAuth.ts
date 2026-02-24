@@ -112,7 +112,7 @@ export const useAuth = () => {
 
   const updateProfile = async (payload: Partial<User>) => {
     if (!user) return;
-    const updated = await profileService.updateProfile(user.id, payload);
+    const updated = await profileService.updateProfile(user.id, payload, user);
     await setAuth({ user: updated, token: token ?? '', role: updated.role });
   };
 

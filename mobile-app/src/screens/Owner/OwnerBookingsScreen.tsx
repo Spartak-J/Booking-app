@@ -19,6 +19,7 @@ import { ScreenShell, Loader, Typography, Input } from '@/ui';
 import { spacing } from '@/theme';
 import OwnerBookingCard from '@/components/Owner/OwnerBookingCard';
 import HomeDatePickerModal from '@/components/Home/HomeDatePickerModal';
+import { BookingsTabs } from '@/components/Bookings/BookingsTabs';
 import noBookingBlackImage from '@/assets/images/nobooking_black.png';
 import noBookingWhiteImage from '@/assets/images/nobooking_white.png';
 import { s } from '@/utils/scale';
@@ -38,6 +39,7 @@ type BookingView = {
   note?: string;
   status: 'active' | 'cancelled' | 'completed';
 };
+type TabKey = 'active' | 'past' | 'cancelled';
 
 const makeGuestNote = (bookingId: string) =>
   bookingId.endsWith('1')
@@ -87,6 +89,7 @@ export const OwnerBookingsScreen = () => {
     return { month: now.getMonth(), year: now.getFullYear() };
   });
   const [collapsedIds, setCollapsedIds] = useState<string[]>([]);
+  const [tab, setTab] = useState<TabKey>('active');
 
   const parseDateParts = (value?: string) => {
     if (!value) {
@@ -237,15 +240,25 @@ export const OwnerBookingsScreen = () => {
     );
   };
   const styles = useMemo(() => getStyles(tokens), [tokens]);
-  const isEmpty = !isLoading && bookings.length === 0;
-  const emptyText = selectedOfferId
-    ? t('owner.bookings.emptyForObject')
-    : t('owner.bookings.empty');
+  const tabBookings = useMemo(() => {
+    if (tab === 'active') return bookings.filter((item) => item.status === 'active');
+    if (tab === 'past') return bookings.filter((item) => item.status === 'completed');
+    return bookings.filter((item) => item.status === 'cancelled');
+  }, [bookings, tab]);
+  const isEmpty = !isLoading && tabBookings.length === 0;
+  const emptyText = tab === 'active'
+    ? selectedOfferId
+      ? t('owner.bookings.emptyForObject')
+      : t('owner.bookings.empty')
+    : tab === 'past'
+      ? t('bookings.emptyPast')
+      : t('bookings.emptyCancelled');
 
   return (
     <AppLayout variant="tab" header={false}>
       <ScreenShell
-        title="Бронювання"
+        title={t('owner.tabs.bookings')}
+        titleBold
         onBack={() => navigation.goBack()}
         contentStyle={{ paddingHorizontal: spacing.md, paddingBottom: spacing.xl }}
       >
@@ -263,6 +276,15 @@ export const OwnerBookingsScreen = () => {
           </View>
         ) : (
           <>
+            <BookingsTabs
+              value={tab}
+              onChange={setTab}
+              colors={{
+                text: tokens.textPrimary,
+                border: tokens.borderStrong,
+                accent: tokens.accent,
+              }}
+            />
             <Input
               value={dateFilterLabel}
               placeholder={t('common.date')}
@@ -277,7 +299,7 @@ export const OwnerBookingsScreen = () => {
               containerStyle={{ marginBottom: spacing.sm }}
             />
             <FlatList
-              data={bookings}
+              data={tabBookings}
               contentContainerStyle={styles.listContent}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (

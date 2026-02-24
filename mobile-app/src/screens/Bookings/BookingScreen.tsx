@@ -26,6 +26,10 @@ export const BookingScreen = () => {
     <AppLayout variant="stack">
       <BookingScreenView
         offerId={params.offerId}
+        initialDates={
+          params.checkIn && params.checkOut ? { from: params.checkIn, to: params.checkOut } : undefined
+        }
+        initialGuests={params.guests}
         offer={offer}
         isLoading={isLoading}
         onBack={() => navigation.goBack()}

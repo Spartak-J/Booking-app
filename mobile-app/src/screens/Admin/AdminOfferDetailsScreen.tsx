@@ -7,13 +7,11 @@ import { AppLayout } from '@/layout/AppLayout';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
 import { offersAdminService, type AdminOffer } from '@/services/admin';
-import { useAuth } from '@/hooks/useAuth';
 
 const AdminOfferDetailsScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'AdminOfferDetails'>>();
   const [offer, setOffer] = useState<AdminOffer | null>(null);
-  const { user } = useAuth();
 
   useEffect(() => {
     let mounted = true;
@@ -33,8 +31,8 @@ const AdminOfferDetailsScreen: React.FC = () => {
     <AppLayout variant="stack" header={false} edges={['top', 'left', 'right']}>
       <AdminOfferDetailsScreenView
         offer={offer}
-        avatarInitial={(user?.name ?? 'A').charAt(0).toUpperCase()}
         onBack={() => navigation.goBack()}
+        onMenu={() => navigation.navigate(Routes.AdminMenu)}
         onWrite={() => navigation.navigate(Routes.Main, { screen: 'Notifications' })}
         onBlock={() => undefined}
       />

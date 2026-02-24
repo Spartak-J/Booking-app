@@ -2,8 +2,6 @@
 import React, { useMemo } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 
-import { DateRangePicker } from '@/components/DateRangePicker';
-import { GuestPicker } from '@/components/GuestPicker';
 import { useTheme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { Input, Typography } from '@/ui';
@@ -16,18 +14,14 @@ const s = (value: number) => value * scale;
 
 type Props = {
   dates: { from: string; to: string };
-  onChangeDates: (next: { from: string; to: string } | undefined) => void;
   guests: number | undefined;
-  onChangeGuests: (next: number | undefined) => void;
   comment: string;
   onChangeComment: (value: string) => void;
 };
 
 export const BookingDetailsSection = ({
   dates,
-  onChangeDates,
   guests,
-  onChangeGuests,
   comment,
   onChangeComment,
 }: Props) => {
@@ -41,8 +35,19 @@ export const BookingDetailsSection = ({
         {t('booking.sectionDetails')}
       </Typography>
       <View style={styles.card}>
-        <DateRangePicker value={dates} onChange={onChangeDates} />
-        <GuestPicker value={guests} onChange={onChangeGuests} />
+        <Typography variant="caption" tone="primary">
+          {t('booking.dates')}
+        </Typography>
+        <View style={styles.dateRow}>
+          <Input value={dates.from} editable={false} containerStyle={styles.dateField} />
+          <Input value={dates.to} editable={false} containerStyle={styles.dateField} />
+          <Input
+            value={guests ? String(guests) : ''}
+            editable={false}
+            containerStyle={styles.guestsField}
+            label={t('bookings.guests')}
+          />
+        </View>
         <Typography variant="caption" tone="primary">
           {t('booking.comment')}
         </Typography>
@@ -71,11 +76,22 @@ const getStyles = (colors: any) =>
     },
     card: {
       gap: s(12),
-      backgroundColor: colors.surface ?? colors.background,
+      backgroundColor: colors.surfaceLight,
       borderRadius: radius.md,
       padding: s(12),
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    dateRow: {
+      flexDirection: 'row',
+      gap: s(8),
+      alignItems: 'flex-end',
+    },
+    dateField: {
+      flex: 1,
+    },
+    guestsField: {
+      width: s(90),
     },
     commentInput: {
       minHeight: s(90),

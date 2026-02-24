@@ -12,15 +12,18 @@ import { Routes } from '@/navigation/routes';
 import { AppLayout } from '@/layout/AppLayout';
 import HomeFooter from '@/components/Home/HomeFooter';
 import { BOTTOM_NAV_ITEMS } from '@/components/Home/homeNavigationData';
+import { useAuthStore } from '@/store/authStore';
 
 export const PaymentInfoScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [cards, setCards] = useState<PaymentCard[]>([]);
+  const userId = useAuthStore((state) => state.user?.id);
 
   const loadCards = useCallback(async () => {
-    const data = await PaymentRepository.getCards();
+    const normalizedUserId = String(userId ?? '').trim() || 'guest';
+    const data = await PaymentRepository.getCards(normalizedUserId);
     setCards(data);
-  }, []);
+  }, [userId]);
 
   useFocusEffect(
     useCallback(() => {

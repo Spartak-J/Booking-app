@@ -6,7 +6,7 @@ export const getApiErrorMessage = (error: unknown, fallback = DEFAULT_ERROR_MESS
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;
     const data = error.response?.data as
-      | { message?: string; error?: string; title?: string }
+      | { message?: string; error?: string; title?: string; errors?: Record<string, string[] | string> }
       | string
       | undefined;
 
@@ -15,6 +15,15 @@ export const getApiErrorMessage = (error: unknown, fallback = DEFAULT_ERROR_MESS
       if (data.message) return data.message;
       if (data.error) return data.error;
       if (data.title) return data.title;
+      if (data.errors && typeof data.errors === 'object') {
+        const flat = Object.entries(data.errors)
+          .flatMap(([field, value]) => {
+            const items = Array.isArray(value) ? value : [String(value)];
+            return items.map((item) => `${field}: ${item}`);
+          })
+          .filter(Boolean);
+        if (flat.length > 0) return flat.join('\n');
+      }
     }
 
     if (status === 404) return 'Данные не найдены.';

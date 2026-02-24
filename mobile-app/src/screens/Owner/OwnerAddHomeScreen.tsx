@@ -36,7 +36,7 @@ export const OwnerAddHomeScreen = () => {
 
   const { data: amenitiesData, isLoading: loadingAmenities } = useQuery({
     queryKey: ['amenities'],
-    queryFn: paramService.getCategories,
+    queryFn: paramService.getAmenities,
   });
 
   const [titleDraft, setTitleDraft] = useState<string | null>(null);

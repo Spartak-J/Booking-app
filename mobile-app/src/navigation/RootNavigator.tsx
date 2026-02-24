@@ -69,9 +69,9 @@ export type RootStackParamList = {
   LandmarksSearchResults: { cityId?: string; cityName?: string } | undefined;
   LandmarkDetail: { landmarkId: string } | undefined;
   Saved: undefined;
-  OfferDetails: { offerId: string };
+  OfferDetails: { offerId: string; checkIn?: string; checkOut?: string; guests?: number };
   OfferGallery: { offerId: string };
-  Booking: { offerId: string };
+  Booking: { offerId: string; checkIn?: string; checkOut?: string; guests?: number };
   BookingDetails: { bookingId: string };
   BookingSuccess: { bookingId: string; offerId?: string; offerTitle?: string; totalPrice?: number };
   BookingFailure: { message?: string; offerId?: string };
@@ -131,6 +131,7 @@ const MainTabs = () => {
         tabBarStyle: { display: 'none' },
       }}
       tabBar={({ state, navigation, insets }) => {
+        if (role === 'admin') return null;
         const activeRoute = state.routes[state.index];
         const activeId = getFooterIdByRoute(activeRoute.name);
         const items = BOTTOM_NAV_ITEMS.map((item) => ({

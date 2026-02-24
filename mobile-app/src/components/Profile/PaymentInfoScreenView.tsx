@@ -30,6 +30,7 @@ export const PaymentInfoScreenView: React.FC<PaymentInfoScreenViewProps> = ({
   return (
     <ScreenShell
       title={t('profile.payment.title')}
+      titleBold
       onBack={onBack}
       showKeys
       footerSlot={footer}

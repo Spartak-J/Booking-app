@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { useTranslation } from '@/i18n';
 import { radius, spacing, typography, useTheme } from '@/theme';
@@ -21,17 +21,19 @@ export type AdminUserCardItem = {
 
 type Props = {
   title: string;
-  avatarInitial: string;
   query: string;
-  sortMode: 'city' | 'rating';
+  sortOrder: 'asc' | 'desc';
+  filterMode: 'all' | 'blocked' | 'active';
   searchOptionsVisible: boolean;
   users: AdminUserCardItem[];
   page: number;
   totalPages: number;
   onQueryChange: (value: string) => void;
   onBack: () => void;
+  onMenu: () => void;
   onToggleSearchOptions: () => void;
-  onSetSortMode: (mode: 'city' | 'rating') => void;
+  onSetSortOrder: (mode: 'asc' | 'desc') => void;
+  onSetFilterMode: (mode: 'all' | 'blocked' | 'active') => void;
   onSetPage: (page: number) => void;
   onWrite: (userId: string) => void;
   onBlock: (userId: string) => void;
@@ -39,17 +41,19 @@ type Props = {
 
 export const AdminUsersScreenView: React.FC<Props> = ({
   title,
-  avatarInitial,
   query,
-  sortMode,
+  sortOrder,
+  filterMode,
   searchOptionsVisible,
   users,
   page,
   totalPages,
   onQueryChange,
   onBack,
+  onMenu,
   onToggleSearchOptions,
-  onSetSortMode,
+  onSetSortOrder,
+  onSetFilterMode,
   onSetPage,
   onWrite,
   onBlock,
@@ -59,113 +63,151 @@ export const AdminUsersScreenView: React.FC<Props> = ({
   const styles = useMemo(() => getStyles(tokens), [tokens]);
 
   return (
-    <ScreenContainer scroll edges={['left', 'right']} contentContainerStyle={styles.content}>
+    <ScreenContainer edges={['top', 'left', 'right']} style={styles.screen}>
       <HeaderBar
         title={title}
         onBack={onBack}
+        onMenu={onMenu}
         showBack
-        showMenu={false}
+        showMenu
         showSearch={false}
-        showAvatar
-        avatarInitial={avatarInitial}
       />
 
-      <AdminSearchMenu
-        query={query}
-        onQueryChange={onQueryChange}
-        placeholder={t('admin.users.searchPlaceholder')}
-        onSearchPress={onToggleSearchOptions}
-        style={styles.searchBox}
-      />
+      <View style={styles.content}>
+        <AdminSearchMenu
+          query={query}
+          onQueryChange={onQueryChange}
+          placeholder={t('admin.users.searchPlaceholder')}
+          onSearchPress={onToggleSearchOptions}
+          style={styles.searchBox}
+        />
 
-      <AdminSearchOptionsMenu
-        visible={searchOptionsVisible}
-        onClose={onToggleSearchOptions}
-        style={styles.searchOverlay}
-        options={[
-          {
-            id: 'city',
-            label: t('admin.users.sortByCity'),
-            selected: sortMode === 'city',
-            onPress: () => {
-              onSetSortMode('city');
-              onToggleSearchOptions();
+        <AdminSearchOptionsMenu
+          visible={searchOptionsVisible}
+          onClose={onToggleSearchOptions}
+          style={styles.searchOverlay}
+          options={[
+            {
+              id: 'all',
+              label: 'Всі користувачі',
+              selected: filterMode === 'all',
+              onPress: () => {
+                onSetFilterMode('all');
+                onToggleSearchOptions();
+              },
             },
-          },
-          {
-            id: 'rating',
-            label: t('admin.users.sortByRating'),
-            selected: sortMode === 'rating',
-            onPress: () => {
-              onSetSortMode('rating');
-              onToggleSearchOptions();
+            {
+              id: 'blocked',
+              label: 'Тільки заблоковані',
+              selected: filterMode === 'blocked',
+              onPress: () => {
+                onSetFilterMode('blocked');
+                onToggleSearchOptions();
+              },
             },
-          },
-        ]}
-      />
+            {
+              id: 'active',
+              label: 'Тільки активні',
+              selected: filterMode === 'active',
+              onPress: () => {
+                onSetFilterMode('active');
+                onToggleSearchOptions();
+              },
+            },
+            {
+              id: 'asc',
+              label: 'Сортування А-Я',
+              selected: sortOrder === 'asc',
+              onPress: () => {
+                onSetSortOrder('asc');
+                onToggleSearchOptions();
+              },
+            },
+            {
+              id: 'desc',
+              label: 'Сортування Я-А',
+              selected: sortOrder === 'desc',
+              onPress: () => {
+                onSetSortOrder('desc');
+                onToggleSearchOptions();
+              },
+            },
+          ]}
+        />
 
-      <View style={styles.cards}>
-        {users.map((item) => (
-          <Card key={item.id} variant="outlined" style={styles.userCard}>
-            <View style={styles.cardTopRow}>
-              <Typography variant="h2" tone="primary" numberOfLines={1} style={styles.userName}>
-                {item.name}
-              </Typography>
-              <View style={styles.ratingBadge}>
-                <Typography variant="caption" tone="primary">
-                  {item.rating}
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.cards}>
+            {users.map((item) => (
+              <Card key={item.id} variant="outlined" style={styles.userCard}>
+                <View style={styles.cardTopRow}>
+                  <Typography variant="h2" tone="primary" numberOfLines={1} style={styles.userName}>
+                    {item.name}
+                  </Typography>
+                  <View style={styles.ratingBadge}>
+                    <Typography variant="caption" tone="primary">
+                      {item.rating}
+                    </Typography>
+                    <MaterialCommunityIcons name="star" size={s(14)} color={tokens.textPrimary} />
+                  </View>
+                </View>
+
+                <View style={styles.cityBadge}>
+                  <Typography variant="caption" tone="primary">
+                    {item.city}
+                  </Typography>
+                </View>
+
+                <Typography variant="body" tone="primary">
+                  {item.phone ?? '-'}
                 </Typography>
-                <MaterialCommunityIcons name="star" size={s(14)} color={tokens.textPrimary} />
-              </View>
-            </View>
+                <Typography variant="body" tone="primary" numberOfLines={1}>
+                  {item.email}
+                </Typography>
 
-            <View style={styles.cityBadge}>
-              <Typography variant="caption" tone="primary">
-                {item.city}
-              </Typography>
-            </View>
+                <View style={styles.actionRow}>
+                  <Button
+                    title={t('admin.offers.write')}
+                    onPress={() => onWrite(item.id)}
+                    variant="ghost"
+                    size="small"
+                    style={styles.writeButton}
+                    textStyle={styles.writeButtonText}
+                  />
+                  <Button
+                    title={item.isBlocked ? t('admin.users.unblock') : t('admin.users.block')}
+                    onPress={() => onBlock(item.id)}
+                    variant="ghost"
+                    size="small"
+                    style={styles.blockButton}
+                    textStyle={styles.blockButtonText}
+                  />
+                </View>
+              </Card>
+            ))}
+          </View>
 
-            <Typography variant="body" tone="primary">
-              {item.phone ?? '-'}
-            </Typography>
-            <Typography variant="body" tone="primary" numberOfLines={1}>
-              {item.email}
-            </Typography>
-
-            <View style={styles.actionRow}>
-              <Button
-                title={t('admin.offers.write')}
-                onPress={() => onWrite(item.id)}
-                variant="ghost"
-                size="small"
-                style={styles.writeButton}
-                textStyle={styles.writeButtonText}
-              />
-              <Button
-                title={item.isBlocked ? t('admin.users.unblock') : t('admin.users.block')}
-                onPress={() => onBlock(item.id)}
-                variant="ghost"
-                size="small"
-                style={styles.blockButton}
-                textStyle={styles.blockButtonText}
-              />
-            </View>
-          </Card>
-        ))}
+          <Pagination currentPage={page} totalPages={totalPages} onPageChange={onSetPage} maxVisible={5} />
+        </ScrollView>
       </View>
-
-      <Pagination currentPage={page} totalPages={totalPages} onPageChange={onSetPage} maxVisible={5} />
     </ScreenContainer>
   );
 };
 
 const getStyles = (tokens: Record<string, string>) =>
   StyleSheet.create({
+    screen: {
+      flex: 1,
+    },
     content: {
-      paddingTop: 0,
+      flex: 1,
+      paddingTop: spacing.md,
       paddingHorizontal: spacing.lg,
       paddingBottom: 0,
       gap: spacing.lg,
+    },
+    scrollContent: {
+      gap: spacing.lg,
+      paddingBottom: spacing.lg,
     },
     searchOverlay: {
       top: s(86),

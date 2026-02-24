@@ -12,8 +12,8 @@ import { s } from '@/utils/scale';
 
 type Props = {
   offer: AdminHotel;
-  avatarInitial: string;
   onBack: () => void;
+  onMenu: () => void;
   onWrite: () => void;
   onBlock: () => void;
 };
@@ -34,8 +34,8 @@ const buildShortAddress = (address: string, city: string) => {
 
 const AdminOfferDetailsScreenView: React.FC<Props> = ({
   offer,
-  avatarInitial,
   onBack,
+  onMenu,
   onWrite,
   onBlock,
 }) => {
@@ -51,11 +51,10 @@ const AdminOfferDetailsScreenView: React.FC<Props> = ({
       <HeaderBar
         title={t('admin.offers.title')}
         onBack={onBack}
+        onMenu={onMenu}
         showBack
-        showMenu={false}
+        showMenu
         showSearch={false}
-        showAvatar
-        avatarInitial={avatarInitial}
       />
 
       <View style={styles.content}>

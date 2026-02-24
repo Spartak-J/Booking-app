@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FlatList, ImageBackground, StyleSheet, View } from 'react-native';
+import { FlatList, ImageBackground, Linking, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,7 +15,6 @@ import { s } from '@/utils/scale';
 import { getHotelImageSource } from '@/data/hotels/hotelImages.mock';
 import AdminSearchMenu from '@/components/Admin/AdminSearchMenu';
 import AdminSearchOptionsMenu from '@/components/Admin/AdminSearchOptionsMenu';
-import { useAuth } from '@/hooks/useAuth';
 
 const PAGE_SIZE = 6;
 type SortOrder = 'asc' | 'desc';
@@ -42,7 +41,6 @@ const AdminOffersScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
   const { tokens } = useTheme();
-  const { user } = useAuth();
 
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -87,11 +85,10 @@ const AdminOffersScreen: React.FC = () => {
         <HeaderBar
           title={t('admin.offers.title')}
           onBack={() => navigation.goBack()}
+          onMenu={() => navigation.navigate(Routes.AdminMenu)}
           showBack
-          showMenu={false}
+          showMenu
           showSearch={false}
-          showAvatar
-          avatarInitial={(user?.name ?? 'A').charAt(0).toUpperCase()}
         />
 
         <View style={styles.searchRow}>
@@ -180,7 +177,19 @@ const AdminOffersScreen: React.FC = () => {
                   <Typography variant="subtitle" tone="primary" numberOfLines={1}>
                     {item.city}
                   </Typography>
-                  <Typography variant="subtitle" tone="primary" numberOfLines={1}>
+                  <Typography
+                    variant="subtitle"
+                    tone="primary"
+                    numberOfLines={1}
+                    onPress={() => {
+                      const raw = item.owner?.phone ?? '';
+                      const phone = raw.replace(/[^\d+]/g, '');
+                      if (phone) {
+                        void Linking.openURL(`tel:${phone}`);
+                      }
+                    }}
+                    style={styles.phoneLink}
+                  >
                     {item.owner?.phone ?? '-'}
                   </Typography>
                   <Typography variant="subtitle" tone="primary" numberOfLines={1}>
@@ -291,6 +300,9 @@ const getStyles = (tokens: Record<string, string>) =>
     },
     hotelTitle: {
       fontFamily: fonts.MontserratAlternatesBold,
+    },
+    phoneLink: {
+      textDecorationLine: 'underline',
     },
     pagination: {
       marginTop: spacing.md,

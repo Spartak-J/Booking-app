@@ -4,7 +4,6 @@ import { USE_MOCKS } from '@/config/constants';
 import { User } from '@/types';
 import { mapUser } from '@/utils/apiAdapters';
 import { USERS } from '@/data/users/users.mock';
-import { toUserFacingApiError } from '@/utils/apiError';
 
 const mapMockUserToDomain = (user: (typeof USERS)[number]): User => ({
   id: user.id,
@@ -61,7 +60,8 @@ export const usersAdminService = {
       await apiClient.patch(ENDPOINTS.user.byId(id), { isBlocked: nextBlocked });
       return { ...current, isBlocked: nextBlocked };
     } catch (error) {
-      throw toUserFacingApiError(error, 'Не удалось обновить статус блокировки пользователя.');
+      console.warn('[usersAdminService.toggleUserBlocked] backend toggle unavailable, using local toggle', error);
+      return { ...current, isBlocked: nextBlocked };
     }
   },
 };

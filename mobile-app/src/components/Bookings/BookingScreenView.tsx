@@ -1,6 +1,6 @@
 // Component: BookingScreenView. Used in: BookingScreen.
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Dimensions, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,12 +10,13 @@ import { BookingGuestInfo } from '@/components/Booking/BookingGuestInfo';
 import { BookingPaymentMethod, PaymentMethod } from '@/components/Booking/BookingPaymentMethod';
 import { BookingTripPurpose } from '@/components/Booking/BookingTripPurpose';
 import { bookingService } from '@/services/bookingService';
+import { paymentService } from '@/services/payment';
 import { useTheme } from '@/theme';
 import { formatPrice } from '@/utils/price';
 import { PaymentType, Offer } from '@/types';
 import { useTranslation } from '@/i18n';
 import { useAuthStore } from '@/store/authStore';
-import { Button, LineWithDots, Loader, Typography } from '@/ui';
+import { Button, LineWithDots, Loader, Modal, Typography } from '@/ui';
 import { radius } from '@/theme';
 import { PaymentRepository } from '@/data/payment';
 import type { PaymentCard } from '@/data/payment/types';
@@ -24,9 +25,12 @@ const DESIGN_WIDTH = 412;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const scale = SCREEN_WIDTH / DESIGN_WIDTH;
 const s = (value: number) => value * scale;
+const DEFAULT_COUNTRY = 'Україна';
 
 type BookingScreenViewProps = {
   offerId: string;
+  initialDates?: { from: string; to: string };
+  initialGuests?: number;
   offer?: Offer;
   isLoading: boolean;
   onBack: () => void;
@@ -40,6 +44,8 @@ type BookingScreenViewProps = {
 
 export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   offerId,
+  initialDates,
+  initialGuests,
   offer,
   isLoading,
   onBack,
@@ -47,6 +53,7 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
 }) => {
   const { colors, mode } = useTheme();
   const { t } = useTranslation();
+  const user = useAuthStore((state) => state.user);
   const userId = useAuthStore((state) => state.user?.id);
   const isDark = mode === 'dark' || colors.background === colors.bgDark;
   const headerTextColor = isDark ? colors.surfaceLight : colors.textPrimary;
@@ -57,21 +64,41 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
   const queryClient = useQueryClient();
 
   const [dates, setDates] = useState<{ from: string; to: string }>(() => ({
-    from: new Date().toISOString().slice(0, 10),
-    to: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+    from: initialDates?.from ?? new Date().toISOString().slice(0, 10),
+    to: initialDates?.to ?? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
   }));
-  const [guests, setGuests] = useState<number | undefined>(2);
+  const [guests, setGuests] = useState<number | undefined>(initialGuests ?? 2);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [tripPurpose, setTripPurpose] = useState<'leisure' | 'work'>('leisure');
   const [comment, setComment] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [country, setCountry] = useState('');
+  const normalizedUserCountry = (user?.country ?? '').trim();
+  const [country, setCountry] = useState(normalizedUserCountry || DEFAULT_COUNTRY);
+  const [fieldErrors, setFieldErrors] = useState<{
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    country?: string;
+  }>({});
   const [cards, setCards] = useState<PaymentCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | undefined>(undefined);
+  const [selectedCardSource, setSelectedCardSource] = useState<'saved' | 'liqpay'>('saved');
+  const [cardSelectOpen, setCardSelectOpen] = useState(false);
+  const resolvedFullName = fullName.trim().length > 0 ? fullName : user?.name ?? '';
+  const resolvedEmail = email.trim().length > 0 ? email : user?.email ?? '';
+  const resolvedPhone = phone.trim().length > 0 ? phone : user?.phone ?? '';
+  const resolvedCountry =
+    country.trim().length > 0 ? country.trim() : normalizedUserCountry || DEFAULT_COUNTRY;
   const paymentType: PaymentType =
-    paymentMethod === 'cash' ? 'cash' : paymentMethod === 'card' ? 'card' : 'online';
+    paymentMethod === 'cash'
+      ? 'cash'
+      : paymentMethod === 'card'
+        ? selectedCardSource === 'liqpay'
+          ? 'online'
+          : 'card'
+        : 'online';
 
   const nights = useMemo(() => {
     const start = new Date(dates.from).getTime();
@@ -80,24 +107,61 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
     return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 1;
   }, [dates]);
 
-  const handleDatesChange = (next: { from: string; to: string } | undefined) => {
-    if (next) {
-      setDates(next);
-    } else {
-      setDates({ from: '', to: '' });
+  useEffect(() => {
+    if (!country.trim()) {
+      setCountry(normalizedUserCountry || DEFAULT_COUNTRY);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [normalizedUserCountry]);
 
   useEffect(() => {
-    PaymentRepository.getCards()
+    const normalizedUserId = String(userId ?? '').trim() || 'guest';
+    PaymentRepository.getCards(normalizedUserId)
       .then((list) => {
         setCards(list);
         if (list.length > 0 && !selectedCardId) {
           setSelectedCardId(list[0].id);
         }
+        if (list.length === 0) {
+          setSelectedCardSource('liqpay');
+        } else if (selectedCardSource === 'liqpay' && !selectedCardId) {
+          setSelectedCardId(list[0].id);
+        }
       })
       .catch(() => setCards([]));
-  }, [selectedCardId]);
+  }, [selectedCardId, selectedCardSource, userId]);
+
+  const selectedCard = cards.find((card) => card.id === selectedCardId);
+  const selectedPaymentLabel =
+    selectedCardSource === 'liqpay'
+      ? 'Оплата через LiqPay'
+      : selectedCard?.numberMasked ?? selectedCard?.holderName ?? t('profile.payment.noCard');
+
+  const validateGuestFields = () => {
+    const nextErrors: {
+      fullName?: string;
+      email?: string;
+      phone?: string;
+      country?: string;
+    } = {};
+
+    if (!resolvedFullName.trim()) nextErrors.fullName = t('validation.required');
+    if (!resolvedEmail.trim()) {
+      nextErrors.email = t('auth.errors.requiredEmail');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resolvedEmail.trim())) {
+      nextErrors.email = t('auth.errors.email');
+    }
+    if (!resolvedPhone.trim()) nextErrors.phone = t('validation.required');
+    if (!resolvedCountry.trim()) nextErrors.country = t('validation.required');
+
+    setFieldErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleBook = () => {
+    if (!validateGuestFields()) return;
+    mutation.mutate();
+  };
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -106,10 +170,39 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         checkIn: dates.from,
         checkOut: dates.to,
         guests: guests ?? 1,
+        fullName: resolvedFullName,
+        email: resolvedEmail,
+        phone: resolvedPhone,
+        country: resolvedCountry,
+        comment,
+        isBusinessTrip: tripPurpose === 'work',
         paymentType,
         userId: userId ?? 'user-1',
       }),
-    onSuccess: (booking) => {
+    onSuccess: async (booking) => {
+      if (paymentType === 'online') {
+        try {
+          const totalAmount = booking.totalPrice || (offer?.pricePerNight ?? 0) * nights;
+          const payment = await paymentService.createPayment({
+            bookingId: booking.id,
+            amount: totalAmount,
+            currency: 'UAH',
+            method: 'pay',
+            clientType: 'mobile',
+          });
+
+          if (payment.redirectUrl) {
+            await Linking.openURL(payment.redirectUrl);
+          } else {
+            throw new Error('Не отримано посилання на оплату LiqPay.');
+          }
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          Alert.alert(t('booking.error'), message);
+          return;
+        }
+      }
+
       queryClient.invalidateQueries({ queryKey: ['bookings', userId ?? ''] });
       queryClient.invalidateQueries({ queryKey: ['owner-bookings'] });
       onBookingSuccess({
@@ -162,10 +255,14 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         </Typography>
 
         <BookingGuestInfo
-          fullName={fullName}
-          email={email}
-          phone={phone}
-          country={country}
+          fullName={resolvedFullName}
+          email={resolvedEmail}
+          phone={resolvedPhone}
+          country={resolvedCountry}
+          nameError={fieldErrors.fullName}
+          emailError={fieldErrors.email}
+          phoneError={fieldErrors.phone}
+          countryError={fieldErrors.country}
           onChangeName={setFullName}
           onChangeEmail={setEmail}
           onChangePhone={setPhone}
@@ -173,9 +270,7 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         />
         <BookingDetailsSection
           dates={dates}
-          onChangeDates={handleDatesChange}
           guests={guests}
-          onChangeGuests={setGuests}
           comment={comment}
           onChangeComment={setComment}
         />
@@ -184,32 +279,55 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         {paymentMethod === 'card' ? (
           <View style={styles.cardsBlock}>
             <Typography variant="body" tone="primary" style={styles.cardsTitle}>
-              {t('profile.payment.yourCard')}
+              Спосіб оплати Mastercard/Visa
             </Typography>
-            {cards.length === 0 ? (
-              <Typography variant="caption" tone="secondary">
-                {t('profile.payment.noCard')}
-              </Typography>
-            ) : (
-              <View style={styles.cardsRow}>
+            <Button
+              title={selectedPaymentLabel}
+              variant="secondary"
+              onPress={() => setCardSelectOpen(true)}
+              style={styles.cardSelectButton}
+              textStyle={styles.cardSelectButtonText}
+            />
+            <Typography variant="caption" tone="secondary">
+              {cards.length > 0
+                ? 'Оберіть збережену карту або оплату через LiqPay'
+                : 'Збережених карт немає, доступна оплата через LiqPay'}
+            </Typography>
+            <Modal visible={cardSelectOpen} onClose={() => setCardSelectOpen(false)} variant="sheet">
+              <View style={styles.cardPickerModal}>
+                <Typography variant="subtitle" tone="primary">
+                  Оберіть спосіб оплати
+                </Typography>
                 {cards.map((card) => (
-                  <Pressable
+                  <Button
                     key={card.id}
-                    onPress={() => setSelectedCardId(card.id)}
-                    style={[styles.cardChip, selectedCardId === card.id && styles.cardChipActive]}
-                  >
-                    <Typography
-                      variant="caption"
-                      tone="primary"
-                      style={styles.cardChipText}
-                      numberOfLines={1}
-                    >
-                      {card.numberMasked ?? card.holderName}
-                    </Typography>
-                  </Pressable>
+                    title={card.numberMasked || card.holderName}
+                    variant={selectedCardSource === 'saved' && selectedCardId === card.id ? 'primary' : 'secondary'}
+                    onPress={() => {
+                      setSelectedCardSource('saved');
+                      setSelectedCardId(card.id);
+                      setCardSelectOpen(false);
+                    }}
+                    style={styles.cardPickerOption}
+                  />
                 ))}
+                <Button
+                  title="Оплата через LiqPay"
+                  variant={selectedCardSource === 'liqpay' ? 'primary' : 'secondary'}
+                  onPress={() => {
+                    setSelectedCardSource('liqpay');
+                    setCardSelectOpen(false);
+                  }}
+                  style={styles.cardPickerOption}
+                />
+                <Button
+                  title="Скасувати"
+                  variant="ghost"
+                  onPress={() => setCardSelectOpen(false)}
+                  style={styles.cardPickerClose}
+                />
               </View>
-            )}
+            </Modal>
           </View>
         ) : null}
 
@@ -224,7 +342,7 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
 
         <Button
           title={mutation.isPending ? t('booking.bookProgress') : t('booking.book')}
-          onPress={() => mutation.mutate()}
+          onPress={handleBook}
           isLoading={mutation.isPending}
         />
       </ScrollView>
@@ -237,7 +355,7 @@ const getStyles = (colors: any, isDark: boolean, headerTextColor: string) =>
   StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.surfaceLight,
     },
     loading: {
       padding: s(14),
@@ -250,7 +368,7 @@ const getStyles = (colors: any, isDark: boolean, headerTextColor: string) =>
       height: s(36),
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: isDark ? colors.bgDark : colors.surfaceLight,
+      backgroundColor: colors.surfaceLight,
       marginTop: s(4),
     },
     backButton: {
@@ -308,25 +426,26 @@ const getStyles = (colors: any, isDark: boolean, headerTextColor: string) =>
     cardsTitle: {
       fontWeight: '600',
     },
-    cardsRow: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: s(8),
-    },
-    cardChip: {
-      paddingHorizontal: s(10),
-      paddingVertical: s(8),
-      borderRadius: radius.xl,
+    cardSelectButton: {
       borderWidth: 1,
       borderColor: colors.border,
-      backgroundColor: isDark ? colors.bgCard : colors.bgPanel,
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      paddingHorizontal: s(12),
     },
-    cardChipActive: {
-      borderColor: colors.primary,
-      backgroundColor: isDark ? colors.bgDarkAlt : colors.surfaceLight,
+    cardSelectButtonText: {
+      textAlign: 'left',
+      width: '100%',
     },
-    cardChipText: {
-      fontWeight: '600',
+    cardPickerModal: {
+      gap: s(10),
+    },
+    cardPickerOption: {
+      width: '100%',
+    },
+    cardPickerClose: {
+      width: '100%',
+      marginTop: s(4),
     },
   });
 

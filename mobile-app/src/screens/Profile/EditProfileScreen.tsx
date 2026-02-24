@@ -12,10 +12,22 @@ import HomeFooter from '@/components/Home/HomeFooter';
 import { BOTTOM_NAV_ITEMS } from '@/components/Home/homeNavigationData';
 import { Routes } from '@/navigation/routes';
 import { mapProfileFormToUserPatch, mapUserToProfileForm } from '@/services/profile/profileMapper';
+import { useTranslation } from '@/i18n';
+import { TopNotification } from '@/ui';
 
 export const EditProfileScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { role, user, updateProfile } = useAuth();
+  const { t } = useTranslation();
+  const [notice, setNotice] = React.useState<{
+    visible: boolean;
+    variant: 'success' | 'error';
+    message: string;
+  }>({
+    visible: false,
+    variant: 'success',
+    message: '',
+  });
 
   const handlePickAvatar = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -56,6 +68,12 @@ export const EditProfileScreen = () => {
         />
       }
     >
+      <TopNotification
+        visible={notice.visible}
+        variant={notice.variant}
+        message={notice.message}
+        onHide={() => setNotice((prev) => ({ ...prev, visible: false }))}
+      />
       <EditProfileScreenView
         initialValues={mapUserToProfileForm(user)}
         onBack={() => navigation.goBack()}
@@ -63,7 +81,20 @@ export const EditProfileScreen = () => {
         isAdmin={role === 'admin'}
         onPickAvatar={handlePickAvatar}
         onSubmit={async (values) => {
-          await updateProfile(mapProfileFormToUserPatch(values));
+          try {
+            await updateProfile(mapProfileFormToUserPatch(values));
+            setNotice({
+              visible: true,
+              variant: 'success',
+              message: t('profile.account.saveSuccess'),
+            });
+          } catch {
+            setNotice({
+              visible: true,
+              variant: 'error',
+              message: t('profile.account.saveError'),
+            });
+          }
         }}
       />
     </AppLayout>

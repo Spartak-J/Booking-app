@@ -9,6 +9,7 @@ export interface CreatePaymentPayload {
   amount: number;
   currency: CurrencyCode;
   method: PaymentMethod;
+  clientType?: 'mobile' | 'web';
   offerId?: number;
   checkIn?: string;
   checkOut?: string;
@@ -24,6 +25,7 @@ export interface PaymentResult {
 export interface StartTokenizeCardPayload {
   userId: string;
   holderName: string;
+  clientType?: 'mobile' | 'web';
 }
 
 export interface TokenizeCardStatusResult {

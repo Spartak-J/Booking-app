@@ -7,4 +7,3 @@ export type ProfileFormValues = {
   ownerDescription: string;
   avatarUrl: string;
 };
-

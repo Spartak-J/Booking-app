@@ -112,7 +112,7 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
   StyleSheet.create({
     block: {
       gap: s(10),
-      marginHorizontal: s(20),
+      marginHorizontal: s(0),
     },
     title: {
       color: palette.title,
@@ -121,7 +121,7 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
     list: {
       gap: s(10),
       paddingVertical: s(6),
-      paddingRight: s(16),
+      paddingRight: s(0),
     },
     card: {
       width: s(133),

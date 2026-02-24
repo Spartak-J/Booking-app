@@ -21,7 +21,7 @@ export const profileService = {
     }
   },
 
-  updateProfile: async (id: string, payload: Partial<User>): Promise<User> => {
+  updateProfile: async (id: string, payload: Partial<User>, currentUser?: User | null): Promise<User> => {
     if (USE_MOCKS) {
       const target = mockUsers.find((item) => item.id === id);
       if (target) {
@@ -44,10 +44,18 @@ export const profileService = {
       return mockUser;
     }
     try {
-      const request = mapUserPatchToApiUpdateRequest(id, payload);
+      const request = mapUserPatchToApiUpdateRequest(id, payload, currentUser);
       const { data } = await apiClient.put<any>(ENDPOINTS.user.update, request);
       const payloadData = data?.data ?? data;
-      return mapUser(payloadData);
+      const mapped = mapUser(payloadData);
+      return {
+        ...mapped,
+        name: payload.name ?? mapped.name ?? currentUser?.name ?? '',
+        birthDate: payload.birthDate ?? mapped.birthDate ?? currentUser?.birthDate,
+        phone: payload.phone ?? mapped.phone ?? currentUser?.phone,
+        email: payload.email ?? mapped.email ?? currentUser?.email ?? '',
+        country: payload.country ?? mapped.country ?? currentUser?.country,
+      };
     } catch (error) {
       throw toUserFacingApiError(error, 'Не удалось обновить профиль.');
     }

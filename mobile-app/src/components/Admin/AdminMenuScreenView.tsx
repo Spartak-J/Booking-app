@@ -17,16 +17,16 @@ export type AdminMenuItem = {
 
 type Props = {
   title: string;
-  avatarInitial: string;
   items: AdminMenuItem[];
   onBack: () => void;
+  onMenu: () => void;
 };
 
 export const AdminMenuScreenView: React.FC<Props> = ({
   title,
-  avatarInitial,
   items,
   onBack,
+  onMenu,
 }) => {
   const { tokens } = useTheme();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -39,11 +39,10 @@ export const AdminMenuScreenView: React.FC<Props> = ({
         <HeaderBar
           title={title}
           onBack={onBack}
+          onMenu={onMenu}
           showBack
-          showMenu={false}
+          showMenu
           showSearch={false}
-          showAvatar
-          avatarInitial={avatarInitial}
         />
 
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
