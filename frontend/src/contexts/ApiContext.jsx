@@ -7,6 +7,7 @@ import {attractionApi} from "../api/attraction";
 import { orderApi } from "../api/order";
 import { rentObjApi } from "../api/rentObject";
 import { locationApi } from "../api/location";
+import {reviewApi} from "../api/review";
 import { paramItemApi } from "../api/paramItem";
 import { paramsCategoryApi } from "../api/paramsCategory";
 import { rentObjParamValueApi } from "../api/rentObjParamValue";
@@ -27,7 +28,8 @@ export const ApiProvider = ({ children }) => {
         rentObjApi,
         paramItemApi,
         paramsCategoryApi,
-        rentObjParamValueApi
+        rentObjParamValueApi,
+        reviewApi
       }}
     >
       {children}

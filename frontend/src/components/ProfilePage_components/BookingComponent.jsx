@@ -65,29 +65,20 @@ export const BookingComponent = ({
                         <div className={styles.headerRow}>
                             <Text text={t("Host.booking.Status")} type="m_500" />
                         </div>
-                        
-                        
-                    </div>
-                    {orders.map(order => (
-                        <Booking_card_row
-                            order={order}
-                            offer={offer}
-                            startDate={startDate}
-                            endDate={endDate}
-                            adults={adults}
-                            children={children}
-                        />
-                    ))}
 
+
+                    </div>
+                    <div className={styles.booking_card_row}>
+                        {orders.map(order => (
+                            <Booking_card_row
+                                order={order}
+                                offerTitle={offer.title}
+                            />
+                        ))}
+                    </div>
 
                 </div>
                 <div className={styles.line}></div>
-                <div className={styles.footerRow}>
-                    <div className={styles.footerLink}>
-                        <Text text={t("hotel_info.expand")} href="#" type="m_600_s_32" />
-                    </div>
-
-                </div>
             </div>
 
         </div >

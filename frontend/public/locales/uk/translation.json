@@ -435,18 +435,23 @@
     },
     "btn_add": "Додати кімнату/номер",
     "btn_save": "Зберегти",
-    "my_housing":{
-      "menu_btn_edit":"Редагувати",
-      "menu_btn_read_reviews":"Читати відгуки",
-      "menu_btn_booking":"Бронювання"
+    "my_housing": {
+      "menu_btn_edit": "Редагувати",
+      "menu_btn_read_reviews": "Відгуки",
+      "menu_btn_booking": "Бронювання"
     },
-    
     "booking": {
       "apartment": "Апартаменти / квартира",
       "user": "Гості",
       "Status": "Статус замовлення",
       "Date": "Дата замовлення",
-      "confirm_order": "Підтвердити"
+      "confirm_order": "Підтвердити",
+      "Pending": "Очікує підтвердження",
+      "Confirmed": "Підтверджено власником",
+      "Paid": "Оплачено",
+      "Cancelled": "Скасовано користувачем",
+      "Rejected": "Відхилено власником",
+      "Completed": "Оренду завершено"
     }
   },
   "admin": {
@@ -461,10 +466,23 @@
     },
     "input_label": "Введіть e-mail або номер телефону",
     "sort_btn": "Сортувати",
-    "write":"написати",
-    "blocked":"заблокувати"
+    "write": "написати",
+    "blocked": "заблокувати"
   },
-  "attraction":{
-    "title":"Визначні пам’ятки"
+  "attraction": {
+    "title": "Визначні пам’ятки"
+  },
+  "reviews_modal": {
+    "leave_review": "Залишіть свій відгук",
+    "your_rating":"Ваша оцінка",
+    "staff": "Персонал",
+    "cleanliness": "Чистота",
+    "comfort": "Комфорт",
+    "facilities": "Зручності",
+    "value_for_money": "Ціна/якість",
+    "location": "Місце розташування",
+    "text": "Текст",
+    "submit": "Відправити",
+    "no_reviews": "У вас немає відгуків для цього готелю"
   }
 }

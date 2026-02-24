@@ -9,6 +9,11 @@ namespace WebApiGetway.View
         public int OfferId { get; set; }
         public int ClientId { get; set; }
 
+        public int OwnerId { get; set; }
+
+        public string? ClientEmail { get; set; }
+        public string? ClientPhoneNumber { get; set; }
+
         // Количество гостей
         public int Adults { get; set; }
         public int Children { get; set; }
@@ -50,7 +55,11 @@ namespace WebApiGetway.View
         public static OrderDto MapToOrderDto(
               CreateOrderRequest request,
               Dictionary<string, object> offer,
-              int userId)
+              int userId,
+              int ownerId,
+              string ClientPhoneNumber,
+              string ClientEmail
+            )
         {
             //int freeCancelUntilHours = int.Parse(offer["freeCancelUntilHours"].ToString());
             //var paidAt = request.StartDate.AddHours(-freeCancelUntilHours);
@@ -59,6 +68,10 @@ namespace WebApiGetway.View
             {
                 OfferId = request.OfferId,
                 ClientId = userId,
+                OwnerId = ownerId,
+                ClientEmail = ClientEmail,
+                ClientPhoneNumber = ClientPhoneNumber,
+
                 Adults = request.Adults,
                 Children = request.Children,
 

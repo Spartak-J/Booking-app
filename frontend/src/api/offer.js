@@ -45,7 +45,7 @@ export const offerApi = {
 
   searchId: ({ id, startDate, endDate, adults, children, userDiscountPercent, lang }) => {
     const params = new URLSearchParams({
-      StartDate: startDate,   // ВАЖНО: PascalCase
+      StartDate: startDate,   
       EndDate: endDate,
        Adults: adults? adults.toString() : "",
       Children: children ? children.toString() :"0",
@@ -58,5 +58,12 @@ export const offerApi = {
   },
 
 
-   getPopularOffers: (period, limit, lang) => http.get(`/Bff/statistic/top/${period}/get/offer/${limit}/${lang}`), 
+   searchIdByOrderId: ({ offerId, orderId, lang }) => 
+   http.get(
+      `/Bff/search/booking-offer/${offerId}/${orderId}/${lang}`
+    ),
+
+
+   getPopularOffers: (period, limit, lang) => 
+    http.get(`/Bff/statistic/top/${period}/get/offer/${limit}/${lang}`), 
 }

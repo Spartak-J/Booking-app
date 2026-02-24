@@ -12,6 +12,7 @@ namespace OrderApiService.Service.Interface
         Task<List<OrderResponse>> GetOrdersByClientIdAsync(int clientId);
 
         Task<List<OrderResponse>> GetOrdersByOfferIdAsync(int offerId);
+        Task<List<int>> GetPendingOfferIdsAsync(int ownerId);
         Task<bool> HasDateConflict(int orderId, int offerId, DateTime start, DateTime end);
     }
 }

@@ -139,6 +139,9 @@
  --color--hotel-review-bg: #EDE9DF;;        /* l-tema_1 */
  --color--hotel-review-text: #F5F3EE;            /* 01 */
 
+ /*--------------------hotel-review-modal------------------*/
+   --color--modal-review-dg:#EDE5D1;        /* l-tema_2 */
+
   /*------------------host-housing-card-----------------------*/
 
   --color-host-housing-card-bg: #EDE9DF;                 /* l-tema_1 */
@@ -302,6 +305,10 @@
   --color--hotel-review-btn: #113E67;        /* t-tema_2 */
  --color--hotel-review-bg:  #0E1E2C;           /* t-tema_1 */
  --color--hotel-review-text: #F5F3EE;            /* 01 */
+
+ /*--------------------hotel-review-modal------------------*/
+   --color--modal-review-dg: #0E1E2C;                 /* t-tema_1 */
+   
  
  /*------------------host-housing-card-----------------------*/
 

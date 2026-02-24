@@ -108,7 +108,8 @@ const [loading, setLoading] = useState(false);
                     key={ht.offerId}
                     title={ht.title}
                     imgSrc={ht.mainImageUrl}
-                    tripId={ht.offerId}
+                    offerId={ht.offerId}
+                    orderId={ht.orderId}
                     onClick={() => console.log(ht.title)}
                   />
                 ))}

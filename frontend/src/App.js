@@ -43,7 +43,7 @@ function App() {
 
             {/* Приватные маршруты */}
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile/trips/past/:tripId" element={<Profile_PastHotelPage />} />
+            <Route path="/profile/trips/past/:offerId/:orderId" element={<Profile_PastHotelPage />} />
             <Route path="/city/:citySlug" element={<CityPage />} />
             <Route path="/attraction" element={<AttractionPage />} />
             <Route path="/attractionByCity/:citySlug" element={<AttractionCarouselPage />} />

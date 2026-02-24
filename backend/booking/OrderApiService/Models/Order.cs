@@ -10,7 +10,11 @@ namespace OrderApiService.Models
         private DateTime _createdAt;
         // ===== Связь с предложением и клиентом =====
         public int OfferId { get; set; }          // ID бронируемого объявления
+        public int OwnerId { get; set; }
         public int ClientId { get; set; }         // ID клиента, сделавшего заказ
+
+        public string? ClientEmail { get; set; }
+        public string? ClientPhoneNumber { get; set; }
 
         // ===== Количество гостей =====
         public int Guests { get; set; }     // Общее количество гостей для этого заказа

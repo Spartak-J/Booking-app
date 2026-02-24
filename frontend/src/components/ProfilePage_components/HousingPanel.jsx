@@ -16,7 +16,7 @@ import { HostPropertyForm } from "./HostPropertyForm.jsx";
 import styles from './HousingPanel.module.css';
 
 
-export const HousingPanel = () => {
+export const HousingPanel = ({ pendingOfferIds }) => {
   const { t } = useTranslation();
   const { getMyOffers } = useContext(AuthContext);
   const { userApi } = useContext(ApiContext);
@@ -89,33 +89,38 @@ export const HousingPanel = () => {
               isActive={activeKey === btn.id}
               onClick={() => {
                 setActiveKey(btn.id)
-               setView("list");
+                setView("list");
 
-                  //  setSelectedOffer(offer);
+                //  setSelectedOffer(offer);
               }}
             />
           ))}
 
         </div>
 
-        {view === "list"  && showHostelList && (
+        {view === "list" && showHostelList && (
           <div className={styles.cardList__container}>
             {activeKey === "1" &&
-              myOffers.map(ht => (
-                <HousingPanel_card
-                  key={ht.id}
-                  id={ht.id}
-                  title={ht.title}
-                  imgSrc={ht.rentObj?.[0]?.images?.[0]?.url}
-                  onAction={(action, offer) => {
-                    setSelectedOffer(ht);
-                    setView(action);
-                    console.log(action)
-                     console.log("selectedOffer")
-                    console.log(selectedOffer)
-                  }}
-                />
-              ))
+              myOffers.map(ht => {
+                const hasPending = pendingOfferIds.includes(ht.id);
+
+                return (
+                  <HousingPanel_card
+                    key={ht.id}
+                    id={ht.id}
+                    title={ht.title}
+                    imgSrc={ht.rentObj?.[0]?.images?.[0]?.url}
+                    hasPending={hasPending} 
+                    onAction={(action, offer) => {
+                      setSelectedOffer(ht);
+                      setView(action);
+                      console.log(action);
+                      console.log("selectedOffer");
+                      console.log(selectedOffer);
+                    }}
+                  />
+                );
+              })
             }
             <HousingPanel_card_empty
               onClick={() => {
@@ -141,7 +146,7 @@ export const HousingPanel = () => {
         )}
 
         {view === "booking" && (
-           <BookingComponent offer={selectedOffer} />
+          <BookingComponent offer={selectedOffer} />
         )}
       </div>
     </div >

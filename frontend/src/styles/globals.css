@@ -237,6 +237,7 @@ body {
   align-items: center;
 }
 
+
 .btn-state_filter {
    border: 3px solid var(--color--btn-state-border);
    width: fit-content; 
@@ -260,7 +261,7 @@ body {
 .btn-state:hover:not(:disabled) {
    border: 3px solid var(--color--btn-state-border-hover);
   background-color: var(--color--btn-state);;
-  color: var(--color-btn-text-dark);
+  color: var(--color--text);
 }
 
 .btn-state--active {

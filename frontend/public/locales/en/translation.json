@@ -437,7 +437,7 @@
     "btn_save": "Save",
     "my_housing": {
       "menu_btn_edit": "Edit",
-      "menu_btn_read_reviews": "Read reviews",
+      "menu_btn_read_reviews": "Reviews",
       "menu_btn_booking": "Booking"
     },
     "booking": {
@@ -445,7 +445,13 @@
       "user": "Guest",
       "Status": "Order status",
       "Date": "Order data",
-     "confirm_order": "Confirm order"
+      "confirm_order": "Confirm order",
+      "Pending": "Pending confirmation",
+      "Confirmed": "Confirmed by owner",
+      "Paid": "Paid",
+      "Cancelled": "Cancelled by user",
+      "Rejected": "Rejected by owner",
+      "Completed": "Rental completed"
     },
     "admin": {
       "title": "Hello, Admin",
@@ -465,4 +471,18 @@
     "attraction": {
       "title": "Attractions"
     }
+  },
+  "reviews_modal": {
+    "leave_review": "Leave a review",
+    "your_rating": "Your rating",
+    "staff": "Staff",
+    "cleanliness": "Cleanliness",
+    "comfort": "Comfort",
+    "facilities": "Facilities",
+    "value_for_money": "Value for money",
+    "location": "Location",
+    "text": "Text",
+    "submit": "Submit",
+    "no_reviews": "You have no reviews for this hotel"
   }
+}

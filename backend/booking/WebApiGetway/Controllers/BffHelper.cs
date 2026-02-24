@@ -118,6 +118,7 @@ namespace WebApiGetway.Controllers
             return list;
         }
 
+
         public static List<Dictionary<string, object>> UpdateParamListWithTranslations(List<Dictionary<string, object>> list, List<Dictionary<string, object>> translations,
   string idFieldName = "paramItemId",
   string translationIdFieldName = "entityId")

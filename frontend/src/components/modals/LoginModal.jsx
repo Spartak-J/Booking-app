@@ -74,23 +74,33 @@ export const LoginModal = ({ setIsModalOpen, setIsRegisterModalOpen }) => {
         }
     };
 
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    document.body.style.cursor = "wait";
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
+    try {
         const result = await login(formData.login, formData.password);
-        console.log(result.response.data.roleName);
-        const roleName = result.response.data.roleName;
+
         if (result.success) {
-            if (roleName == "SuperAdmin") {
-                navigate(`/admin`)
+            const roleName = result.response.data.roleName;
+
+            if (roleName === "SuperAdmin") {
+                navigate("/admin");
             } else {
-            setIsModalOpen(false);
+                setIsModalOpen(false);
             }
-    } else {
-        alert(result.message);
-}
-    };
+        } else {
+            alert(result.message);
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Ошибка сервера");
+    } finally {
+        document.body.style.cursor = "default";
+    }
+};
+
 
 
 
