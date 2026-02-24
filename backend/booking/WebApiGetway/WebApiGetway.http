@@ -1,6 +1,0 @@
-@WebApiGetway_HostAddress = http://localhost:5184
-
-GET {{WebApiGetway_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

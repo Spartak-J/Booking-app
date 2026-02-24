@@ -1,6 +1,0 @@
-@TranslationApiService_HostAddress = http://localhost:5100
-
-GET {{TranslationApiService_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
