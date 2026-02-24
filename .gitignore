@@ -161,6 +161,31 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# Local project artifacts
+.cloudflared/
+.expo/
+.git_backup_local_*/
+docs/
+docker/
+docker-compose.yml
+eas.json
+app.json
+react-native.config.js
+package.json
+package-lock.json
+splashscreen_logo*.png
+ios/
+frontend/
+
+# Local docs/notes
+.github/
+AGENTS.md
+API.txt
+PAYMENT.md
+ПРАВИТЬ_ЭКРАНЫ.md
+ПРАВИТЬ*ЭКРАНЫ*.md
+\320\237\320\240\320\220\320\222\320\230\320\242\320\254 \320\255\320\232\320\240\320\220\320\235\320\253.md
+
 # Build results
 bin/
 obj/
