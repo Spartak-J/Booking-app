@@ -1,0 +1,71 @@
+.hotelPage {
+    width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+    justify-content: space-between;
+     gap:50px;
+}
+
+.hotel_page__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: space-between;
+
+    width: 100%;           
+    /* max-width: 1920px;      */
+    padding: 0 4%;      
+    box-sizing: border-box; 
+    gap:50px;
+}
+
+.description_with_map{
+    min-height: 335px;
+    
+}
+.description_card{
+flex:  1;
+}
+.card_map{
+ flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+     min-height: 280px;
+     height: 100%;
+     gap: 15px;
+}
+
+
+
+
+.hotelDetails {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+
+
+
+.modalOverlay {
+  position: fixed;      /* поверх всего контента */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+   backdrop-filter: blur(8px); /* размытие фона позади */
+  -webkit-backdrop-filter: blur(8px); /* для Safari */
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;        /* чтобы быть выше всего */
+}
+
+

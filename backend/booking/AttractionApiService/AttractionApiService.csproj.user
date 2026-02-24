@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ActiveDebugProfile>Container (Dockerfile)</ActiveDebugProfile>
+    <NameOfLastUsedPublishProfile>D:\Step\DIPLOM__BOOKING\backend\booking\AttractionApiService\Properties\PublishProfiles\registry.hub.docker.com_inneta_attractionapiservice.pubxml</NameOfLastUsedPublishProfile>
+  </PropertyGroup>
+</Project>
