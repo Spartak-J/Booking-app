@@ -1,29 +1,19 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
+COPY ["booking/booking.sln", "booking/"]
 COPY ["Globals/Globals.csproj", "Globals/"]
-#COPY ["booking/ReviewApiService/ReviewApiService.csproj", "booking/ReviewApiService/"]
-COPY ["ReviewApiService/ReviewApiService.csproj", "ReviewApiService/"]
-
-#RUN dotnet restore "booking/ReviewApiService/ReviewApiService.csproj"
-RUN dotnet restore "ReviewApiService/ReviewApiService.csproj"
-
-COPY Globals/ ./Globals/
-#COPY booking/ReviewApiService/ ./booking/ReviewApiService/
-COPY ReviewApiService/ ./ReviewApiService/
-
-#WORKDIR "/src/booking/ReviewApiService"
-WORKDIR "/src/ReviewApiService"
+COPY ["booking/ReviewApiService/ReviewApiService.csproj", "booking/ReviewApiService/"]
+RUN dotnet restore "booking/ReviewApiService/ReviewApiService.csproj"
+COPY . .
+WORKDIR "/src/booking/ReviewApiService"
 RUN dotnet build "ReviewApiService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "ReviewApiService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
