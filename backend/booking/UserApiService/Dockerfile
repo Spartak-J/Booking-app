@@ -9,16 +9,21 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy solution and csproj files
-COPY ["booking/booking.sln", "booking/"]
+COPY ["booking.sln", "booking/"]
 COPY ["Globals/Globals.csproj", "Globals/"]
-COPY ["booking/UserApiService/UserApiService.csproj", "booking/UserApiService/"]
-COPY ["booking/OfferApiService/OfferApiService.csproj", "booking/OfferApiService/"]
-COPY ["booking/OrderApiService/OrderApiService.csproj", "booking/OrderApiService/"]
-RUN dotnet restore "booking/UserApiService/UserApiService.csproj"
+#COPY ["booking/UserApiService/UserApiService.csproj", "booking/UserApiService/"]
+#COPY ["booking/OfferApiService/OfferApiService.csproj", "booking/OfferApiService/"]
+#COPY ["booking/OrderApiService/OrderApiService.csproj", "booking/OrderApiService/"]
+#RUN dotnet restore "booking/UserApiService/UserApiService.csproj"
+COPY ["UserApiService/UserApiService.csproj", "UserApiService/"]
+COPY ["OfferApiService/OfferApiService.csproj", "OfferApiService/"]
+COPY ["OrderApiService/OrderApiService.csproj", "OrderApiService/"]
+RUN dotnet restore "UserApiService/UserApiService.csproj"
 
 # Copy all source
 COPY . .
-WORKDIR "/src/booking/UserApiService"
+#WORKDIR "/src/booking/UserApiService"
+WORKDIR "/src/UserApiService"
 RUN dotnet build "UserApiService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Stage 3: Publish

@@ -11,17 +11,21 @@ WORKDIR /src
 COPY ["Globals/Globals.csproj", "Globals/"]
 
 # Copy LocationApiService
-COPY ["booking/LocationApiService/LocationApiService.csproj", "booking/LocationApiService/"]
+#COPY ["booking/LocationApiService/LocationApiService.csproj", "booking/LocationApiService/"]
+COPY ["LocationApiService/LocationApiService.csproj", "LocationApiService/"]
 
 # Restore
-RUN dotnet restore "booking/LocationApiService/LocationApiService.csproj"
+#RUN dotnet restore "booking/LocationApiService/LocationApiService.csproj"
+RUN dotnet restore "LocationApiService/LocationApiService.csproj"
 
 # Copy source
-COPY Globals/ ./Globals/
-COPY booking/LocationApiService/ ./booking/LocationApiService/
+COPY Globals/ Globals/
+#COPY booking/LocationApiService/ ./booking/LocationApiService/
+COPY LocationApiService/ LocationApiService/
 
 # Build
-WORKDIR "/src/booking/LocationApiService"
+#WORKDIR "/src/booking/LocationApiService"
+WORKDIR "/src/LocationApiService"
 RUN dotnet build "LocationApiService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

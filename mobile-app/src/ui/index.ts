@@ -17,4 +17,5 @@ export { default as Pagination } from './Pagination';
 export { default as UnreadBadge } from './UnreadBadge';
 export { default as ScreenShell } from './ScreenShell';
 export { default as ScreenContainer } from './ScreenContainer';
+export { default as TopNotification } from './TopNotification';
 export { default as Typography } from './Typography';

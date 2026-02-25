@@ -34,18 +34,6 @@ const buildUsernameFromEmail = (email: string): string => {
   return `${base}_${shortHash(normalized)}`;
 };
 
-const resolveLoginUsernames = (email: string): string[] => {
-  const normalized = email.trim().toLowerCase();
-  const [localPart] = normalized.split('@');
-  return Array.from(
-    new Set([
-      buildUsernameFromEmail(normalized),
-      normalized,
-      localPart && localPart.length > 0 ? localPart : normalized,
-    ]),
-  );
-};
-
 const fetchProfile = async (token: string): Promise<User> => {
   const { data } = await apiClient.get<any>(ENDPOINTS.user.me(getApiLang()), {
     headers: { Authorization: `Bearer ${token}` },
@@ -77,33 +65,22 @@ export const authService = {
         : baseUser;
       return { token: `mock-token-${user.id}`, user };
     }
-    const usernames = resolveLoginUsernames(payload.email);
-    let lastError: unknown;
-    for (const username of usernames) {
-      try {
-        const { data } = await apiClient.post<any>(ENDPOINTS.auth.login, {
-          login: username,
-          password: payload.password,
-        });
+    try {
+      const { data } = await apiClient.post<any>(ENDPOINTS.auth.login, {
+        login: payload.email.trim(),
+        password: payload.password,
+      });
 
-        const token: string =
-          data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
-        if (!token) throw new Error('Токен не получен при логине');
-        const user = await fetchProfile(token);
-        const forcedRole = resolveRoleByEmail(payload.email);
-        const resolvedUser: User = forcedRole ? { ...user, role: forcedRole } : user;
-        return { token, user: resolvedUser };
-      } catch (error: any) {
-        const status = error?.response?.status;
-        if (status === 401) {
-          lastError = error;
-          continue;
-        }
-        throw toUserFacingApiError(error, 'Не удалось выполнить вход.');
-      }
+      const token: string =
+        data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
+      if (!token) throw new Error('Токен не получен при логине');
+      const user = await fetchProfile(token);
+      const forcedRole = resolveRoleByEmail(payload.email);
+      const resolvedUser: User = forcedRole ? { ...user, role: forcedRole } : user;
+      return { token, user: resolvedUser };
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Неверный логин или пароль.');
     }
-
-    throw toUserFacingApiError(lastError, 'Неверный логин или пароль.');
   },
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     if (USE_MOCKS_AUTH) {
@@ -122,8 +99,12 @@ export const authService = {
     }
     const resolvedRole = payload.role === 'owner' ? 'owner' : 'user';
     try {
-      const { data } = await apiClient.post<any>(ENDPOINTS.auth.register, {
+      const registerEndpoint =
+        resolvedRole === 'owner' ? ENDPOINTS.auth.registerOwner : ENDPOINTS.auth.register;
+      const normalizedName = payload.name?.trim().replace(/\s+/g, ' ');
+      const { data } = await apiClient.post<any>(registerEndpoint, {
         username: buildUsernameFromEmail(payload.email),
+        lastname: normalizedName && normalizedName.length > 0 ? normalizedName : undefined,
         password: payload.password,
         email: payload.email,
         phoneNumber: '',
@@ -136,7 +117,18 @@ export const authService = {
         data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
       if (!token) throw new Error('Токен не получен при регистрации');
       const user = await fetchProfile(token);
-      return { token, user };
+      return {
+        token,
+        user: {
+          ...user,
+          name:
+            user.name && user.name !== user.username
+              ? user.name
+              : normalizedName && normalizedName.length > 0
+                ? normalizedName
+                : user.name,
+        },
+      };
     } catch (error) {
       throw toUserFacingApiError(error, 'Не удалось выполнить регистрацию.');
     }

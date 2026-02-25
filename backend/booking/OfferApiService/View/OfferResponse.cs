@@ -28,6 +28,9 @@ namespace OfferApiService.View
        
         public int DaysCount { get; set; }
 
+        public string? StartDate { get; set; }
+        public string? EndDate { get; set; }
+
 
         public decimal? OrderPrice { get; set; } // цена для текущего заказа (по количеству дней расчет)
 

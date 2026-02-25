@@ -26,6 +26,7 @@ const AdminAccountScreenView: React.FC<AdminAccountScreenViewProps> = ({
   return (
     <ScreenShell
       title={t('profile.account.title')}
+      titleBold
       onBack={onBack}
       showKeys
       contentStyle={styles.shellContent}

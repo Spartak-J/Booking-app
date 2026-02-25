@@ -151,14 +151,18 @@ max-width: 0;
 
 
 .btn_close{
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
+  box-sizing:content-box;
   display: flex;
   justify-content: center;
   align-items: center;
   border: 1px solid var(--color-text);
   border-radius: 5px;
   background-color:  rgba(171, 170, 170, 0.8);
+}
+.btn_close:hover{
+   border: 1px solid red;
 }
 
 .emptyImages {

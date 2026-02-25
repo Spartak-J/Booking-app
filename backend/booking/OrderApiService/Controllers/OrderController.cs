@@ -53,16 +53,22 @@ namespace OrderApiService.Controllers
 
         [HttpPost("update/status/{orderId}")]
         public async Task<IActionResult> UpdateOrderStatus(
-        int orderId,
-        [FromQuery] OrderStatus orderState) 
+             int orderId,
+         [FromQuery] string orderState) 
         {
+            if (!Enum.TryParse<OrderStatus>(orderState, true, out var statusEnum))
+            {
+                return BadRequest($"Неверный статус: {orderState}");
+            }
 
-            var result = await _orderService.UpdateOrderStatus(orderId, orderState);
+            var result = await _orderService.UpdateOrderStatus(orderId, statusEnum);
+
             if (result == -1)
                 return BadRequest("Не удалось изменить заказ");
 
             return Ok(result);
         }
+
 
         //===========================================================================================
 
@@ -92,6 +98,34 @@ namespace OrderApiService.Controllers
                 return NotFound();
 
             return Ok(new {offerId = order.OfferId});
+        }
+
+        //===========================================================================================
+
+        [HttpGet("get/byOfferId/{offerId}")]
+        public async Task<ActionResult<List<OrderResponse>>> GetOrdersByOfferIdAsync(
+        int offerId)
+        {
+
+            var orders = await _orderService.GetOrdersByOfferIdAsync(offerId);
+
+            if (orders == null)
+                return NotFound();
+
+            return Ok(orders);
+        }
+
+
+
+
+        //===========================================================================================
+
+        [HttpGet("has-pending/{ownerId}")]
+        public async Task<ActionResult<List<int>>> GetPendingOfferIds(int ownerId)
+        {
+            var offerIds = await _orderService.GetPendingOfferIdsAsync(ownerId);
+
+            return Ok(offerIds);
         }
 
         //===========================================================================================

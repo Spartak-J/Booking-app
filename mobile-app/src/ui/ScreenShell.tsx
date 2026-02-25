@@ -2,13 +2,14 @@ import React from 'react';
 import { ImageBackground, StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { useTheme, spacing, radius } from '@/theme';
+import { useTheme, spacing, radius, fonts } from '@/theme';
 import IconButton from './IconButton';
 import Typography from './Typography';
 import KeysBackground from '@/components/layout/KeysBackground';
 
 type Props = {
   title?: string;
+  titleBold?: boolean;
   onBack?: () => void;
   rightSlot?: React.ReactNode;
   children: React.ReactNode;
@@ -23,6 +24,7 @@ type Props = {
 // Универсальная оболочка для "пустых" экранов: фон, хедер, опциональный декор.
 export const ScreenShell: React.FC<Props> = ({
   title,
+  titleBold = false,
   onBack,
   rightSlot,
   children,
@@ -63,7 +65,11 @@ export const ScreenShell: React.FC<Props> = ({
         )}
 
         {title ? (
-          <Typography variant="h2" style={styles.headerTitle} numberOfLines={1}>
+          <Typography
+            variant="h2"
+            style={[styles.headerTitle, titleBold ? styles.headerTitleBold : null]}
+            numberOfLines={1}
+          >
             {title}
           </Typography>
         ) : (
@@ -118,6 +124,10 @@ const getStyles = (tokens: any) =>
       flex: 1,
       color: tokens.textPrimary,
       textAlign: 'center',
+    },
+    headerTitleBold: {
+      fontFamily: fonts.MontserratAlternatesBold,
+      fontWeight: '700',
     },
     headerRight: {
       width: spacing.xl + spacing.sm,

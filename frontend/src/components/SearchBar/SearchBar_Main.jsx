@@ -24,7 +24,7 @@ export const SearchBar_Main = () => {
   const [locationId, setLocationId] = useState(null);
   const [hotels, setHotels] = useState([]);
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
-
+ const [slug, setSlug] = useState("");
   const [guests, setGuests] = useState({
     rooms: 1,
     adults: 1,
@@ -59,10 +59,13 @@ export const SearchBar_Main = () => {
   };
 
 
-  const setLocationInfo = (cityName, cityId) => {
+
+  const setLocationInfo = (cityName, cityId, slug) => {
     setLocation(cityName);
     setLocationId(cityId);
+    setSlug(slug);
   };
+
 
   return (
     <div className={`${styles.searchBar} ${styles.searchBar_bg_color_dark}  ${styles.searchBar_Main_txt} flex-left btn-w-1451 btn-h-106 btn-br-r-20 gap-20 `}>
@@ -111,7 +114,7 @@ export const SearchBar_Main = () => {
           }
         </div>
 
-        <IconButton_Search onClick={handleSearch} icon_name="search_big" size="48" classTitle="btn-br-r-20 btn-h-72 btn-w-72" />
+        <IconButton_Search onClick={handleSearch} icon_name="search_big" size="48" classTitle="btn-br-r-20 btn-h-72 btn-w-72 btn_search_border" />
       </div>
     </div >
   );

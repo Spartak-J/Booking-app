@@ -8,6 +8,7 @@ import { useTranslation } from '@/i18n';
 import { spacing, radius } from '@/theme';
 import { useTheme, withOpacity } from '@/theme';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
+import { Routes } from '@/navigation/routes';
 
 // Экран: вход администратора (email). Логика авторизации пока заглушка.
 const AdminEntryScreen: React.FC = () => {
@@ -17,13 +18,14 @@ const AdminEntryScreen: React.FC = () => {
   const styles = useMemo(() => getStyles(tokens), [tokens]);
 
   return (
-    <ScreenContainer scroll edges={['top', 'left', 'right']} contentContainerStyle={styles.screenContent}>
+    <ScreenContainer edges={['top', 'left', 'right']} style={styles.screen}>
       <HeaderBar
         title={t('admin.entry.title')}
         onBack={() => navigation.goBack()}
+        onMenu={() => navigation.navigate(Routes.AdminMenu)}
         showBack
         showSearch={false}
-        showMenu={false}
+        showMenu
       />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.formCard}>
@@ -44,11 +46,12 @@ const AdminEntryScreen: React.FC = () => {
 
 const getStyles = (tokens: Record<string, string>) =>
   StyleSheet.create({
-    screenContent: {
-      paddingBottom: spacing.xl,
+    screen: {
+      flex: 1,
     },
     content: {
       padding: spacing.lg,
+      paddingBottom: spacing.xl,
       gap: spacing.lg,
     },
     formCard: {

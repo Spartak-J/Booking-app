@@ -16,7 +16,6 @@ const AdminMenuScreen: React.FC = () => {
   const { logout } = useAuth();
 
   const greeting = `${t('profile.greeting')} ${t('profile.role.admin').toLowerCase()}`;
-  const avatarInitial = (t('profile.role.admin').charAt(0) || 'A').toUpperCase();
 
   const items = useMemo<AdminMenuItem[]>(
     () => [
@@ -71,9 +70,9 @@ const AdminMenuScreen: React.FC = () => {
   return (
     <AdminMenuScreenView
       title={greeting}
-      avatarInitial={avatarInitial}
       items={items}
       onBack={() => navigation.goBack()}
+      onMenu={() => navigation.navigate(Routes.AdminMenu)}
     />
   );
 };

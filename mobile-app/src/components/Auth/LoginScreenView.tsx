@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { StyleSheet, View, Dimensions, Image } from 'react-native';
+import { Alert, StyleSheet, View, Dimensions, Image } from 'react-native';
 import * as yup from 'yup';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -31,7 +31,7 @@ type FormValues = {
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 export const LoginScreenView = () => {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigation = useNavigation<Navigation>();
   const { tokens } = useTheme();
   const { t } = useTranslation();
@@ -120,7 +120,17 @@ export const LoginScreenView = () => {
               variant="ghost"
               size="large"
               style={styles.socialOutline}
-              onPress={() => console.log('Google login')}
+              onPress={async () => {
+                try {
+                  await googleLogin();
+                } catch (error) {
+                  const message =
+                    error instanceof Error && error.message
+                      ? error.message
+                      : t('auth.errors.generic');
+                  Alert.alert(t('auth.errors.title'), message);
+                }
+              }}
             >
               <View style={styles.socialContent}>
                 <Image source={googleIcon} style={styles.socialIcon} />

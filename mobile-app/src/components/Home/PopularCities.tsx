@@ -29,7 +29,7 @@ export const PopularCities: React.FC<PopularCitiesProps> = ({ data, onOpenCity }
 const styles = StyleSheet.create({
   block: {
     gap: s(10),
-    marginHorizontal: s(20),
+    marginHorizontal: s(0),
   },
   title: {
     fontFamily: typography.h1.fontFamily,

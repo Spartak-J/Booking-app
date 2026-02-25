@@ -21,28 +21,29 @@ namespace Globals.EventBus
 
         public RabbitMqListenerBase(string hostname = "rabbitmq", string queueName = "MyQueue")
         {
-            _queueName = queueName;
-            var factory = new ConnectionFactory { HostName = hostname };
+            _queueName = queueName;            
+        }
 
+        public void Connect(string hostname = "rabbitmq")
+        {
+            var factory = new ConnectionFactory { HostName = hostname };
             int retries = 5;
+
             while (true)
             {
                 try
                 {
                     _connection = factory.CreateConnection();
-                    break;  
+                    break;
                 }
                 catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
                 {
                     retries--;
                     if (retries == 0)
-                        throw; 
+                        throw;
 
-                  
                     Console.WriteLine($"Не удалось подключиться к RabbitMQ. Осталось попыток: {retries}. Ошибка: {ex.Message}");
-
-                 
-                    Task.Delay(2000).GetAwaiter().GetResult();
+                    Task.Delay(2000);
                 }
             }
 
@@ -50,9 +51,11 @@ namespace Globals.EventBus
             _channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override  Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
+
+            Connect();
 
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ch, ea) =>
@@ -70,8 +73,8 @@ namespace Globals.EventBus
 
         public override void Dispose()
         {
-            _channel.Close();
-            _connection.Close();
+            _channel?.Close();
+            _connection?.Close();
             base.Dispose();
         }
 

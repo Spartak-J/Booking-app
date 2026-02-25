@@ -84,12 +84,13 @@ line-height: 39px ;
   height: 100%;
   text-align: center;
   box-sizing: border-box;
+  color: var(--color-btn-text-dark) !important;
 }
 
 .input_city::placeholder {
   opacity: 1;
   line-height: normal;
-  color: var(--color-text);
+    color: var(--color-btn-text-dark) !important;
 }
 
 .input_icon {
@@ -116,5 +117,5 @@ line-height: 39px ;
   border-radius: 0 0 10px 10px;
   list-style: none;
   z-index: 1000;
-  background: var(--color-input-form-bg);
+  background: var(--color-city-modal-bg);
 }

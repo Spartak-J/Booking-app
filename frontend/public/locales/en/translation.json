@@ -119,7 +119,7 @@
   },
   "filters": {
     "filterTitle": "Filter",
-      "filterBtn": "Apply",
+    "filterBtn": "Apply",
     "accommodation_type": {
       "title": "Accommodation type",
       "hotel": "Hotel",
@@ -414,7 +414,7 @@
       "singleBedsCount": "Single bed",
       "doubleBedsCount": "Double bed",
       "pricePerDay": "Price/night",
-      "pricePerWeek": "Price/from 3 nights"
+      "pricePerWeek": "Discount/from 3 nights"
     },
     "amenities": {
       "title": "Amenities",
@@ -434,6 +434,55 @@
       "addYourOwn": "Add your own"
     },
     "btn_add": "Add room/unit",
-    "btn_save": "Save"
+    "btn_save": "Save",
+    "my_housing": {
+      "menu_btn_edit": "Edit",
+      "menu_btn_read_reviews": "Reviews",
+      "menu_btn_booking": "Booking"
+    },
+    "booking": {
+      "apartment": "Apartment",
+      "user": "Guest",
+      "Status": "Order status",
+      "Date": "Order data",
+      "confirm_order": "Confirm order",
+      "Pending": "Pending confirmation",
+      "Confirmed": "Confirmed by owner",
+      "Paid": "Paid",
+      "Cancelled": "Cancelled by user",
+      "Rejected": "Rejected by owner",
+      "Completed": "Rental completed"
+    },
+    "admin": {
+      "title": "Hello, Admin",
+      "menu": {
+        "users": "Users",
+        "offers": "Listings",
+        "reviews": "Reviews",
+        "settings": "Settings",
+        "tools": "Tools",
+        "contacts": "Contacts"
+      },
+      "input_label": "Enter email or phone number",
+      "sort_btn": "Sort",
+      "write": "Write",
+      "blocked": "Block"
+    },
+    "attraction": {
+      "title": "Attractions"
+    }
+  },
+  "reviews_modal": {
+    "leave_review": "Leave a review",
+    "your_rating": "Your rating",
+    "staff": "Staff",
+    "cleanliness": "Cleanliness",
+    "comfort": "Comfort",
+    "facilities": "Facilities",
+    "value_for_money": "Value for money",
+    "location": "Location",
+    "text": "Text",
+    "submit": "Submit",
+    "no_reviews": "You have no reviews for this hotel"
   }
 }

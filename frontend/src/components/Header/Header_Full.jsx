@@ -34,7 +34,7 @@ export const Header_Full = ({
   params,
   showFilterBtn = true,
   openFilterMenu = true,
-  setOpenFilterMenu,
+  setOpenFilterMenu=false,
   handleSearchResults,
   handleSortChange
 }) => {

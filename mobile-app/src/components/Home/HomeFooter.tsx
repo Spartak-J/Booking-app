@@ -110,6 +110,9 @@ export const HomeFooter: React.FC<HomeFooterProps> = ({
                 style={styles.navLabel}
                 tone="primary"
                 numberOfLines={1}
+                ellipsizeMode="clip"
+                adjustsFontSizeToFit
+                minimumFontScale={0.72}
               >
                 {item.label}
               </Typography>
@@ -161,8 +164,10 @@ const getStyles = (palette: ReturnType<typeof getPalette>) =>
     navLabel: {
       marginTop: s(4),
       textAlign: 'center',
-      maxWidth: s(90),
+      maxWidth: s(110),
       color: palette.label,
+      fontSize: s(11),
+      lineHeight: s(12),
     },
   });
 

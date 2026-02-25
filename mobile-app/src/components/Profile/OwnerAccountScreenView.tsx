@@ -31,6 +31,7 @@ const OwnerAccountScreenView: React.FC<OwnerAccountScreenViewProps> = ({
   return (
     <ScreenShell
       title={t('profile.account.title')}
+      titleBold
       onBack={onBack}
       showKeys
       keysBottomOffset={s(20)}

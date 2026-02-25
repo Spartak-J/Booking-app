@@ -8,14 +8,18 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY ["Globals/Globals.csproj", "Globals/"]
-COPY ["booking/StatisticApiService/StatisticApiService.csproj", "booking/StatisticApiService/"]
+#COPY ["booking/StatisticApiService/StatisticApiService.csproj", "booking/StatisticApiService/"]
+COPY ["StatisticApiService/StatisticApiService.csproj", "StatisticApiService/"]
 
-RUN dotnet restore "booking/StatisticApiService/StatisticApiService.csproj"
+#RUN dotnet restore "booking/StatisticApiService/StatisticApiService.csproj"
+RUN dotnet restore "StatisticApiService/StatisticApiService.csproj"
 
-COPY Globals/ ./Globals/
-COPY booking/StatisticApiService/ ./booking/StatisticApiService/
+COPY Globals/ Globals/
+#COPY booking/StatisticApiService/ ./booking/StatisticApiService/
+COPY StatisticApiService/ StatisticApiService/
 
-WORKDIR "/src/booking/StatisticApiService"
+#WORKDIR "/src/booking/StatisticApiService"
+WORKDIR "/src/StatisticApiService"
 RUN dotnet build "StatisticApiService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

@@ -8,9 +8,13 @@ namespace WebApiGetway.View
     {
         public int id { get; set; }
 
+        public int OrderId { get; set; }
         public int OfferId { get; set; }
         public int ClientId { get; set; }
-        
+
+        public int CityId { get; set; }
+
+
 
         public string Title { get; set; }
         //public string Country { get; set; }

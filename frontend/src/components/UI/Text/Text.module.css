@@ -372,5 +372,7 @@
 
 .icon {
   font-size: clamp(12px, 1vw, 16px);
-  color: #999;
+    width: 11px;
+  height: 15px;
+  color: var(--color-icon-next);
 }

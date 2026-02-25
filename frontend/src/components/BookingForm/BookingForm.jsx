@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Select from "react-select";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useParams, useLocation, useSearchParams  } from "react-router-dom";
@@ -174,20 +175,20 @@ const buildOfferBooking = () => {
   setBookingStep("loading");
 
   try {
-    // Формируем объект для отправки
+   
     const booking = buildOfferBooking();
     console.log("Попытка отправки данных на бек:", JSON.stringify(booking, null, 2));
 
-    // Отправляем на сервер через orderApi
+   
     const result = await orderApi.createOrder({
       formData: booking,
       lang: language
     });
 
     console.log("Ответ от сервера:", result.data);
-
-    // Проверяем успех
-    if (result?.data?.success) {
+    console.log("Ответ от сервера  result:", result);
+    
+    if (result.statusText == "OK") {
       setBookingStep("success");
     } else {
       setBookingStep("error");
@@ -222,6 +223,11 @@ const buildOfferBooking = () => {
     setIsOpenCardNum(false);
   };
 
+  const countryOptions = countries.map(country => ({
+  value: country.id,
+  label: country.title,
+  phonePrefix: country.phonePrefix, 
+}));
 
   return (
     <form onSubmit={handleSubmit} className={styles.bookingForm} noValidate>
@@ -229,11 +235,11 @@ const buildOfferBooking = () => {
 
       <div className={styles.infoBox}>
         <div className="flex-left gap-5">
-          <span className={styles.language_notice}>!</span>.
+          <span className={styles.language_notice}>!</span>
           <Text text={t("Booking.booking_language_notice")} type="m_400_s_14" />
         </div>
         <div className="flex-left gap-5">
-          <span className={styles.required_fields}>*</span>.
+          <span className={styles.required_fields}>*</span>
           <Text text={t("Booking.required_fields_note")} type="m_400_s_14" />
         </div>
 
@@ -303,32 +309,22 @@ const buildOfferBooking = () => {
             <legend className={styles.form__legend} >
               <Text text={t("Booking.country_city_label")} type="m_400_s_20" />
             </legend>
-            <select
-              name="countryId"
-              value={formData.countryId || ""}
-              onChange={e => {
-                const selectedId = Number(e.target.value);
-                const selectedCountry = countries.find(c => c.id === selectedId);
-
-                setFormData(prev => ({
-                  ...prev,
-                  countryId: selectedId,
-                  phonePrefix: selectedCountry?.phonePrefix || "",
-                }));
-              }}
-              className={`${styles.input} btn-h-59 btn-br-r-20 p-10`}
-              required
-            >
-              <option value="" disabled>
-                {t("Profile.AccountPanel.select_country")}
-              </option>
-
-              {countries.map(country => (
-                <option key={country.id} value={country.id}>
-                  {country.title}  {/* <-- это и отобразится в селекте */}
-                </option>
-              ))}
-            </select>
+           <Select
+  name="countryId"
+  options={countryOptions}
+  value={countryOptions.find(c => c.value === formData.countryId) || null}
+  onChange={(selected) => {
+    setFormData(prev => ({
+      ...prev,
+      countryId: selected?.value || null,
+      phonePrefix: selected?.phonePrefix || "",
+    }));
+  }}
+  className={`${styles.input} btn-h-59 btn-br-r-20 p-10`}
+  classNamePrefix="countrySelect"
+  placeholder={t("Profile.AccountPanel.select_country")}
+  isSearchable={false} 
+/>
 
 
           </label>
@@ -349,7 +345,7 @@ const buildOfferBooking = () => {
               className={`${styles.input} btn-h-59  btn-br-r-20 p-10`}
             />
             <div className="flex-left gap-5">
-              <span className={styles.required_fields}>*</span>.
+              <span className={styles.required_fields}>*</span>
               <Text text={t("Booking.required_email_note")} type="m_400_s_14" />
             </div>
           </label>
@@ -360,7 +356,7 @@ const buildOfferBooking = () => {
               <Text text={t("Booking.phone_label")} type="m_400_s_20 " />
             </legend>
             <div className={styles.phoneInput}>
-              <div className={styles.phonePrefixWrapper}>
+              {/* <div className={styles.phonePrefixWrapper}>
                 <select
                   name="phonePrefix"
                   value={formData.phonePrefix}
@@ -372,7 +368,7 @@ const buildOfferBooking = () => {
                   </option>
                 </select>
                 <span className={styles.selectArrow}>▼</span>
-              </div>
+              </div> */}
 
               <input
                 type="tel"
@@ -380,7 +376,7 @@ const buildOfferBooking = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="095 123 4567"
-                className={`${styles.input} ${styles.phoneNumber} btn-h-59  btn-br-r-20 p-10`}
+                className={`${styles.input}  btn-h-59  btn-br-r-20 p-10`}
                 required
               />
             </div>
@@ -389,7 +385,7 @@ const buildOfferBooking = () => {
 
 
             <div className="flex-left gap-5">
-              <span className={styles.required_fields}>*</span>.
+              <span className={styles.required_fields}>*</span>
               <Text text={t("Booking.required_phone_note")} type="m_400_s_14" />
             </div>
           </label>

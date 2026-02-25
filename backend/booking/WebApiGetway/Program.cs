@@ -123,6 +123,8 @@ builder.Services.AddHttpClient("StatisticApiService", client =>
     client.BaseAddress = new Uri($"{baseUrl}:{port}");
 });
 
+builder.Services.AddHttpClient("CurrencyRates");
+
 //builder.Services.AddHttpClient<IOfferServiceClient, OfferServiceClient>(client =>
 //{
 //    var baseUrl = "http://offerapiservice";
@@ -132,6 +134,7 @@ builder.Services.AddHttpClient("StatisticApiService", client =>
 
 builder.Services.AddScoped<IRabbitMqService, RabbitMqService>();
 builder.Services.AddHostedService<GetwayRabbitListener>();
+builder.Services.AddHostedService<CurrencyRatesScheduler>();
 
 builder.Services.AddScoped<IGatewayService, GatewayService>();
 builder.Services.AddMemoryCache(); 

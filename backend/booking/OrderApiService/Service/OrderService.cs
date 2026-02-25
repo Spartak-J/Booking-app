@@ -111,6 +111,41 @@ namespace OrderApiService.Services
             return orderResponses;
         }
 
+        //===========================================================================================
+
+        public async Task<List<OrderResponse>> GetOrdersByOfferIdAsync(int offerId)
+        {
+            using var db = new OrderContext();
+            var orders = await db.Orders
+                .Where(o => o.OfferId == offerId)
+                .ToListAsync();
+            var orderResponses = orders
+                .Select(o => OrderResponse.MapToResponse(o))
+                .ToList();
+            return orderResponses;
+        }
+
+        //===========================================================================================
+
+        public async Task<List<int>> GetPendingOfferIdsAsync(int ownerId)
+        {
+            using var db = new OrderContext();
+
+            return await db.Orders
+                .Where(o => o.OwnerId == ownerId && o.Status == OrderStatus.Pending)
+                .Select(o => o.OfferId)
+                .Distinct()         
+                .ToListAsync();
+        }
+
+        //public async Task<bool> HasPendingOrderAsync(int ownerId)
+        //{
+        //    using var db = new OrderContext();
+
+        //    return await db.Orders
+        //        .AnyAsync(o => o.OwnerId == ownerId && o.Status == OrderStatus.Pending);
+        //}
+
 
 
 

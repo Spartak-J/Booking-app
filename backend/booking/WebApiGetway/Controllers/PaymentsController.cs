@@ -38,7 +38,7 @@ public class PaymentsController : ControllerBase
         var publicKey = _configuration["LIQPAY_PUBLIC_KEY"];
         var privateKey = _configuration["LIQPAY_PRIVATE_KEY"];
         var serverUrl = _configuration["LIQPAY_SERVER_URL"];
-        var resultUrl = _configuration["LIQPAY_RESULT_URL"];
+        var resultUrl = ResolveResultUrl(request.ClientType);
 
         if (string.IsNullOrWhiteSpace(publicKey) || string.IsNullOrWhiteSpace(privateKey))
         {
@@ -150,7 +150,7 @@ public class PaymentsController : ControllerBase
         var publicKey = _configuration["LIQPAY_PUBLIC_KEY"];
         var privateKey = _configuration["LIQPAY_PRIVATE_KEY"];
         var serverUrl = _configuration["LIQPAY_SERVER_URL"];
-        var resultUrl = _configuration["LIQPAY_RESULT_URL"];
+        var resultUrl = ResolveResultUrl(request.ClientType);
 
         if (string.IsNullOrWhiteSpace(publicKey) || string.IsNullOrWhiteSpace(privateKey))
         {
@@ -452,7 +452,7 @@ public class PaymentsController : ControllerBase
         var publicKey = _configuration["LIQPAY_PUBLIC_KEY"];
         var privateKey = _configuration["LIQPAY_PRIVATE_KEY"];
         var serverUrl = _configuration["LIQPAY_SERVER_URL"];
-        var resultUrl = _configuration["LIQPAY_RESULT_URL"];
+        var resultUrl = ResolveResultUrl(request.ClientType);
         if (string.IsNullOrWhiteSpace(publicKey) || string.IsNullOrWhiteSpace(privateKey))
         {
             return StatusCode(500, new { message = "LIQPAY_PUBLIC_KEY / LIQPAY_PRIVATE_KEY are not configured." });
@@ -705,6 +705,24 @@ public class PaymentsController : ControllerBase
             _ => "pay",
         };
 
+    private string? ResolveResultUrl(string? clientType)
+    {
+        var requestedType = clientType?.Trim().ToLowerInvariant();
+        var fallbackResultUrl = _configuration["LIQPAY_RESULT_URL"];
+        var mobileResultUrl = _configuration["LIQPAY_RESULT_URL_MOBILE"];
+        var webResultUrl = _configuration["LIQPAY_RESULT_URL_WEB"];
+
+        return requestedType switch
+        {
+            "mobile" => FirstNonEmpty(mobileResultUrl, fallbackResultUrl, "mobileapp://payment/result"),
+            "web" => FirstNonEmpty(webResultUrl, fallbackResultUrl),
+            _ => FirstNonEmpty(fallbackResultUrl, webResultUrl, mobileResultUrl),
+        };
+    }
+
+    private static string? FirstNonEmpty(params string?[] candidates) =>
+        candidates.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+
     private static string? ResolvePayTypes(string? method) =>
         method switch
         {
@@ -755,6 +773,7 @@ public class PaymentsController : ControllerBase
         public decimal Amount { get; set; }
         public string Currency { get; set; } = "UAH";
         public string Method { get; set; } = "pay";
+        public string ClientType { get; set; } = "web";
     }
 
     public sealed class ConfirmHoldRequest
@@ -769,6 +788,7 @@ public class PaymentsController : ControllerBase
         public string BookingId { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public string Currency { get; set; } = "UAH";
+        public string ClientType { get; set; } = "web";
     }
 
     private sealed class PaymentState

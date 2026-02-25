@@ -3,6 +3,7 @@ export const ENDPOINTS = {
     login: '/User/login',
     google: '/User/google',
     register: '/User/register/client',
+    registerOwner: '/User/register/owner',
     reset: '/User/me/change-password',
   },
   user: {

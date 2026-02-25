@@ -7,7 +7,8 @@ import { useLanguage } from "../../contexts/LanguageContext.jsx";
 
 
 import { HousingPanel_card } from "./HousingPanel_card.jsx";
-import { MyTravelsPanel_active_card } from "./MyTravelsPanel_active_card.jsx";
+import { ReviewsComponent } from "./ReviewsComponent.jsx";
+import { BookingComponent } from "./BookingComponent.jsx";
 import { HousingPanel_card_empty } from "./HousingPanel_card_empty.jsx";
 import { Text } from "../UI/Text/Text.jsx"
 import { StateButton_Profile_OrangOnHover } from "../UI/Button/StateButton_Profile_OrangOnHover.jsx";
@@ -15,7 +16,7 @@ import { HostPropertyForm } from "./HostPropertyForm.jsx";
 import styles from './HousingPanel.module.css';
 
 
-export const HousingPanel = () => {
+export const HousingPanel = ({ pendingOfferIds }) => {
   const { t } = useTranslation();
   const { getMyOffers } = useContext(AuthContext);
   const { userApi } = useContext(ApiContext);
@@ -24,11 +25,13 @@ export const HousingPanel = () => {
 
   const [activeKey, setActiveKey] = useState("1");
   const [showHostelList, setShowHostelList] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [showHostelId, setShowHostelId] = useState(null);
+  const [view, setView] = useState("list");
+
   const [selectedOffer, setSelectedOffer] = useState([]);
 
   const [myOffers, setMyOffers] = useState([]);
+
+  const [update, setUpdate] = useState(0);
 
 
 
@@ -56,14 +59,20 @@ export const HousingPanel = () => {
 
 
   useEffect(() => {
-    console.log(language)
+    document.body.style.cursor = "wait";
+
     userApi.getMyOffers(language)
       .then(res => {
-        setMyOffers(res.data)
-        console.log({ MyOffers: res.data })
+        setMyOffers(res.data);
+        console.log({ MyOffers: res.data });
       })
-      .catch(err => console.error("Error loading countries:", err));
-  }, [language, showForm]);
+      .catch(err => console.error("Error loading offers:", err))
+      .finally(() => {
+        document.body.style.cursor = "default";
+      });
+
+  }, [language, view, update]);
+
 
 
   return (
@@ -80,43 +89,64 @@ export const HousingPanel = () => {
               isActive={activeKey === btn.id}
               onClick={() => {
                 setActiveKey(btn.id)
-                setShowForm(false)
-                setShowHostelList(true)
+                setView("list");
+
+                //  setSelectedOffer(offer);
               }}
             />
           ))}
 
         </div>
 
-        {showHostelList && (
+        {view === "list" && showHostelList && (
           <div className={styles.cardList__container}>
             {activeKey === "1" &&
-              myOffers.map(ht => (
-                <HousingPanel_card
-                  key={ht.id}
-                  id={ht.id}
-                  title={ht.title}
-                  imgSrc={ht.rentObj?.[0]?.images?.[0]?.url}
-                  onClick={() => {
-                    setSelectedOffer(ht)
-                    setShowForm(true)
-                    setShowHostelList(false)
-                    console.log({ selectedOffer: ht })
-                  }}
-                />
-              ))
-            }
-            <HousingPanel_card_empty 
-            onClick={() => {
-                    setShowForm(true)
-                    setShowHostelList(false)
-                    console.log("HousingPanel_card_empty")
-                  }}
+              myOffers.map(ht => {
+                const hasPending = pendingOfferIds.includes(ht.id);
+
+                return (
+                  <HousingPanel_card
+                    key={ht.id}
+                    id={ht.id}
+                    title={ht.title}
+                    imgSrc={ht.rentObj?.[0]?.images?.[0]?.url}
+                    hasPending={hasPending} 
+                    onAction={(action, offer) => {
+                      setSelectedOffer(ht);
+                      setView(action);
+                      console.log(action);
+                      console.log("selectedOffer");
+                      console.log(selectedOffer);
+                    }}
                   />
+                );
+              })
+            }
+            <HousingPanel_card_empty
+              onClick={() => {
+                setView("edit")
+                setShowHostelList(false)
+                console.log("HousingPanel_card_empty")
+              }}
+            />
           </div>
         )}
-        {showForm && selectedOffer && (
-          <HostPropertyForm hotel={selectedOffer} setShowForm={setShowForm}/>
+        {view === "edit" && selectedOffer && (
+          <HostPropertyForm
+            hotel={selectedOffer}
+            setView={setView}
+            setActiveKey={setActiveKey}
+            setShowHostelList={setShowHostelList}
+            update={update}
+            setUpdate={setUpdate} />
+        )}
+
+        {view === "reviews" && (
+          <ReviewsComponent offer={selectedOffer} />
+        )}
+
+        {view === "booking" && (
+          <BookingComponent offer={selectedOffer} />
         )}
       </div>
     </div >

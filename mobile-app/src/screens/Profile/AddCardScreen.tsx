@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Alert, AppState, Linking } from 'react-native';
+import axios from 'axios';
 
 import AddCardScreenView from '@/components/Profile/AddCardScreenView';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -51,9 +52,11 @@ export const AddCardScreen = () => {
     saveCard: boolean;
   }) => {
     try {
+      const normalizedUserId = String(userId ?? '').trim() || 'guest';
       const start = await paymentService.startTokenizeCard({
-        userId: userId ?? 'guest',
+        userId: normalizedUserId,
         holderName: values.holderName,
+        clientType: 'mobile',
       });
 
       if (start.redirectUrl) {
@@ -75,16 +78,26 @@ export const AddCardScreen = () => {
           if (values.saveCard) {
             const card = statusResult.card;
             const expiryFromInput = values.expiry;
+            const normalizedLast4 =
+              card?.last4?.replace(/\D/g, '').slice(-4) ??
+              values.cardNumber.replace(/\D/g, '').slice(-4);
+            const normalizedExpiry = (card?.expiry ?? expiryFromInput ?? '').trim() || '--/--';
+            const normalizedMasked =
+              card?.numberMasked?.trim() ||
+              `**** **** **** ${normalizedLast4 || values.cardNumber.replace(/\D/g, '').slice(-4)}`;
+
+            if (!normalizedLast4 || normalizedLast4.length !== 4) {
+              throw new Error('Не вдалося визначити останні 4 цифри картки.');
+            }
+
             await paymentService.saveTokenizedCard({
-              userId: userId ?? 'guest',
+              userId: normalizedUserId,
               holderName: values.holderName,
               cardToken: statusResult.cardToken,
-              last4: card?.last4 ?? values.cardNumber.replace(/\D/g, '').slice(-4),
-              numberMasked:
-                card?.numberMasked ??
-                `**** **** **** ${values.cardNumber.replace(/\D/g, '').slice(-4)}`,
+              last4: normalizedLast4,
+              numberMasked: normalizedMasked,
               brand: card?.brand ?? 'card',
-              expiry: card?.expiry ?? expiryFromInput,
+              expiry: normalizedExpiry,
               saveCard: true,
             });
           }
@@ -102,7 +115,13 @@ export const AddCardScreen = () => {
         throw new Error('Очікування токенізації перевищило таймаут.');
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Не вдалося зберегти картку.';
+      let message = error instanceof Error ? error.message : 'Не вдалося зберегти картку.';
+      if (axios.isAxiosError(error)) {
+        const backendMessage =
+          (error.response?.data as { message?: string; error?: string } | undefined)?.message ??
+          (error.response?.data as { message?: string; error?: string } | undefined)?.error;
+        message = backendMessage || error.message || message;
+      }
       Alert.alert('Помилка', message);
     }
   };

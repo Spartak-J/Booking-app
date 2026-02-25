@@ -5,6 +5,7 @@ import { USE_MOCKS_SEARCH } from '@/config/constants';
 import { getApiLang, mapOfferFull, mapOfferShort } from '@/utils/apiAdapters';
 import { getAuthState } from '@/store/authStore';
 import { cityService } from '@/services/cityService';
+import { paramService } from '@/services/paramService';
 import { mockOffers } from '@/utils/mockData';
 import { BookingRepository } from '@/data/bookings';
 import { isOfferAvailableForDates } from '@/services/bookingAvailability';
@@ -258,6 +259,209 @@ const getMockOffersByFilters = async (filters: OfferFilters = {}) => {
   return { items, total: items.length };
 };
 
+const toNumber = (value: unknown, fallback = 0): number => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const toPositiveInt = (value: unknown): number | null => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  const rounded = Math.trunc(parsed);
+  return rounded > 0 ? rounded : null;
+};
+
+const isRemoteImage = (value?: string) => /^https?:\/\//i.test((value ?? '').trim());
+
+const splitAddress = (address?: string) => {
+  const source = (address ?? '').trim();
+  if (!source) {
+    return { street: '', houseNumber: '1' };
+  }
+  const match = source.match(/^(.*?)(\d+[a-zA-Z\u0410-\u044f\/\-]*)$/);
+  if (!match) {
+    return { street: source, houseNumber: '1' };
+  }
+  const street = (match[1] ?? '').trim().replace(/[,\s]+$/, '');
+  const houseNumber = (match[2] ?? '').trim() || '1';
+  return {
+    street: street || source,
+    houseNumber,
+  };
+};
+
+const buildDefaultDetailsParams = () => {
+  const today = new Date();
+  const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+  return {
+    startDate: today.toISOString(),
+    endDate: tomorrow.toISOString(),
+    guests: '2',
+    adults: '2',
+    children: '0',
+    rooms: '1',
+    userDiscountPercent: '0',
+  };
+};
+
+const extractApiPayload = (data: any) => Array.isArray(data) ? data[0] : (data?.data?.[0] ?? data?.data ?? data);
+
+const resolveCreatedOfferId = (data: any): number | null => {
+  if (typeof data === 'number') return data;
+  if (typeof data === 'string') {
+    const parsed = Number(data);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  const candidate = data?.id ?? data?.offerId ?? data?.idOffer ?? data?.data?.id ?? data?.data?.offerId;
+  return toPositiveInt(candidate);
+};
+
+const uploadOfferImages = async (offerId: number, images?: string[]) => {
+  const localImages = (images ?? []).filter((uri) => uri && !isRemoteImage(uri));
+  if (!localImages.length) return;
+
+  const formData = new FormData();
+  localImages.forEach((uri, index) => {
+    formData.append('files', {
+      uri,
+      name: `offer-${offerId}-${index + 1}.jpg`,
+      type: 'image/jpeg',
+    } as any);
+  });
+
+  await apiClient.post(`/Bff/img/booking-offer/${offerId}/add`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
+
+type OfferRuntimeMeta = {
+  offerId?: number;
+  rentObjId?: number;
+  countryId?: number;
+  regionId?: number;
+  cityId?: number;
+  districtId?: number;
+  postcode?: string;
+  latitude?: number;
+  longitude?: number;
+};
+
+const fetchOfferRuntimeMeta = async (id: string, lang: string): Promise<OfferRuntimeMeta> => {
+  try {
+    const { data } = await apiClient.get<any>(ENDPOINTS.offers.fullById(id, lang), {
+      params: buildDefaultDetailsParams(),
+    });
+    const raw = extractApiPayload(data);
+    const rentObj = Array.isArray(raw?.rentObj) ? raw.rentObj[0] : raw?.rentObj;
+    return {
+      offerId: toPositiveInt(raw?.id ?? id) ?? undefined,
+      rentObjId: toPositiveInt(rentObj?.id) ?? undefined,
+      countryId: toPositiveInt(rentObj?.countryId) ?? undefined,
+      regionId: toPositiveInt(rentObj?.regionId) ?? undefined,
+      cityId: toPositiveInt(rentObj?.cityId) ?? undefined,
+      districtId: toPositiveInt(rentObj?.districtId) ?? undefined,
+      postcode: (rentObj?.postcode ?? '').toString().trim() || undefined,
+      latitude: Number.isFinite(Number(rentObj?.latitude)) ? Number(rentObj.latitude) : undefined,
+      longitude: Number.isFinite(Number(rentObj?.longitude)) ? Number(rentObj.longitude) : undefined,
+    };
+  } catch {
+    return {};
+  }
+};
+
+const buildBffOfferPayload = async (
+  payload: Partial<Offer>,
+  options: { lang: string; existing?: OfferRuntimeMeta; offerId?: number } = { lang: 'en' },
+) => {
+  const lang = options.lang;
+  const existing = options.existing ?? {};
+  const address = payload.address?.trim() ?? '';
+  const { street, houseNumber } = splitAddress(address);
+
+  const amenitiesCatalog = await paramService.getAmenities();
+  const amenityIdByName = new Map(
+    amenitiesCatalog.map((item) => [normalizeText(item.name), toPositiveInt(item.id) ?? 0]),
+  );
+  const amenityParamIds = Array.from(
+    new Set(
+      (payload.amenities ?? [])
+        .map((name) => amenityIdByName.get(normalizeText(name)) ?? 0)
+        .filter((id) => id > 0),
+    ),
+  );
+
+  let resolvedCityId =
+    toPositiveInt(payload.city?.id) ??
+    existing.cityId ??
+    null;
+  if (!resolvedCityId) {
+    const cities = await cityService.getAll();
+    resolvedCityId = toPositiveInt(cities[0]?.id) ?? 1;
+  }
+
+  const offerId = options.offerId ?? existing.offerId ?? 0;
+  const rentObjId = existing.rentObjId ?? 0;
+  const remoteImages = (payload.images ?? []).filter((uri) => isRemoteImage(uri));
+
+  return {
+    id: offerId,
+    Title: payload.title?.trim() || 'Новий обʼєкт',
+    Description: payload.description?.trim() || '',
+    TitleInfo: (payload.description?.trim() || '').slice(0, 120),
+    PricePerDay: toNumber(payload.pricePerNight, 0),
+    PricePerWeek: null,
+    PricePerMonth: null,
+    Tax: null,
+    MinRentDays: 1,
+    AllowPets: false,
+    AllowSmoking: false,
+    AllowChildren: true,
+    AllowParties: false,
+    MaxGuests: toNumber(payload.maxGuests ?? payload.guests, 1),
+    CheckInTime: '11:00:00',
+    CheckOutTime: '15:00:00',
+    OwnerId: toPositiveInt(payload.ownerId) ?? undefined,
+    RentObj: {
+      id: rentObjId,
+      OfferId: offerId,
+      CountryId: existing.countryId ?? 1,
+      RegionId: existing.regionId ?? 1,
+      CityId: resolvedCityId,
+      DistrictId: existing.districtId ?? 1,
+      CountryTitle: payload.city?.country || '',
+      CityTitle: payload.city?.name || '',
+      CityLatitude: null,
+      CityLongitude: null,
+      Latitude: existing.latitude ?? 0,
+      Longitude: existing.longitude ?? 0,
+      Street: street,
+      HouseNumber: houseNumber,
+      Postcode: existing.postcode ?? '00000',
+      RoomCount: toNumber(payload.bedrooms, 1),
+      LivingRoomCount: 0,
+      BathroomCount: 1,
+      Area: 0,
+      TotalBedsCount: toNumber(payload.guests, 1),
+      SingleBedsCount: 1,
+      DoubleBedsCount: 1,
+      HasBabyCrib: false,
+      ParamValues: amenityParamIds.map((paramItemId) => ({
+        id: 0,
+        RentObjId: rentObjId,
+        ParamItemId: paramItemId,
+        ValueBool: true,
+        ValueInt: 0,
+        ValueString: '',
+      })),
+      Images: remoteImages.map((url) => ({
+        id: 0,
+        Url: url,
+        RentObjId: rentObjId,
+      })),
+    },
+  };
+};
+
 export const offerService = {
   getAll: async (filters: OfferFilters = {}) => {
     if (USE_MOCKS_SEARCH) {
@@ -401,7 +605,23 @@ export const offerService = {
       mockOffers.unshift(offer);
       return offer;
     }
-    throw new Error('Создание объявлений через мобильное приложение пока не подключено к API');
+    const lang = getApiLang();
+    const requestPayload = await buildBffOfferPayload(payload, { lang });
+    try {
+      const { data } = await apiClient.post<any>(
+        `/Bff/create/booking-offer?lang=${encodeURIComponent(lang)}`,
+        requestPayload,
+      );
+      const createdId = resolveCreatedOfferId(data);
+      if (!createdId) {
+        throw new Error('BFF did not return created offer id');
+      }
+      await uploadOfferImages(createdId, payload.images);
+      const saved = await offerService.getById(String(createdId));
+      return saved;
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось создать объявление.');
+    }
   },
   update: async (id: string, payload: Partial<Offer>): Promise<Offer> => {
     if (USE_MOCKS_SEARCH) {
@@ -420,9 +640,27 @@ export const offerService = {
       mockOffers[index] = updated;
       return updated;
     }
-    throw new Error(
-      'Редактирование объявлений через мобильное приложение пока не подключено к API',
-    );
+    const lang = getApiLang();
+    const existingMeta = await fetchOfferRuntimeMeta(id, lang);
+    const requestPayload = await buildBffOfferPayload(payload, {
+      lang,
+      existing: existingMeta,
+      offerId: toPositiveInt(id) ?? existingMeta.offerId ?? 0,
+    });
+    try {
+      await apiClient.post<any>(
+        `/Bff/update/booking-offer?lang=${encodeURIComponent(lang)}`,
+        requestPayload,
+      );
+      const offerId = toPositiveInt(id) ?? existingMeta.offerId;
+      if (offerId) {
+        await uploadOfferImages(offerId, payload.images);
+      }
+      const saved = await offerService.getById(id);
+      return saved;
+    } catch (error) {
+      throw toUserFacingApiError(error, 'Не удалось обновить объявление.');
+    }
   },
   remove: async (id: string): Promise<void> => {
     if (USE_MOCKS_SEARCH) {

@@ -23,6 +23,7 @@ export const HotelCard = ({
     startDate,
     endDate,
     adults,
+    showHeart = true,
     children
 }) => {
     const navigate = useNavigate();
@@ -43,8 +44,9 @@ export const HotelCard = ({
                 if (e.key === 'Enter' || e.key === ' ') handleClick();
             }}
         >
-
-            <IconButton_isFavoritest hotelId={id}/>
+            {showHeart &&
+                <IconButton_isFavoritest hotelId={id} />
+            }
 
             <div className={`${styles.card__imageWrapper} btn-br-r-20 `}>
                 <Image src={image} alt={title} type="card" />

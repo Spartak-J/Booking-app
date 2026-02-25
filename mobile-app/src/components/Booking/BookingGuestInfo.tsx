@@ -17,6 +17,10 @@ type Props = {
   email: string;
   phone: string;
   country: string;
+  nameError?: string;
+  emailError?: string;
+  phoneError?: string;
+  countryError?: string;
   onChangeName: (value: string) => void;
   onChangeEmail: (value: string) => void;
   onChangePhone: (value: string) => void;
@@ -28,6 +32,10 @@ export const BookingGuestInfo = ({
   email,
   phone,
   country,
+  nameError,
+  emailError,
+  phoneError,
+  countryError,
   onChangeName,
   onChangeEmail,
   onChangePhone,
@@ -48,6 +56,7 @@ export const BookingGuestInfo = ({
           value={fullName}
           onChangeText={onChangeName}
           placeholder={t('auth.placeholder.name')}
+          error={nameError}
         />
         <Input
           label={t('auth.email')}
@@ -56,6 +65,7 @@ export const BookingGuestInfo = ({
           placeholder={t('auth.placeholder.email')}
           keyboardType="email-address"
           autoCapitalize="none"
+          error={emailError}
         />
         <Input
           label={t('booking.phone')}
@@ -63,12 +73,14 @@ export const BookingGuestInfo = ({
           onChangeText={onChangePhone}
           placeholder={t('booking.phone')}
           keyboardType="phone-pad"
+          error={phoneError}
         />
         <Input
           label={t('booking.country')}
           value={country}
           onChangeText={onChangeCountry}
           placeholder={t('booking.country')}
+          error={countryError}
         />
       </View>
     </View>
@@ -86,7 +98,7 @@ const getStyles = (colors: any) =>
     },
     formCard: {
       gap: s(12),
-      backgroundColor: colors.surface ?? colors.background,
+      backgroundColor: colors.surfaceLight,
       borderRadius: radius.md,
       padding: s(12),
       borderWidth: 1,

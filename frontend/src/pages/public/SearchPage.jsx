@@ -6,15 +6,9 @@ import { offerApi } from "../../api/offer.js";
 import { Header_Full } from "../../components/Header/Header_Full.jsx";
 
 import { Footer } from "../../components/Footer/Footer.jsx";
-import { TwoColumnInfoSection } from "../../components/Info_Components/TwoColumnInfoSection.jsx";
-import { MoreOffersSection } from "../../components/Info_Components/MoreOffersSection.jsx";
 import { FilterSidebar } from "../../components/Filter/FilterSidebar.jsx";
 import { HotelCardList } from "../../components/HotelCard/HotelCardList.jsx";
-import { HotelCardList_Recomented } from "../../components/HotelCard/HotelCardList_Recomented.jsx";
-import { MoreTourWrapper } from "../../components/Info_Components/MoreTourWrapper";
-import { CityCard_carousel } from "../../components/CityCard/CityCard_carousel.jsx";
 import { Spinner } from "../../components/UI/Spinner.jsx";
-import { Text } from "../../components/UI/Text/Text.jsx";
 import { ApiContext } from "../../contexts/ApiContext.jsx";
 import { useLanguage } from "../../contexts/LanguageContext";
 
@@ -78,6 +72,7 @@ export const SearchPage = ({ defaultCityId }) => {
 
     const fetchHotels = async () => {
       setLoading(true);
+      document.body.style.cursor = "wait";
 
       try {
         const response = await offerApi.searchOffers({
@@ -97,6 +92,7 @@ export const SearchPage = ({ defaultCityId }) => {
         console.error("Ошибка загрузки:", error);
       } finally {
         setLoading(false);
+        document.body.style.cursor = "default";
       }
     };
 

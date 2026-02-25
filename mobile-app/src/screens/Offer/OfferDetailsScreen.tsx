@@ -29,7 +29,14 @@ export const OfferDetailsScreen = () => {
         isLoading={isLoading}
         onBack={() => navigation.goBack()}
         onOpenGallery={(offerId) => navigation.navigate(Routes.OfferGallery, { offerId })}
-        onBook={(offerId) => navigation.navigate(Routes.Booking, { offerId })}
+        onBook={(offerId) =>
+          navigation.navigate(Routes.Booking, {
+            offerId,
+            checkIn: params.checkIn,
+            checkOut: params.checkOut,
+            guests: params.guests,
+          })
+        }
       />
     </AppLayout>
   );

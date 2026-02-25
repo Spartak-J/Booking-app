@@ -37,7 +37,14 @@ export const SearchResultsScreen = () => {
         isFetching={isFetching}
         onRefresh={refetch}
         onBack={() => navigation.goBack()}
-        onPressOffer={(offer) => navigation.navigate(Routes.OfferDetails, { offerId: offer.id })}
+        onPressOffer={(offer) =>
+          navigation.navigate(Routes.OfferDetails, {
+            offerId: offer.id,
+            checkIn: filters?.dates?.from,
+            checkOut: filters?.dates?.to,
+            guests: filters?.guests,
+          })
+        }
       />
     </AppLayout>
   );

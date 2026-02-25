@@ -261,7 +261,7 @@ public class UserController : ControllerBase
 
         var offerObjResult = await _gateway.ForwardRequestAsync<object>(
                "OfferApiService",
-               $"/api/get/offers/{userId}/{cityId}",
+               $"/api/Offer/get/offers/{userId}/{cityId}",
                HttpMethod.Get,
                null
            );
@@ -323,7 +323,7 @@ public class UserController : ControllerBase
 
         var offerObjResult = await _gateway.ForwardRequestAsync<object>(
                "OfferApiService",
-               $"/api/get/offers/{userId}/{countryId}",
+               $"/api/Offer/get/offers/{userId}/{countryId}",
                HttpMethod.Get,
                null
            );
@@ -342,11 +342,35 @@ public class UserController : ControllerBase
     }
 
 
-
     // =====================================================================
-    //  получить брони клиентом
+    // проверить есть ли новые не подтвержденные брони у owner
     // =====================================================================
     [Authorize]
+    [HttpGet("me/myOffers/orders/has-pending")]
+    public async Task<IActionResult> HasPendingOrder()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                         ?? User.FindFirst(JwtRegisteredClaimNames.Sub);
+
+        if (userIdClaim == null)
+            return Unauthorized();
+
+        if (!int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized();
+
+        return await _gateway.ForwardRequestAsync<object>(
+             "OrderApiService",
+             $"/api/Order/has-pending/{userId}",
+             HttpMethod.Get,
+             null
+         );
+    }
+
+
+        // =====================================================================
+        //  получить брони клиентом
+        // =====================================================================
+        [Authorize]
     [HttpGet("me/orders/{lang}")]
     public async Task<IActionResult> GetMyOrders(string lang)
     {
@@ -374,6 +398,43 @@ public class UserController : ControllerBase
         var orderDictList = BffHelper.ConvertActionResultToDict(okOrder);
 
 
+        var orderState = "Completed";
+        foreach (var order in orderDictList)
+        {
+            if (order.ContainsKey("endDate") && order["endDate"] != null)
+            {
+                if (DateTimeOffset.TryParse(order["endDate"]?.ToString(), out var dto))
+                {
+                    if (dto.UtcDateTime < DateTime.UtcNow && order["status"] != orderState)
+                    {
+
+                        var orderId = int.Parse(order["id"].ToString());
+                       
+
+                        order["status"] = orderState;
+                        var resultObj = await _gateway.ForwardRequestAsync<object>(
+                            "OrderApiService",
+                            $"/api/order/update/status/{orderId}?orderState={orderState}",
+                            HttpMethod.Post,
+                            null
+                        );
+                        if (resultObj is not OkObjectResult okResult)
+                        {
+                            return resultObj;
+                        }
+
+                        if (okResult.Value is int resultId)
+                        {
+                            if (resultId == -1)
+                            {
+                                return BadRequest(new { message = "Не удалось изменить заказ" });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         var orderTranslations = await GetTranslationsAsync(lang, "Order");
 
         var updateOrderDictList = BffHelper.UpdateListWithTranslations(orderDictList, orderTranslations);
@@ -383,6 +444,8 @@ public class UserController : ControllerBase
 
         foreach (var orderDict in updateOrderDictList)
         {
+            var idOrder = int.Parse(orderDict["id"].ToString());
+
             var idOffer = int.Parse(orderDict["offerId"].ToString());
 
 
@@ -445,8 +508,10 @@ public class UserController : ControllerBase
 
             var order = new OrderResponseForAccountCard
             {
+                OrderId = idOrder,
                 OfferId = int.TryParse(offerIdRaw?.ToString(), out var oid) ? oid : 0,
                 ClientId = userId,
+                CityId = cityId,
                 Title = titleOffer ?? "Без названия",
                 StartDate = startDateRaw?.ToString() ?? "",
                 EndDate = endDateRaw?.ToString() ?? "",

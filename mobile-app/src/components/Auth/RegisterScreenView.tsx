@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from '@/i18n';
-import { StyleSheet, View, Image } from 'react-native';
+import { Alert, StyleSheet, View, Image } from 'react-native';
 import * as yup from 'yup';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -27,7 +27,7 @@ type FormValues = {
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 export const RegisterScreenView = () => {
-  const { register } = useAuth();
+  const { register, googleLogin } = useAuth();
   const navigation = useNavigation<Navigation>();
   const [agreed, setAgreed] = useState(false);
   const { tokens } = useTheme();
@@ -148,7 +148,22 @@ export const RegisterScreenView = () => {
             {t('auth.login.social')}
           </Typography>
 
-          <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
+          <Button
+            variant="ghost"
+            size="large"
+            style={styles.socialOutline}
+            onPress={async () => {
+              try {
+                await googleLogin();
+              } catch (error) {
+                const message =
+                  error instanceof Error && error.message
+                    ? error.message
+                    : t('auth.errors.generic');
+                Alert.alert(t('auth.errors.title'), message);
+              }
+            }}
+          >
             <View style={styles.socialContent}>
               <Image source={googleIcon} style={styles.socialIcon} />
               <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>

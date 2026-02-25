@@ -1,5 +1,8 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
+import Select from "react-select";
+
 import { useLanguage } from "../../contexts/LanguageContext.jsx";
+import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
@@ -22,7 +25,7 @@ const handleSearchResults = (results) => {
 export const RegisterModal = ({ setIsModalOpen }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { register } = useContext(AuthContext);
+    const { register, googleAuth } = useContext(AuthContext);
     const { locationApi } = useContext(ApiContext);
     const { language } = useLanguage();
     const contentRef = useRef(null);
@@ -35,7 +38,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
 
     const [activeButton, setActiveButton] = useState("owner");
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  
+
 
     const [formData, setFormData] = useState({
         username: "",
@@ -44,7 +47,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
         email: "",
         birthDate: null,
         phoneNumber: "",
-        postcode:"",
+        postcode: "",
         roleName: ""
     });
 
@@ -77,19 +80,19 @@ export const RegisterModal = ({ setIsModalOpen }) => {
         return age >= 18;
     };
 
-  useEffect(() => {
+    useEffect(() => {
         const selectedCountry = countries.find(
             c => c.id === formData.countryId
         );
 
-       if (selectedCountry) {
-        console.log(selectedCountry);
-        setFormData(prev => ({
-            ...prev,
-            postcode: selectedCountry.countryCode
-        }));
-        console.log(formData.postcode);
-    }
+        if (selectedCountry) {
+            console.log(selectedCountry);
+            setFormData(prev => ({
+                ...prev,
+                postcode: selectedCountry.countryCode
+            }));
+            console.log(formData.postcode);
+        }
     }, [formData.countryId, countries]);
 
 
@@ -186,14 +189,15 @@ export const RegisterModal = ({ setIsModalOpen }) => {
         console.log({ roleName: activeButton });
         const combinedPhoneNumber = `${formData.postcode} ${formData.phoneNumber}`;
 
+        document.body.style.cursor = "wait";
         try {
             const result = await register({
                 username: formData.username,
                 countryId: formData.countryId,
                 email: formData.email,
                 birthDate: new Date(formData.birthDate).toISOString(),
-                password:formData.password,
-                phoneNumber:  combinedPhoneNumber,
+                password: formData.password,
+                phoneNumber: combinedPhoneNumber,
                 roleName: activeButton
             }
             );
@@ -206,13 +210,22 @@ export const RegisterModal = ({ setIsModalOpen }) => {
             }
         } catch (error) {
             console.error("Registration error:", error);
+        } finally {
+            document.body.style.cursor = "default";
         }
     };
+
+    const countryOptions = countries?.map(country => ({
+        value: country.id,
+        label: country.title
+    }));
+
 
 
     return (
         <div className={styles.registerPage}>
             <IconButtonClose
+                size="30"
                 className={`closeBtn ${hasScroll ? "withScroll" : ""
                     }`}
                 onClick={() => setIsModalOpen(false)}
@@ -232,9 +245,31 @@ export const RegisterModal = ({ setIsModalOpen }) => {
 
                 <form className={`${styles.registerPage__form} gap-30 mt-10`} onSubmit={handleSubmit}>
                     {/* google */}
-                    <span className={`${styles.googleButton__wrapper} flex-center mt-10 mb-50`}>
-                        < GoogleButton text={t("Auth.register.google")} className="btn-w-1165 btn-h-100 btn-br-r-15" />
+                    <span className={`${styles.googleButton__wrapper} flex-center btn-w-full mt-10 mb-50`}>
+                        <GoogleLogin
+                            theme="outline"          // outline | filled_blue | filled_black
+                            size="large"             // small | medium | large
+                            text="signin_with"       // signin_with | signup_with | continue_with | signin
+                            shape="circle"      // rectangular | pill | circle | square
+                            logo_alignment="left"    // left | center
+                            width="1200"
+
+                            onSuccess={async (credentialResponse) => {
+                                console.log("Google login");
+                                const rez = credentialResponse.credential
+                                console.log(rez);
+                                const result = await googleAuth(credentialResponse.credential);
+
+                                if (result.success) {
+                                    setIsModalOpen(false);
+                                } else {
+                                    alert(result.message);
+                                }
+                            }}
+                            onError={() => console.log("Login Failed")}
+                        />
                     </span>
+
 
                     <div className={`${styles.line_wrapper} gap-12`}>
                         <div className={`${styles.line} ${styles.left} `}>
@@ -258,23 +293,20 @@ export const RegisterModal = ({ setIsModalOpen }) => {
                     />
                     {/* country */}
                     {/* Country select */}
-                    <select
+                    <Select
                         name="countryId"
-                        value={formData.countryId || ""}
-                        onChange={e => setFormData(prev => ({
-                            ...prev,
-                            countryId: Number(e.target.value)
-                        }))}
-                        className={`${styles.input} btn-h-120  btn-br-r-20 p-10`}
-                        required
-                    >
-                        <option value="" disabled>{t("Auth.register.country")}</option>
-                        {countries?.map(country => (
-                            <option key={country.id} value={country.id}>
-                                {country.title}
-                            </option>
-                        ))}
-                    </select>
+                        options={countryOptions}
+                        value={countryOptions?.find(c => c.value === formData.countryId)}
+                        onChange={(selected) =>
+                            setFormData(prev => ({
+                                ...prev,
+                                countryId: selected?.value
+                            }))
+                        }
+                        className={`${styles.input} btn-h-120 btn-br-r-20`}
+                        classNamePrefix="countrySelect"
+                        placeholder={t("Auth.register.country")}
+                    />
 
                     {/* Email */}
                     <input
@@ -328,7 +360,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
                         name="password"
                         value={displayPassword}
                         onChange={handleChange}
-                        placeholder={t("Auth.login.password")}
+                        placeholder={t("Auth.register.password")}
                         className={`${styles.input} btn-h-120 btn-w-1165 btn-br-r-20 p-10`}
                         autoComplete="new-password"
                         required
@@ -357,7 +389,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder={t("Auth.login.confirm_password")}
+                        placeholder={t("Auth.register.confirm_password")}
                         className={`${styles.input} btn-h-120 btn-w-1165 btn-br-r-20 p-10`}
                         required
                     />

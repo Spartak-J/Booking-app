@@ -9,6 +9,10 @@ namespace OrderApiService.View
     {
         public int OfferId { get; set; }
         public int ClientId { get; set; }
+        public int OwnerId { get; set; }
+
+        public string? ClientEmail { get; set; }
+        public string? ClientPhoneNumber { get; set; }
 
         // Количество гостей
         public int Guests { get; set; }
@@ -57,6 +61,9 @@ namespace OrderApiService.View
             {
                 OfferId = request.OfferId,
                 ClientId = request.ClientId,
+                OwnerId = request.OwnerId,
+                ClientEmail = request.ClientEmail,
+                ClientPhoneNumber = request.ClientPhoneNumber,
                 Guests = request.Guests,
                 Adults = request.Adults,
                 Children = request.Children,

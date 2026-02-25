@@ -65,13 +65,46 @@ const resolveUserRole = (input: any): Role => {
   return mapRole(rawRole);
 };
 
-export const mapUser = (input: any): User => ({
-  id: String(input?.id ?? input?.userId ?? ''),
-  email: input?.email ?? input?.username ?? '',
-  name: input?.username ?? input?.name ?? 'User',
-  phone: input?.phoneNumber,
-  role: resolveUserRole(input),
-});
+export const mapUser = (input: any): User => {
+  const countryId =
+    input?.countryId !== undefined && input?.countryId !== null ? Number(input.countryId) : undefined;
+  const countryTitle =
+    (typeof input?.countryTitle === 'string' ? input.countryTitle.trim() : '') ||
+    (typeof input?.country === 'string' ? input.country.trim() : '');
+
+  const lastnameRaw =
+    input?.lastname ??
+    input?.lastName ??
+    input?.Lastname ??
+    input?.surName ??
+    input?.surname ??
+    '';
+  const firstNameRaw = input?.firstName ?? input?.firstname ?? input?.FirstName ?? '';
+
+  const lastname = typeof lastnameRaw === 'string' ? lastnameRaw.trim() : '';
+  const firstName = typeof firstNameRaw === 'string' ? firstNameRaw.trim() : '';
+  const fullNameFromParts = [firstName, lastname].filter(Boolean).join(' ').trim();
+
+  const fullNameCandidate =
+    (typeof input?.fullName === 'string' ? input.fullName.trim() : '') ||
+    (typeof input?.name === 'string' ? input.name.trim() : '');
+
+  const profileName = fullNameFromParts || lastname || fullNameCandidate;
+
+  return {
+    id: String(input?.id ?? input?.userId ?? ''),
+    email: input?.email ?? input?.username ?? '',
+    username: input?.username ?? undefined,
+    name: profileName || input?.username || 'User',
+    phone: input?.phoneNumber ?? input?.phone ?? input?.phoneNum ?? undefined,
+    role: resolveUserRole(input),
+    birthDate: input?.birthDate,
+    countryId,
+    country: countryTitle || (countryId === 1 ? 'Україна' : undefined),
+    discount:
+      input?.discount !== undefined && input?.discount !== null ? Number(input.discount) : undefined,
+  };
+};
 
 const pickNumber = (value: any, fallback = 0) => {
   const num = Number(value);

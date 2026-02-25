@@ -289,9 +289,9 @@
       "past": "Минулі",
       "cancelled": "Скасовані"
     },
-     "my_history": {
-     "all": "Усі готелі",
-     "favorites": "Обране"
+    "my_history": {
+      "all": "Усі готелі",
+      "favorites": "Обране"
     },
     "AccountPanel": {
       "name": "Ім’я",
@@ -324,8 +324,8 @@
     },
     "Reservation_management": "Управління  бронюванням",
     "no_active_travel": "У вас немає активних поїздок",
-     "no_past_travel": "У вас немає минулих поїздок",
-      "no_cancelled_travel": "У вас немає скасованих поїздок",
+    "no_past_travel": "У вас немає минулих поїздок",
+    "no_cancelled_travel": "У вас немає скасованих поїздок",
     "PastHotel": {
       "title_page": "Реалізовано",
       "price": "Ціна",
@@ -384,7 +384,6 @@
     "Choise_btn": "Обрати",
     "processing": "Оформляємо бронювання...",
     "success": "Бронювання підтверджено!",
-    "success": "Бронювання підтверджено!",
     "success_title": "Успіх!",
     "success_message": "Підтвердження бронювання ми надіслали на вашу електронну пошту."
   },
@@ -397,10 +396,10 @@
       "housing": {
         "name": "Назва",
         "country": "Країна",
-        "region":"Область/регіон",
-        "city":"Місто",
-         "district":"Район",
-        "Postcode":"Поштовий код",
+        "region": "Область/регіон",
+        "city": "Місто",
+        "district": "Район",
+        "Postcode": "Поштовий код",
         "address": "Адреса",
         "street": "Вулиця",
         "number": "номер",
@@ -415,7 +414,7 @@
       "singleBedsCount": "Односпальне ліжко",
       "doubleBedsCount": "Двоспальне ліжко",
       "pricePerDay": "Ціна/ніч",
-      "pricePerWeek": "Ціна/від 3ночей"
+      "pricePerWeek": "Знижка/від 3ночей"
     },
     "amenities": {
       "title": "Зручності",
@@ -435,6 +434,55 @@
       "addYourOwn": "Додати своє"
     },
     "btn_add": "Додати кімнату/номер",
-    "btn_save": "Зберегти"
+    "btn_save": "Зберегти",
+    "my_housing": {
+      "menu_btn_edit": "Редагувати",
+      "menu_btn_read_reviews": "Відгуки",
+      "menu_btn_booking": "Бронювання"
+    },
+    "booking": {
+      "apartment": "Апартаменти / квартира",
+      "user": "Гості",
+      "Status": "Статус замовлення",
+      "Date": "Дата замовлення",
+      "confirm_order": "Підтвердити",
+      "Pending": "Очікує підтвердження",
+      "Confirmed": "Підтверджено власником",
+      "Paid": "Оплачено",
+      "Cancelled": "Скасовано користувачем",
+      "Rejected": "Відхилено власником",
+      "Completed": "Оренду завершено"
+    }
+  },
+  "admin": {
+    "title": "Привіт, адмін",
+    "menu": {
+      "users": "Користувачі",
+      "offers": "Об’яви",
+      "reviews": "Відгуки",
+      "settings": "Налаштування",
+      "tools": "Інструменти",
+      "contacts": "Контакти"
+    },
+    "input_label": "Введіть e-mail або номер телефону",
+    "sort_btn": "Сортувати",
+    "write": "написати",
+    "blocked": "заблокувати"
+  },
+  "attraction": {
+    "title": "Визначні пам’ятки"
+  },
+  "reviews_modal": {
+    "leave_review": "Залишіть свій відгук",
+    "your_rating":"Ваша оцінка",
+    "staff": "Персонал",
+    "cleanliness": "Чистота",
+    "comfort": "Комфорт",
+    "facilities": "Зручності",
+    "value_for_money": "Ціна/якість",
+    "location": "Місце розташування",
+    "text": "Текст",
+    "submit": "Відправити",
+    "no_reviews": "У вас немає відгуків для цього готелю"
   }
 }

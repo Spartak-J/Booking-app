@@ -11,6 +11,10 @@ namespace OrderApiService.View
 
         public int OfferId { get; set; }
         public int ClientId { get; set; }
+        public int OwnerId { get; set; }
+
+        public string? ClientEmail { get; set; }
+        public string? ClientPhoneNumber { get; set; }
         public int Guests { get; set; }
 
         public int? Adults { get; set; }
@@ -67,6 +71,9 @@ namespace OrderApiService.View
                 // ===== Основные данные =====
                 OfferId = model.OfferId,
                 ClientId = model.ClientId,
+                OwnerId = model.OwnerId,
+                ClientEmail = model.ClientEmail,
+                ClientPhoneNumber = model.ClientPhoneNumber,
                 Guests = model.Guests,
                 Adults = model.Adults,
                 Children = model.Children,

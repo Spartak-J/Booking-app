@@ -2,6 +2,7 @@
 import React, { useMemo, useRef, useCallback } from 'react';
 import { Animated, Image, StyleSheet, View, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 import { useTheme, withOpacity } from '@/theme';
 import { Button, Typography } from '@/ui';
@@ -20,6 +21,7 @@ const SPACING = s(0);
 const SNAP_INTERVAL = CARD_WIDTH + SPACING;
 const SIDE_SCALE_X = 0.8;
 const SIDE_SCALE_Y = 0.8;
+const formatCityLabel = (name: string): string => name.replace(/-/g, '-\n');
 
 export const PopularCitiesCarousel: React.FC<PopularCitiesCarouselProps> = ({
   data,
@@ -91,8 +93,9 @@ export const PopularCitiesCarousel: React.FC<PopularCitiesCarouselProps> = ({
           <Image source={item.image} style={styles.cardImage} />
           <LinearGradient colors={gradientColors} style={styles.cardGradient} />
           <View style={styles.cardLabel}>
+            <BlurView intensity={25} tint="light" style={styles.cardLabelBlur} />
             <Typography variant="subtitle" style={styles.cardLabelText}>
-              {item.name}
+              {formatCityLabel(item.name)}
             </Typography>
           </View>
         </Button>
@@ -181,16 +184,23 @@ const getStyles = (colors: any) =>
       left: 0,
       right: 0,
       bottom: 0,
-      paddingVertical: s(8),
-      backgroundColor: 'transparent',
+      paddingVertical: s(6),
+      paddingHorizontal: s(8),
+      overflow: 'hidden',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: withOpacity(colors.white, 0.1),
+    },
+    cardLabelBlur: {
+      ...StyleSheet.absoluteFillObject,
     },
     cardGradient: {
       ...StyleSheet.absoluteFillObject,
     },
     cardLabelText: {
       textAlign: 'center',
-      fontSize: s(20),
-      lineHeight: s(24),
+      fontSize: s(17),
+      lineHeight: s(22),
       fontWeight: '500',
       color: colors.white,
     },

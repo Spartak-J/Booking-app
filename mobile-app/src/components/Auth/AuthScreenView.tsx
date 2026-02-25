@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, StyleSheet, View } from 'react-native';
+import { Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as yup from 'yup';
 
@@ -35,7 +36,7 @@ type Props = {
 
 export const AuthScreenView: React.FC<Props> = ({ mode }) => {
   const navigation = useNavigation<Navigation>();
-  const { login, register } = useAuth();
+  const { login, register, googleLogin } = useAuth();
   const { tokens } = useTheme();
   const { t } = useTranslation();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -210,7 +211,22 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
               {t('auth.login.social')}
             </Typography>
 
-            <Button variant="ghost" size="large" style={styles.socialOutline} onPress={() => {}}>
+            <Button
+              variant="ghost"
+              size="large"
+              style={styles.socialOutline}
+              onPress={async () => {
+                try {
+                  await googleLogin();
+                } catch (error) {
+                  const message =
+                    error instanceof Error && error.message
+                      ? error.message
+                      : t('auth.errors.generic');
+                  Alert.alert(t('auth.errors.title'), message);
+                }
+              }}
+            >
               <View style={styles.socialContent}>
                 <Image source={googleIcon} style={styles.socialIcon} />
                 <Typography style={styles.socialText}>{t('auth.login.google')}</Typography>

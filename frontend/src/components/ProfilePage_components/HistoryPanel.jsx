@@ -20,18 +20,39 @@ export const HistoryPanel = ({ isHistoryPanel }) => {
   const [activeKey, setActiveKey] = useState("1");
   const [myHistory, setMyHistory] = useState([]);
   const [columnWidth, setColumnWidth] = useState(0);
-
+  
   const viewportRef = useRef(null);
 
 
   // useEffect(() => {
-  //   if (!isHistoryPanel) return;
+  // if (!isHistoryPanel) return;
 
-  //   userApi
-  //     .getMyHistory(language)
-  //     .then((res) => setMyHistory(res.data || []))
-  //     .catch(() => setMyHistory([]));
-  // }, [isHistoryPanel, language]);
+  // document.body.style.cursor = "wait";
+
+  // let isMounted = true;
+
+//   userApi
+//     .getMyHistory(language)
+//     .then((res) => {
+//       if (isMounted) setMyHistory(res.data || []);
+//     })
+//     .catch(() => {
+//       if (isMounted) setMyHistory([]);
+//     })
+//     .finally(() => {
+//       if (isMounted) {
+//         document.body.style.cursor = "default";
+//       }
+//     });
+
+//   return () => {
+//     isMounted = false;
+//     document.body.style.cursor = "default";
+//   };
+
+// }, [isHistoryPanel, language]);
+// 
+
 useEffect(() => {
   if (!isHistoryPanel) return;
   setMyHistory(mockHistory);
@@ -87,7 +108,7 @@ useEffect(() => {
       ? myHistory.filter((item) => item.IsFavorites)
       : myHistory;
 
-  /*  Расчёт ширины колонки*/
+
   useEffect(() => {
     const calculateWidth = () => {
       if (!viewportRef.current) return;
@@ -96,7 +117,7 @@ useEffect(() => {
       const gap = 20;
       const width = (totalWidth - gap * 2) / 3;
 
-      setColumnWidth(width + gap); // шаг сдвига
+      setColumnWidth(width + gap); 
     };
 
     calculateWidth();

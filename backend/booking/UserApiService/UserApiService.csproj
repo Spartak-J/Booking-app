@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Globals\Globals.csproj" />
+    <ProjectReference Include="..\Globals\Globals.csproj" />
   </ItemGroup>
 
 </Project>

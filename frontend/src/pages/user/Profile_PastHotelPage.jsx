@@ -86,13 +86,7 @@ export const Profile_PastHotelPage = () => {
     { id: "reviews", label: t("hotel.sections.reviews") },
   ];
 
-  const { id } = useParams();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-
-  const startDate = queryParams.get("checkin");
-  const endDate = queryParams.get("checkout");
-  const guests = queryParams.get("guests");
+  const { offerId, orderId } = useParams();
 
   const { offerApi } = useContext(ApiContext);
 
@@ -113,16 +107,12 @@ export const Profile_PastHotelPage = () => {
 
 
   useEffect(() => {
-    if (!offerApi) return;
-    if (!id) return;
+    if (!offerId) return;
     offerApi
-      .searchId({
-        id,
-        cityId: id,
-        startDate,
-        endDate,
-        guests,
-        userDiscountPercent: 5,
+      .searchIdByOrderId({
+        offerId,
+        orderId,
+        lang: "uk",
       })
       .then((res) => {
         const data = res.data[0];
@@ -137,7 +127,7 @@ export const Profile_PastHotelPage = () => {
         console.log("Loaded param rentObj:", res.data[0].rentObj[0].paramValues);
       })
       .catch((err) => console.error("Error loading offer:", err));
-  }, [id, offerApi, startDate, endDate, guests]);
+  }, [offerId, orderId]);
 
 
   const lat = 48.8566;
@@ -149,7 +139,7 @@ export const Profile_PastHotelPage = () => {
       <main className={styles.hotel_page__content}>
         <div className="flex-left-column  btn-w-full gap-20">
           <div className="flex-left btn-w-full">
-            <Text text={hotelData.title} type="m_700_s_40" />
+            <Text text={offer.title} type="m_700_s_40" />
           </div>
           <div className="flex-between btn-w-full">
             <div className="flex-left btn-w-fit-content gap-5">
@@ -158,29 +148,40 @@ export const Profile_PastHotelPage = () => {
             </div>
             <div className="flex-left btn-w-fit-content gap-20">
               <ImageSvg name="calendar_middle" sizeX={36} sizeY={36} />
-              <Text text={hotelData.data} type="m_500_s_36" />
+              <Text
+                text={offer.startDate?.split("T")[0]}
+                type="m_500_s_36"
+              />
+              <Text
+                text={"-"}
+                type="m_500_s_36"
+              />
+              <Text
+                text={offer.endDate?.split("T")[0]}
+                type="m_500_s_36"
+              />
             </div>
           </div>
-      
 
 
-        <div className="flex-center btn-w-full">
-          <HotelGallery images={images} />
-        </div>
+
+          <div className="flex-center btn-w-full">
+            <HotelGallery images={images} />
           </div>
+        </div>
         <div className="flex-right btn-w-full">
           <ActionButton__Primary
             className={`flex-between  btn-h-101 btn-br-r-20 ${styles.btn_price}`}
             text={t("Prrofile.PastHotel.price")}
-            text_2={`UAH ${hotelData.price}`}
+            text_2={`UAH ${offer.totalPrice}`}
             type="m_700_s_48"
             type_2="m_700_s_48"
           />
         </div>
-        <HotelDescription text={hotelData?.description || hotelData.hotelDescriptionText} />
+        <HotelDescription text={offer?.description || hotelData.hotelDescriptionText} />
 
         <div className="flex-left btn-w-full" >
-          <HotelParamsList params={dummyParams} />
+          <HotelParamsList params={paramValues} />
         </div>
         <div id="prices" className="flex-center btn-w-full gap-20 btn-h-656">
           <div className={styles.info_card}>
@@ -190,18 +191,19 @@ export const Profile_PastHotelPage = () => {
           <div className={`${styles.card_map} flex-left btn-w-full btn-h-full `} >
             {lat && lng ? (
 
-              <HotelMap lat={lat} lng={lng} minHeight="280" />) : (
+              <HotelMap lat={hotelData.latitude} lng={hotelData.longitude} minHeight="280" />) : (
               <div className={styles.mapPlaceholder}>Координаты отсутствуют</div>
             )}
           </div>
         </div>
 
 
-        <HotelReviews 
-        reviews={hotelData.reviews}
-         comments={hotelData.comments}
-         showBtn = {true} 
-         />
+        <HotelReviews
+          showBtn={true}
+          orderId={orderId}
+          offerId={offerId}
+
+        />
 
       </main>
       <Footer />

@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import AdminUsersScreenView, { type AdminUserCardItem } from '@/components/Admin/AdminUsersScreenView';
-import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from '@/i18n';
 import { AppLayout } from '@/layout/AppLayout';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
@@ -12,7 +11,8 @@ import { usersAdminService } from '@/services/admin';
 import type { User } from '@/types';
 
 const PAGE_SIZE = 8;
-type UsersSortMode = 'city' | 'rating';
+type UsersSortOrder = 'asc' | 'desc';
+type UsersFilterMode = 'all' | 'blocked' | 'active';
 
 const normalizePhone = (value?: string) => (value ?? '').replace(/[^\d+]/g, '').toLowerCase();
 
@@ -32,6 +32,17 @@ const matchesUserQuery = (user: User, query: string) => {
   );
 };
 
+const uniqueUsers = (users: User[]) => {
+  const map = new Map<string, User>();
+  users.forEach((user) => {
+    const key = `${(user.email ?? '').toLowerCase()}|${normalizePhone(user.phone)}|${(user.name ?? '').toLowerCase()}`;
+    if (!map.has(key)) {
+      map.set(key, user);
+    }
+  });
+  return Array.from(map.values());
+};
+
 const mapToCardItem = (user: User): AdminUserCardItem => ({
   id: user.id,
   name: user.name,
@@ -45,11 +56,11 @@ const mapToCardItem = (user: User): AdminUserCardItem => ({
 const AdminUsersScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
-  const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [users, setUsers] = useState<User[]>([]);
-  const [sortMode, setSortMode] = useState<UsersSortMode>('city');
+  const [sortOrder, setSortOrder] = useState<UsersSortOrder>('asc');
+  const [filterMode, setFilterMode] = useState<UsersFilterMode>('all');
   const [searchOptionsVisible, setSearchOptionsVisible] = useState(false);
 
   useEffect(() => {
@@ -57,7 +68,7 @@ const AdminUsersScreen: React.FC = () => {
     const loadUsers = async () => {
       const items = await usersAdminService.getUsers();
       if (isMounted) {
-        setUsers(items.filter((item) => item.role !== 'admin'));
+        setUsers(uniqueUsers(items.filter((item) => item.role !== 'admin')));
       }
     };
     loadUsers();
@@ -68,15 +79,19 @@ const AdminUsersScreen: React.FC = () => {
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    const list = users.filter((item) => matchesUserQuery(item, normalizedQuery));
+    let list = users.filter((item) => matchesUserQuery(item, normalizedQuery));
+    if (filterMode === 'blocked') {
+      list = list.filter((item) => Boolean(item.isBlocked));
+    } else if (filterMode === 'active') {
+      list = list.filter((item) => !item.isBlocked);
+    }
 
     return [...list].sort((lhs, rhs) => {
-      if (sortMode === 'city') {
-        return (lhs.city ?? '').localeCompare(rhs.city ?? '', 'uk');
-      }
-      return (rhs.rating ?? 0) - (lhs.rating ?? 0);
+      const left = lhs.name.toLowerCase();
+      const right = rhs.name.toLowerCase();
+      return sortOrder === 'asc' ? left.localeCompare(right, 'uk') : right.localeCompare(left, 'uk');
     });
-  }, [query, sortMode, users]);
+  }, [filterMode, query, sortOrder, users]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)), [filtered.length]);
   const currentPage = Math.min(page, totalPages);
@@ -97,29 +112,41 @@ const AdminUsersScreen: React.FC = () => {
   );
 
   const handleBlock = useCallback(async (userId: string) => {
-    const updated = await usersAdminService.toggleUserBlocked(userId);
-    if (!updated) return;
     setUsers((prev) =>
-      prev.map((item) => (item.id === userId ? { ...item, isBlocked: Boolean(updated.isBlocked) } : item)),
+      prev.map((item) => (item.id === userId ? { ...item, isBlocked: !item.isBlocked } : item)),
     );
+    try {
+      const updated = await usersAdminService.toggleUserBlocked(userId);
+      if (!updated) return;
+      setUsers((prev) =>
+        prev.map((item) => (item.id === userId ? { ...item, isBlocked: Boolean(updated.isBlocked) } : item)),
+      );
+    } catch {
+      // keep optimistic state for admin panel UX
+    }
   }, []);
 
   return (
     <AppLayout variant="stack" header={false} edges={['top', 'left', 'right']}>
       <AdminUsersScreenView
         title={t('admin.users.title')}
-        avatarInitial={(user?.name ?? 'A').charAt(0).toUpperCase()}
         query={query}
         users={pageItems}
         page={currentPage}
         totalPages={totalPages}
         onQueryChange={setQuery}
-        sortMode={sortMode}
+        sortOrder={sortOrder}
+        filterMode={filterMode}
         searchOptionsVisible={searchOptionsVisible}
         onBack={() => navigation.goBack()}
+        onMenu={() => navigation.navigate(Routes.AdminMenu)}
         onToggleSearchOptions={() => setSearchOptionsVisible((prev) => !prev)}
-        onSetSortMode={(nextMode) => {
-          setSortMode(nextMode);
+        onSetSortOrder={(nextOrder) => {
+          setSortOrder(nextOrder);
+          setPage(1);
+        }}
+        onSetFilterMode={(nextFilter) => {
+          setFilterMode(nextFilter);
           setPage(1);
         }}
         onSetPage={(nextPage) => setPage(Math.max(1, Math.min(totalPages, nextPage)))}
