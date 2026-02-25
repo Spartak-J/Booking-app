@@ -6,7 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["booking/booking.sln", "booking/"]
-COPY ["Globals/Globals.csproj", "Globals/"]
+COPY ["booking/Globals/Globals.csproj", "booking/Globals/"]
 COPY ["booking/OrderApiService/OrderApiService.csproj", "booking/OrderApiService/"]
 RUN dotnet restore "booking/OrderApiService/OrderApiService.csproj"
 COPY . .
