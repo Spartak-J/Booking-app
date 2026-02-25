@@ -305,6 +305,9 @@ const en = {
   'admin.search.placeholder': 'Enter email or ID',
   'admin.payment.failed': 'Failed',
   'admin.payment.date': 'Date',
+  'admin.systemStatus.title': 'System status',
+  'admin.systemStatus.checkedAt': 'Last check',
+  'admin.systemStatus.latency': 'latency {{ms}}ms',
 
   'profile.title': 'Profile',
   'profile.greeting': 'Welcome',

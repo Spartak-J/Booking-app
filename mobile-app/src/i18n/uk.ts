@@ -310,6 +310,9 @@ const uk = {
   'admin.search.placeholder': 'Введіть email або ID',
   'admin.payment.failed': 'Помилка',
   'admin.payment.date': 'Дата',
+  'admin.systemStatus.title': 'Стан системи',
+  'admin.systemStatus.checkedAt': 'Остання перевірка',
+  'admin.systemStatus.latency': 'затримка {{ms}}мс',
 
   'profile.title': 'Профіль',
   'profile.greeting': 'Вітаємо',

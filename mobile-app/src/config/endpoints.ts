@@ -65,4 +65,7 @@ export const ENDPOINTS = {
   currency: {
     rates: '/Bff/currency/rates',
   },
+  admin: {
+    health: '/Bff/admin/health',
+  },
 };

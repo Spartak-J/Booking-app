@@ -6,6 +6,8 @@ import KeysBackground from '@/components/layout/KeysBackground';
 import { spacing, useTheme } from '@/theme';
 import { HeaderBar, ListItem, ScreenContainer } from '@/ui';
 import { s } from '@/utils/scale';
+import AdminSystemStatusCard from '@/components/Admin/AdminSystemStatusCard';
+import type { SystemStatusResponse } from '@/services/admin';
 
 export type AdminMenuItem = {
   id: string;
@@ -20,6 +22,9 @@ type Props = {
   items: AdminMenuItem[];
   onBack: () => void;
   onMenu: () => void;
+  status?: SystemStatusResponse | null;
+  statusTitle?: string;
+  checkedAtLabel?: string;
 };
 
 export const AdminMenuScreenView: React.FC<Props> = ({
@@ -27,6 +32,9 @@ export const AdminMenuScreenView: React.FC<Props> = ({
   items,
   onBack,
   onMenu,
+  status,
+  statusTitle,
+  checkedAtLabel,
 }) => {
   const { tokens } = useTheme();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -46,6 +54,14 @@ export const AdminMenuScreenView: React.FC<Props> = ({
         />
 
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {status ? (
+            <AdminSystemStatusCard
+              title={statusTitle ?? ''}
+              checkedAtLabel={checkedAtLabel ?? ''}
+              checkedAtValue={status.checkedAt}
+              items={status.items}
+            />
+          ) : null}
           <View style={styles.list}>
             {items.map((item) => (
               <ListItem

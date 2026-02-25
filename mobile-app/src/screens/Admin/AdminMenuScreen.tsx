@@ -1,12 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import AdminMenuScreenView, { type AdminMenuItem } from '@/components/Admin/AdminMenuScreenView';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/RootNavigator';
 import { Routes } from '@/navigation/routes';
+import { systemStatusService, type SystemStatusResponse } from '@/services/admin';
 
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
@@ -14,8 +15,23 @@ const AdminMenuScreen: React.FC = () => {
   const navigation = useNavigation<Navigation>();
   const { t } = useTranslation();
   const { logout } = useAuth();
+  const [status, setStatus] = useState<SystemStatusResponse | null>(null);
 
   const greeting = `${t('profile.greeting')} ${t('profile.role.admin').toLowerCase()}`;
+
+  useEffect(() => {
+    let mounted = true;
+    const loadStatus = async () => {
+      const response = await systemStatusService.getStatus();
+      if (mounted) setStatus(response);
+    };
+    void loadStatus();
+    const interval = setInterval(loadStatus, 30000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   const items = useMemo<AdminMenuItem[]>(
     () => [
@@ -73,6 +89,9 @@ const AdminMenuScreen: React.FC = () => {
       items={items}
       onBack={() => navigation.goBack()}
       onMenu={() => navigation.navigate(Routes.AdminMenu)}
+      status={status}
+      statusTitle={t('admin.systemStatus.title')}
+      checkedAtLabel={t('admin.systemStatus.checkedAt')}
     />
   );
 };
