@@ -192,6 +192,8 @@ namespace UserApiService.Services
                 {
                     id = c.id,
                     Username = c.Username,
+                    Lastname = c.Lastname,
+                    BirthDate = c.BirthDate,
                     Email = c.Email,
                     PhoneNumber = c.PhoneNumber,
                     RoleName = "Client",
@@ -234,15 +236,13 @@ namespace UserApiService.Services
                 .Where(o => o.id == userId)
                 .Select(o => new OwnerResponse
                 {
-                   
-                    id = o.id,
                     Username = o.Username,
+                    Lastname = o.Lastname,
+                    BirthDate = o.BirthDate,
                     Email = o.Email,
                     PhoneNumber = o.PhoneNumber,
-                    RoleName = "Owner",
-
-                 
                     CountryId = o.CountryId,
+                    RoleName = "Owner",
                     Discount = o.Discount,
 
                     // ===== OwnerOfferLinks =====

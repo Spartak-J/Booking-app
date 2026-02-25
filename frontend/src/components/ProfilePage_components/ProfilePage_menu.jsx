@@ -72,7 +72,7 @@ export const ProfilePageMenu = ({ user }) => {
       case "travels": return <MyTravelsPanel isActivePanel={true} />;
       case "payment": return <PaymentInfoPanel />;
       case "help": return <HelpPanel />;
-      case "housing": return  <HousingPanel pendingOfferIds={hasPendingByOfferId} />
+      case "housing": return <HousingPanel pendingOfferIds={hasPendingByOfferId} />
       case "privacy": return <PrivacyPanel />;
       case "history": return <HistoryPanel isHistoryPanel={true} />;
       case "message": return <MessagePanel />;
@@ -108,10 +108,19 @@ export const ProfilePageMenu = ({ user }) => {
   if (!user) {
     return null;
   }
-
+  const firstLetter = user?.username?.charAt(0).toUpperCase() || "";
   return (
     <div className={`${styles.profilePageMenu} ${classFooter_bg}`}>
-      <div className={styles.logo}><Logo_Oselya_128 /></div>
+      {/* <div className={styles.logo}><Logo_Oselya_128 /></div> */}
+      <div className={styles.logo}>
+        <div
+          className={styles.card__title_icon}
+        >
+          <Text text={firstLetter} type="m_600_s_24" />
+        </div>
+         <Text text={user?.username} type="m_600_s_24" />
+      </div>
+     
       <div className={styles.profilePageMenu__title}>
         <Text text={t("Prrofile.title")} type="m_600_s_40" />
       </div>

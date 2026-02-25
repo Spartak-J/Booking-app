@@ -20,9 +20,38 @@ export const HistoryPanel = ({ isHistoryPanel }) => {
   const [activeKey, setActiveKey] = useState("1");
   const [myHistory, setMyHistory] = useState([]);
   const [columnWidth, setColumnWidth] = useState(0);
-  
-  const viewportRef = useRef(null);
 
+  const viewportRef = useRef(null);
+  const [columns, setColumns] = useState(3);
+
+
+  useEffect(() => {
+    const calculateLayout = () => {
+      if (!viewportRef.current) return;
+
+      const screenWidth = window.innerWidth;
+      const totalWidth = viewportRef.current.offsetWidth;
+      const gap = 20;
+
+      let cols;
+      if (screenWidth < 1550) {
+        cols = 1;
+      } else if (screenWidth < 1830) {
+        cols = 2;
+      } else {
+        cols = 3;
+      }
+      setColumns(cols);
+
+      const width = (totalWidth - gap * (cols - 1)) / cols;
+      setColumnWidth(width + gap);
+    };
+
+    calculateLayout();
+    window.addEventListener("resize", calculateLayout);
+
+    return () => window.removeEventListener("resize", calculateLayout);
+  }, []);
 
   // useEffect(() => {
   // if (!isHistoryPanel) return;
@@ -31,77 +60,77 @@ export const HistoryPanel = ({ isHistoryPanel }) => {
 
   // let isMounted = true;
 
-//   userApi
-//     .getMyHistory(language)
-//     .then((res) => {
-//       if (isMounted) setMyHistory(res.data || []);
-//     })
-//     .catch(() => {
-//       if (isMounted) setMyHistory([]);
-//     })
-//     .finally(() => {
-//       if (isMounted) {
-//         document.body.style.cursor = "default";
-//       }
-//     });
+  //   userApi
+  //     .getMyHistory(language)
+  //     .then((res) => {
+  //       if (isMounted) setMyHistory(res.data || []);
+  //     })
+  //     .catch(() => {
+  //       if (isMounted) setMyHistory([]);
+  //     })
+  //     .finally(() => {
+  //       if (isMounted) {
+  //         document.body.style.cursor = "default";
+  //       }
+  //     });
 
-//   return () => {
-//     isMounted = false;
-//     document.body.style.cursor = "default";
-//   };
+  //   return () => {
+  //     isMounted = false;
+  //     document.body.style.cursor = "default";
+  //   };
 
-// }, [isHistoryPanel, language]);
-// 
+  // }, [isHistoryPanel, language]);
+  // 
 
-useEffect(() => {
-  if (!isHistoryPanel) return;
-  setMyHistory(mockHistory);
-}, [isHistoryPanel]);
+  useEffect(() => {
+    if (!isHistoryPanel) return;
+    setMyHistory(mockHistory);
+  }, [isHistoryPanel]);
 
- const mockHistory = [
-  {
-    offerId: 1,
-    title: "Trip to Paris",
-    mainImageUrl: "https://picsum.photos/400/300?random=1",
-    IsFavorites: true,
-  },
-  {
-    offerId: 2,
-    title: "Weekend in Rome",
-    mainImageUrl: "https://picsum.photos/400/300?random=2",
-    IsFavorites: false,
-  },
-  {
-    offerId: 3,
-    title: "Berlin Adventure",
-    mainImageUrl: "https://picsum.photos/400/300?random=3",
-    IsFavorites: true,
-  },
-  {
-    offerId: 4,
-    title: "Barcelona Escape",
-    mainImageUrl: "https://picsum.photos/400/300?random=4",
-    IsFavorites: false,
-  },
-  {
-    offerId: 5,
-    title: "Amsterdam Lights",
-    mainImageUrl: "https://picsum.photos/400/300?random=5",
-    IsFavorites: false,
-  },
-  {
-    offerId: 6,
-    title: "Prague Old Town",
-    mainImageUrl: "https://picsum.photos/400/300?random=6",
-    IsFavorites: true,
-  },
-  {
-    offerId: 7,
-    title: "Vienna City Break",
-    mainImageUrl: "https://picsum.photos/400/300?random=7",
-    IsFavorites: false,
-  },
-];
+  const mockHistory = [
+    {
+      offerId: 1,
+      title: "Trip to Paris",
+      mainImageUrl: "https://picsum.photos/400/300?random=1",
+      IsFavorites: true,
+    },
+    {
+      offerId: 2,
+      title: "Weekend in Rome",
+      mainImageUrl: "https://picsum.photos/400/300?random=2",
+      IsFavorites: false,
+    },
+    {
+      offerId: 3,
+      title: "Berlin Adventure",
+      mainImageUrl: "https://picsum.photos/400/300?random=3",
+      IsFavorites: true,
+    },
+    {
+      offerId: 4,
+      title: "Barcelona Escape",
+      mainImageUrl: "https://picsum.photos/400/300?random=4",
+      IsFavorites: false,
+    },
+    {
+      offerId: 5,
+      title: "Amsterdam Lights",
+      mainImageUrl: "https://picsum.photos/400/300?random=5",
+      IsFavorites: false,
+    },
+    {
+      offerId: 6,
+      title: "Prague Old Town",
+      mainImageUrl: "https://picsum.photos/400/300?random=6",
+      IsFavorites: true,
+    },
+    {
+      offerId: 7,
+      title: "Vienna City Break",
+      mainImageUrl: "https://picsum.photos/400/300?random=7",
+      IsFavorites: false,
+    },
+  ];
 
   const displayedHistory =
     activeKey === "2"
@@ -109,29 +138,29 @@ useEffect(() => {
       : myHistory;
 
 
-  useEffect(() => {
-    const calculateWidth = () => {
-      if (!viewportRef.current) return;
+  // useEffect(() => {
+  //   const calculateWidth = () => {
+  //     if (!viewportRef.current) return;
 
-      const totalWidth = viewportRef.current.offsetWidth;
-      const gap = 20;
-      const width = (totalWidth - gap * 2) / 3;
+  //     const totalWidth = viewportRef.current.offsetWidth;
+  //     const gap = 20;
+  //     const width = (totalWidth - gap * 2) / 3;
 
-      setColumnWidth(width + gap); 
-    };
+  //     setColumnWidth(width + gap);
+  //   };
 
-    calculateWidth();
-    window.addEventListener("resize", calculateWidth);
+  //   calculateWidth();
+  //   window.addEventListener("resize", calculateWidth);
 
-    return () => window.removeEventListener("resize", calculateWidth);
-  }, []);
+  //   return () => window.removeEventListener("resize", calculateWidth);
+  // }, []);
 
 
   const totalColumns = Math.ceil(displayedHistory.length / 2);
-  const visibleColumns = 3;
+  const visibleColumns = columns;
   const maxIndex = Math.max(0, totalColumns - visibleColumns);
 
- 
+
   useEffect(() => {
     setIndex(0);
   }, [displayedHistory.length]);
@@ -161,7 +190,8 @@ useEffect(() => {
           <div
             className={styles.container_card}
             style={{
-              transform: `translateX(-${index * columnWidth}px)`
+              transform: `translateX(-${index * columnWidth}px)`,
+              "--column-width": `${columnWidth - 20}px`
             }}
           >
             {displayedHistory.length === 0 ? (

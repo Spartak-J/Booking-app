@@ -50,18 +50,16 @@ namespace ReviewApiService.Controllers
         //  получение рейтинга для списка популярных обьявлений
         //===========================================================================================
 
-        [HttpGet("search/offers/rating")]
+        [HttpPost("search/offers/rating")]
         public async Task<ActionResult<List<RatingResponse>>> GetRatingPopularOffers(
-            [FromQuery] List<int> idList)
-        {
-
-
+      [FromBody] List<int> idList)
+        { 
             var result = new List<RatingResponse>();
             foreach (var offerId in idList)
             {
                 var exists = await _reviewService.ExistsEntityAsync(offerId);
                 if (!exists)
-                    return NotFound(new { message = $"offerId {offerId} not found" });
+                   continue;
 
                 var averageRating = await _reviewService.GetRatingByOfferId(offerId);
                 var ratingResponse = new RatingResponse

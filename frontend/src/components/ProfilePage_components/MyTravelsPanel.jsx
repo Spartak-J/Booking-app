@@ -18,7 +18,7 @@ export const MyTravelsPanel = ({ isActivePanel }) => {
   const { language } = useLanguage();
   const [activeKey, setActiveKey] = useState("1");
   const [myTrip, setMyTrip] = useState([]);
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fetchTrips = () => {
     setLoading(true);
@@ -78,66 +78,66 @@ const [loading, setLoading] = useState(false);
           </div>
 
 
-
-          {activeKey === "1" &&
-            (activeTrips.length === 0 ?
-              <MyTravelsPanel_card_empty
-                text={t("Prrofile.no_active_travel")}
-              /> :
-              activeTrips.map(ht => (
-                <MyTravelsPanel_active_card
-                  key={ht.offerId}
-                  title={ht.title}
-                  imgSrc={ht.mainImageUrl}
-                  date={`${formatDate(ht.startDate)} - ${formatDate(ht.endDate)}`}
-                  price={ht.totalPrice}
-                  onClick={() => console.log(ht.title)}
-                />
-              ))
-            )
-          }
-
-          {activeKey === "2" &&
-            (pastTrips.length === 0 ?
-              <MyTravelsPanel_card_empty
-                text={t("Prrofile.no_past_travel")}
-              /> :
-              <div className={styles.container_card}>
-                {pastTrips.map(ht => (
-                  <MyTravelsPanel_card
+          <div className={styles.container_card}>
+            {activeKey === "1" &&
+              (activeTrips.length === 0 ?
+                <MyTravelsPanel_card_empty
+                  text={t("Prrofile.no_active_travel")}
+                /> :
+                activeTrips.map(ht => (
+                  <MyTravelsPanel_active_card
                     key={ht.offerId}
                     title={ht.title}
                     imgSrc={ht.mainImageUrl}
-                    offerId={ht.offerId}
-                    orderId={ht.orderId}
+                    date={`${formatDate(ht.startDate)} - ${formatDate(ht.endDate)}`}
+                    price={ht.totalPrice}
                     onClick={() => console.log(ht.title)}
                   />
-                ))}
-              </div>
-            )
-          }
+                ))
+              )
+            }
 
-          {activeKey === "3" &&
-            (cancelledTrips.length === 0 ?
-              <MyTravelsPanel_card_empty
-                text={t("Prrofile.no_cancelled_travel")}
-              /> :
-              <div className={styles.container_card}>
-                {cancelledTrips.map(ht => (
-                  <MyTravelsPanel_card
-                    key={ht.offerId}
-                    title={ht.title}
-                    imgSrc={ht.mainImageUrl}
-                    tripId={ht.offerId}
-                    onClick={() => console.log(ht.title)}
-                  />
-                ))}
-              </div>
-            )
-          }
+            {activeKey === "2" &&
+              (pastTrips.length === 0 ?
+                <MyTravelsPanel_card_empty
+                  text={t("Prrofile.no_past_travel")}
+                /> :
+                <div className={styles.container_card}>
+                  {pastTrips.map(ht => (
+                    <MyTravelsPanel_card
+                      key={ht.offerId}
+                      title={ht.title}
+                      imgSrc={ht.mainImageUrl}
+                      offerId={ht.offerId}
+                      orderId={ht.orderId}
+                      onClick={() => console.log(ht.title)}
+                    />
+                  ))}
+                </div>
+              )
+            }
+
+            {activeKey === "3" &&
+              (cancelledTrips.length === 0 ?
+                <MyTravelsPanel_card_empty
+                  text={t("Prrofile.no_cancelled_travel")}
+                /> :
+                <div className={styles.container_card}>
+                  {cancelledTrips.map(ht => (
+                    <MyTravelsPanel_card
+                      key={ht.offerId}
+                      title={ht.title}
+                      imgSrc={ht.mainImageUrl}
+                      tripId={ht.offerId}
+                      onClick={() => console.log(ht.title)}
+                    />
+                  ))}
+                </div>
+              )
+            }
 
 
-
+          </div>
         </div>
       )}
     </div >

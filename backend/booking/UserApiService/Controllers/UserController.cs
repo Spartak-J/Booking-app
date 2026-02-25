@@ -259,10 +259,12 @@ namespace UserApiService.Controllers
 
            
             user.Username = request.Username ?? user.Username;
+            user.Lastname = request.Lastname ?? user.Lastname;
             user.Email = request.Email ?? user.Email;
             user.PhoneNumber = request.PhoneNumber ?? user.PhoneNumber;
             user.Discount = request.Discount;
             user.CountryId = request.CountryId;
+            user.BirthDate = request.BirthDate ?? user.BirthDate;
 
             await _userService.UpdateEntityAsync(user);
 

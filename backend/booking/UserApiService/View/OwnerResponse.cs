@@ -7,6 +7,7 @@ namespace UserApiService.View
 
         public int id { get; set; }
         public string Username { get; set; } = string.Empty;
+        public string? Lastname { get; set; }
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public DateTime? BirthDate { get; set; }

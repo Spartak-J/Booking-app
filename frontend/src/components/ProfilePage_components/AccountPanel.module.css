@@ -1,10 +1,10 @@
 .accountPanel {
   /* min-width: 1020px; */
   width: 100%;
-  height: 771px;
+  height: 820px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: start;
   align-items: center;
   border-radius: 20px;
   background-color: var(--color-bg);
@@ -16,11 +16,30 @@
   padding: 26px 154px 12px 101px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  /* gap: 32px; */
+  gap: 2px;
+}
+@media (max-width: 1900px) {
+  .accountPanel__container {
+    padding: 26px 40px 12px 40px; 
+  }
 }
 
 .accountPanel_btn {
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+@media (max-width: 1500px) {
+  .accountPanel_btn {
+    padding: 6px 40px 2px 0; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: start;
+  }
+  
 }
 
 .accountPanel__form {
@@ -33,7 +52,6 @@
 }
 
 .input {
-  min-width: 695px;
   width: 100%;
   background-color: transparent;
   border: 3px solid var(--color-input-border);
@@ -55,6 +73,8 @@
 .actionButton__wrapper {
   width: 100%;
   display: inline-flex;
+  
+  margin-top: 25px;
 }
 
 /* placeholder */

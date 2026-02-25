@@ -204,7 +204,6 @@ export const HomePage = () => {
     if (savedStart) setStartDate(savedStart);
     if (savedEnd) setEndDate(savedEnd);
     // if (savedHotels) setHotels(JSON.parse(savedHotels));
-    if (savedHotels) setHotels(JSON.parse(savedHotels));
 
   }, []);
 

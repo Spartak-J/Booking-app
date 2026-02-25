@@ -2498,7 +2498,11 @@ namespace WebApiGetway.Controllers
             //}
 
             //получаем рейтинг
-            var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Post, idList);
+            var ratingObjResult = await _gateway.ForwardRequestAsync<object>(
+                "ReviewApiService",
+                $"/api/review/search/offers/rating",
+                HttpMethod.Post,
+                idList);
             if (ratingObjResult is not OkObjectResult okRating)
                 return Ok(statisticOfferDictList);
             var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
