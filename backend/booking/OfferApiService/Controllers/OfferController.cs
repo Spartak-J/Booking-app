@@ -34,7 +34,8 @@ namespace OfferApiService.Controllers
             : base(offerService, mqService)
         {
             _offerService = offerService;
-            _baseUrl = configuration["AppSettings:BaseUrl"];
+            //_baseUrl = configuration["AppSettings:BaseUrl"];
+            _baseUrl = $"{configuration["HostUrl"] ?? "http://localhost"}:5003";
             _paramValueService = paramValueService;
             _rentObjService = rentObjService;
             _geocodingService = geocodingService;

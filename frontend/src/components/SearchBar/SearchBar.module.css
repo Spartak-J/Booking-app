@@ -14,15 +14,31 @@
   font-weight: 400;
 }
 
+
 .searchBar_Main_txt,
 .input_city_Main_txt,
 .input_guest_Main_txt,
 .input_date_title_Main_txt {
- font-size: 32px ;
-line-height: 39px ;
+  font-size: 32px;
+  line-height: 39px;
   font-family: 'Montserrat Alternates';
   font-style: normal;
   font-weight: 400;
+}
+
+
+@media (max-width: 1900px) {
+
+  .searchBar_Main_txt,
+  .input_city_Main_txt,
+  .input_guest_Main_txt,
+  .input_date_title_Main_txt {
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 29px;
+    font-family: 'Montserrat Alternates';
+    font-style: normal;
+  }
 }
 
 
@@ -64,10 +80,17 @@ line-height: 39px ;
   transform: translateX(-50%);
   text-align: center;
   white-space: nowrap;
-
-
 }
 
+
+@media (max-width: 1670px) {
+  .input_date_title {
+    display: block;
+    white-space: normal;      
+    word-break: break-word;    
+    text-align: center;
+}
+}
 
 .input_wrapper {
   width: 100% !important;
@@ -90,7 +113,7 @@ line-height: 39px ;
 .input_city::placeholder {
   opacity: 1;
   line-height: normal;
-    color: var(--color-btn-text-dark) !important;
+  color: var(--color-btn-text-dark) !important;
 }
 
 .input_icon {

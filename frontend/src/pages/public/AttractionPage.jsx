@@ -76,8 +76,6 @@ export const AttractionPage = () => {
                         className={`${styles.searchBar__wrapper} btn-br-r-10 btn-h-35  flex-center`}
                       >
                         <div className={`form-control border-0`}>
-
-
                           <CitySelector
                             value={location}
                             onChange={setLocationInfo}

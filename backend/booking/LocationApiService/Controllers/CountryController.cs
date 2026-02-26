@@ -17,7 +17,8 @@ namespace LocationApiService.Controllers
            IConfiguration configuration)
             : base(countryService, mqService)
         {
-            _baseUrl = configuration["AppSettings:BaseUrl"];
+            //_baseUrl = configuration["AppSettings:BaseUrl"];
+            _baseUrl = $"{configuration["HostUrl"] ?? "http://localhost"}:5001";
             _countryService = countryService;
         }
 

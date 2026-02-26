@@ -31,7 +31,8 @@
     }
   },
   "header": {
-    "subtitle_header_main": "Знайди свій затишок разом з нами"
+    "subtitle_header_main": "Знайди свій затишок разом з нами",
+    "popular_cities": "Популярні міста"
   },
   "DateRangeInput": {
     "date": "Дата"
@@ -295,12 +296,13 @@
     },
     "AccountPanel": {
       "name": "Ім’я",
+      "lastname": "Прізвище",
       "birthday": "Дата народження",
       "email": "Електронна пошта",
       "phone": "Номер телефону",
       "country": "Країна/Територія",
       "select_country": "Виберіть країну/територію",
-      "btn_continue": "Продовжити",
+      "btn_continue": "Зберегти",
       "myself_info": "Особисті данні",
       "Security_settings": "Налаштування безпеки"
     },

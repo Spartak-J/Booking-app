@@ -18,7 +18,9 @@ namespace LocationApiService.Controllers
             : base(cityService, mqService)
         {
             _cityService = cityService;
-            _baseUrl = configuration["AppSettings:BaseUrl"];
+            //_baseUrl = configuration["AppSettings:BaseUrl"];
+
+            _baseUrl = $"{configuration["HostUrl"] ?? "http://localhost"}:5001";
         }
 
         //===========================================================================================

@@ -63,7 +63,12 @@ public class UserController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetMe(string lang)
 {
-        var userResult = await _gateway.ForwardRequestAsync<object>("UserApiService", $"/api/user/me", HttpMethod.Get, null);
+        var userResult = await _gateway.ForwardRequestAsync<object>(
+            "UserApiService",
+            $"/api/user/me",
+            HttpMethod.Get,
+            null
+            );
         if (userResult is not OkObjectResult okResult)
         {
             return userResult;

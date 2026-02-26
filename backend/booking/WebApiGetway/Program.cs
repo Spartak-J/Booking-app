@@ -28,6 +28,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+var imgUrl = builder.Configuration["ImgBaseUrl"];
+
 builder.Services.AddHttpClient("UserApiService", client =>
 {
     var baseUrl = builder.Configuration["UserApiServiceUrl"] ?? "http://userapiservice";
@@ -168,6 +171,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 
@@ -179,3 +183,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+
+public class AppSettings
+{
+    public string BaseUrl { get; set; }
+}

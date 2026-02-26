@@ -31,7 +31,8 @@
     }
   },
   "header": {
-    "subtitle_header_main": "Find your perfect stay with us"
+    "subtitle_header_main": "Find your perfect stay with us",
+    "popular_cities": "Popular cities"
   },
   "DateRangeInput": {
     "date": "Date"
@@ -295,12 +296,13 @@
     },
     "AccountPanel": {
       "name": "Name",
+      "lastname": "Last name",
       "birthday": "Date of birth",
       "email": "Email",
       "phone": "Phone number",
       "country": "Country/Territory",
       "select_country": "Select country/territory",
-      "btn_continue": "Continue",
+      "btn_continue": "Save",
       "myself_info": "Personal information",
       "Security_settings": "Security settings"
     },
@@ -452,7 +454,8 @@
       "Cancelled": "Cancelled by user",
       "Rejected": "Rejected by owner",
       "Completed": "Rental completed"
-    },
+    }
+  },
     "admin": {
       "title": "Hello, Admin",
       "menu": {
@@ -470,8 +473,7 @@
     },
     "attraction": {
       "title": "Attractions"
-    }
-  },
+    },
   "reviews_modal": {
     "leave_review": "Leave a review",
     "your_rating": "Your rating",

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useTranslation } from "react-i18next";
 
 import { Link } from 'react-router-dom';
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -10,7 +11,7 @@ import { ApiContext } from "../../contexts/ApiContext.jsx";
 
 import styles from './CityCard_carousel.module.css';
 
-const cityListMock = [
+const citiesListMock = [
   { id: 1, slug: 'kyiv', title: 'Київ', imageSrc: "/img/city/Kyiv.svg" },
   { id: 2, slug: 'odesa', title: 'Одеса', imageSrc: "/img/city/Odesa.svg" },
   { id: 3, slug: 'lviv', title: 'Львів', imageSrc: "/img/city/Lviv.svg" },
@@ -21,11 +22,14 @@ const cityListMock = [
   { id: 8, slug: 'bukovel', title: 'Буковель', imageSrc: "/img/city/Bukovel.svg" },
 ];
 
+const TEN_MINUTES = 10 * 60 * 1000; // 10 минут в мс
+
 export const CityCard_carousel = () => {
   const { locationApi } = useContext(ApiContext);
   const { darkMode } = useContext(ThemeContext);
   const viewportRef = useRef(null);
   const { language } = useLanguage();
+  const { t } = useTranslation();
 
   const CARD_WIDTH = 425;
   const GAP = 20;
@@ -33,24 +37,57 @@ export const CityCard_carousel = () => {
   const [index, setIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(3);
   const [withTransition, setWithTransition] = useState(true);
-  const [cityList, setCitiesList] = useState([]);
+  const [citiesList, setCitiesList] = useState([]);
+
+  // useEffect(() => {
+  //   const loadOffers = async () => {
+  //     try {
+  //       const res = await locationApi.getPopularCities("week", 10, language);
+  //       setCitiesList(res.data);
+  //       console.log("Ответ setCitiesList:", res.data);
+  //       console.log("Данные:", res.data);
+  //     } catch (error) {
+  //       console.warn("API недоступен, используется mock");
+  //       setCitiesList(citiesListMock);
+  //     }
+  //   };
+
+  //   loadOffers();
+  // }, [language]);
 
 
   useEffect(() => {
-    const loadOffers = async () => {
+    const loadCities = async () => {
       try {
         const res = await locationApi.getPopularCities("week", 10, language);
         setCitiesList(res.data);
-        console.log("Ответ setCitiesList:", res.data);
-        console.log("Данные:", res.data);
+        localStorage.setItem("popularCities", JSON.stringify(res.data));
+        localStorage.setItem("popularCitiesTimestamp", Date.now().toString());
+        console.log("Данные обновлены из API:", res.data);
       } catch (error) {
-        console.warn("API недоступен, используется mock");
-        setCitiesList(cityListMock);
+        console.warn("API недоступен, используем mock");
+        setCitiesList(citiesListMock);
       }
     };
 
-    loadOffers();
+    const cachedData = localStorage.getItem("popularCities");
+    const timestamp = Number(localStorage.getItem("popularCitiesTimestamp") || 0);
+
+    if (cachedData && Date.now() - timestamp < TEN_MINUTES) {
+      setCitiesList(JSON.parse(cachedData));
+      console.log("Данные загружены из кэша:", JSON.parse(cachedData));
+    } else {
+      loadCities();
+    }
+
+
+    const interval = setInterval(() => {
+      loadCities();
+    }, TEN_MINUTES);
+
+    return () => clearInterval(interval);
   }, [language]);
+
 
 
   useEffect(() => {
@@ -75,14 +112,14 @@ export const CityCard_carousel = () => {
 
 
   const extendedList = [
-    ...cityList.slice(-visibleCount),
-    ...cityList,
-    ...cityList.slice(0, visibleCount),
+    ...citiesList.slice(-visibleCount),
+    ...citiesList,
+    ...citiesList.slice(0, visibleCount),
   ];
 
 
   useEffect(() => {
-    if (index >= cityList.length) {
+    if (index >= citiesList.length) {
       setTimeout(() => {
         setWithTransition(false);
         setIndex(0);
@@ -92,7 +129,7 @@ export const CityCard_carousel = () => {
     if (index < 0) {
       setTimeout(() => {
         setWithTransition(false);
-        setIndex(cityList.length - 1);
+        setIndex(citiesList.length - 1);
       }, 400);
     }
   }, [index]);
@@ -130,7 +167,10 @@ export const CityCard_carousel = () => {
           onClick={() => setIndex(prev => prev - 1)}
           className={classNameArrowLeft}
         />
-        <Text text="Популярні міста" type="title" />
+        <Text
+          text={t("header.popular_cities")}
+          type="title"
+        />
         <IconButtonArrow
           onClick={() => setIndex(prev => prev + 1)}
           className={classNameArrowRight}
@@ -157,7 +197,7 @@ export const CityCard_carousel = () => {
                   style={{ width: CARD_WIDTH, flexShrink: 0 }}
                 >
                   <CityCard__Popular
-                    imageSrc={city.imageUrl_Main} 
+                    imageSrc={city.imageUrl_Main}
                     title={city.title}
                   />
                 </Link>

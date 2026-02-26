@@ -24,7 +24,8 @@ namespace AttractionApiService.Controllers
                   GeocodingService geocodingService)
             : base(attractionService, mqService)
         {
-            _baseUrl = configuration["AppSettings:BaseUrl"];
+            //_baseUrl = configuration["AppSettings:BaseUrl"];
+            _baseUrl = $"{configuration["HostUrl"] ?? "http://localhost"}:5007";
             _geocodingService = geocodingService;
             _attractionService = attractionService;
         }

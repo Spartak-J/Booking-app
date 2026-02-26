@@ -260,7 +260,7 @@ body {
 
 .btn-state:hover:not(:disabled) {
    border: 3px solid var(--color--btn-state-border-hover);
-  background-color: var(--color--btn-state);;
+  background-color: var(--color--btn-state);
   color: var(--color--text);
 }
 
@@ -333,10 +333,20 @@ body {
   cursor: pointer;
 }
 
+.btn-icon:hover {
+  background-color: var(--color--btn-icon-hover);
+
+  border: none;
+}
+
 .btn_icon_close svg {
   width: 30px;
   height: 30px;
     color: var(--color-icon-close);
+}
+
+.svg-icon {
+  color: var(--color--svg-icon);
 }
 
 .btn_icon_close{
@@ -433,7 +443,6 @@ body {
 
 .btn_search {
   background: var(--color--btn-search);
-border: 2px solid transparent; 
   box-sizing: border-box;
   transition: background-color 0.3s ease;
   display: flex;
@@ -442,8 +451,7 @@ border: 2px solid transparent;
   gap: 0 !important;
 }
 .btn_search:hover {
- background: var(--color-search-bg);
- border: 2px solid var(--color--btn-search); 
+ background: var(--color--btn-search);
 }
 .btn_search svg {
   display: block;
