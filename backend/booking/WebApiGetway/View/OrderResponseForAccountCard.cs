@@ -6,8 +6,6 @@ namespace WebApiGetway.View
 {
     public class OrderResponseForAccountCard : IBaseResponse
     {
-        public int id { get; set; }
-
         public int OrderId { get; set; }
         public int OfferId { get; set; }
         public int ClientId { get; set; }

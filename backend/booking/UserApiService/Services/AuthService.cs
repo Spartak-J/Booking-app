@@ -134,7 +134,6 @@ namespace UserApiService.Services
             return await _context.Users.AnyAsync(u => u.Username == name);
         }
 
-
         private string NormalizePhone(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone))

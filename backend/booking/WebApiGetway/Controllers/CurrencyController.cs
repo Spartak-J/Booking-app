@@ -1,77 +1,97 @@
 using System.Globalization;
 using System.Text.Json;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
 
-namespace WebApiGetway.Service;
+namespace WebApiGetway.Controllers;
 
-public sealed class CurrencyRatesScheduler : BackgroundService
+[ApiController]
+[Route("Bff/currency")]
+public sealed class CurrencyController : ControllerBase
 {
-    private static readonly int[] RunHours = { 9, 12, 18 };
-
-    private readonly ILogger<CurrencyRatesScheduler> _logger;
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<CurrencyController> _logger;
 
-    public CurrencyRatesScheduler(
-        ILogger<CurrencyRatesScheduler> logger,
+    public CurrencyController(
         IConfiguration configuration,
         IWebHostEnvironment environment,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        ILogger<CurrencyController> logger)
     {
-        _logger = logger;
         _configuration = configuration;
         _environment = environment;
         _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    [HttpGet("rates")]
+    public async Task<IActionResult> GetRates([FromQuery] bool forceRefresh = false, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await UpdateRatesAsync(stoppingToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Currency scheduler initial update failed.");
-        }
+        bool? refreshSucceeded = null;
+        string? refreshError = null;
 
-        while (!stoppingToken.IsCancellationRequested)
+        if (forceRefresh)
         {
-            var nowUtc = DateTime.UtcNow;
-            var nextRunUtc = GetNextRunUtc(nowUtc);
-            var delay = nextRunUtc - nowUtc;
-            if (delay < TimeSpan.Zero)
-            {
-                delay = TimeSpan.FromMinutes(1);
-            }
-
-            _logger.LogInformation("Currency scheduler sleeping for {Delay}. Next run at {NextRunUtc}.", delay, nextRunUtc);
-
             try
             {
-                await Task.Delay(delay, stoppingToken);
-            }
-            catch (TaskCanceledException)
-            {
-                break;
-            }
-
-            if (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-
-            try
-            {
-                await UpdateRatesAsync(stoppingToken);
+                await UpdateRatesAsync(cancellationToken);
+                refreshSucceeded = true;
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Currency scheduler update failed.");
+                _logger.LogWarning(ex, "Manual currency rates refresh failed.");
+                refreshSucceeded = false;
+                refreshError = ex.Message;
             }
         }
+
+        var path = ResolveRatesFilePath();
+        CurrencyRatesFileDto payload;
+
+        if (!System.IO.File.Exists(path))
+        {
+            payload = BuildFallbackPayload();
+            if (forceRefresh && refreshSucceeded == true)
+            {
+                refreshSucceeded = false;
+                refreshError = "Rates file not found after refresh.";
+            }
+        }
+        else
+        {
+            var json = await System.IO.File.ReadAllTextAsync(path, cancellationToken);
+            payload = JsonSerializer.Deserialize<CurrencyRatesFileDto>(json) ?? BuildFallbackPayload();
+        }
+
+        payload.RefreshSucceeded = refreshSucceeded;
+        payload.RefreshError = refreshError;
+
+        return Ok(payload);
+    }
+
+    private string ResolveRatesFilePath()
+    {
+        var configuredPath = _configuration["CURRENCY_RATES_FILE_PATH"];
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
+            return configuredPath;
+        }
+
+        return Path.Combine(_environment.ContentRootPath, "data", "currency-rates.json");
+    }
+
+    private static CurrencyRatesFileDto BuildFallbackPayload()
+    {
+        return new CurrencyRatesFileDto
+        {
+            BaseCurrency = "UAH",
+            SupportedCurrencies = new List<string> { "UAH" },
+            Rates = new Dictionary<string, decimal> { ["UAH"] = 1m },
+            UpdatedAtUtc = DateTime.UtcNow.ToString("O"),
+            Source = "fallback",
+            Disclaimer = "Fallback rates; file not found."
+        };
     }
 
     private async Task UpdateRatesAsync(CancellationToken cancellationToken)
@@ -79,7 +99,7 @@ public sealed class CurrencyRatesScheduler : BackgroundService
         var requestUrl = BuildPrivatBankUrl();
         if (string.IsNullOrWhiteSpace(requestUrl))
         {
-            _logger.LogWarning("Currency scheduler skipped: missing PrivatBank URL.");
+            _logger.LogWarning("Currency update skipped: missing PrivatBank URL.");
             return;
         }
 
@@ -87,7 +107,7 @@ public sealed class CurrencyRatesScheduler : BackgroundService
         using var response = await client.GetAsync(requestUrl, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Currency scheduler failed. HTTP {Status} for {Url}.", response.StatusCode, requestUrl);
+            _logger.LogWarning("Currency update failed. HTTP {Status} for {Url}.", response.StatusCode, requestUrl);
             return;
         }
 
@@ -95,7 +115,7 @@ public sealed class CurrencyRatesScheduler : BackgroundService
         var parsedRates = ParsePrivatBankRates(json);
         if (parsedRates.Count == 0)
         {
-            _logger.LogWarning("Currency scheduler received empty rates.");
+            _logger.LogWarning("Currency update received empty rates.");
             return;
         }
 
@@ -112,9 +132,7 @@ public sealed class CurrencyRatesScheduler : BackgroundService
         var path = ResolveRatesFilePath();
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         var output = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
-        await File.WriteAllTextAsync(path, output, cancellationToken);
-
-        _logger.LogInformation("Currency rates updated: {Path}", path);
+        await System.IO.File.WriteAllTextAsync(path, output, cancellationToken);
     }
 
     private string? BuildPrivatBankUrl()
@@ -147,17 +165,6 @@ public sealed class CurrencyRatesScheduler : BackgroundService
         }
 
         return baseUrl + endpoint;
-    }
-
-    private string ResolveRatesFilePath()
-    {
-        var configuredPath = _configuration["CURRENCY_RATES_FILE_PATH"];
-        if (!string.IsNullOrWhiteSpace(configuredPath))
-        {
-            return configuredPath;
-        }
-
-        return Path.Combine(_environment.ContentRootPath, "data", "currency-rates.json");
     }
 
     private static Dictionary<string, decimal> ParsePrivatBankRates(string json)
@@ -207,50 +214,6 @@ public sealed class CurrencyRatesScheduler : BackgroundService
         return rates;
     }
 
-    private DateTime GetNextRunUtc(DateTime utcNow)
-    {
-        var tz = ResolveTimeZone();
-        var localNow = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz);
-        var today = localNow.Date;
-
-        foreach (var hour in RunHours)
-        {
-            var candidateLocal = today.AddHours(hour);
-            if (candidateLocal > localNow)
-            {
-                return TimeZoneInfo.ConvertTimeToUtc(candidateLocal, tz);
-            }
-        }
-
-        var nextDayLocal = today.AddDays(1).AddHours(RunHours[0]);
-        return TimeZoneInfo.ConvertTimeToUtc(nextDayLocal, tz);
-    }
-
-    private TimeZoneInfo ResolveTimeZone()
-    {
-        var tzId = _configuration["CURRENCY_SCHEDULE_TIME_ZONE"];
-        if (string.IsNullOrWhiteSpace(tzId))
-        {
-            tzId = "Europe/Kyiv";
-        }
-
-        try
-        {
-            return TimeZoneInfo.FindSystemTimeZoneById(tzId);
-        }
-        catch (TimeZoneNotFoundException)
-        {
-            try
-            {
-                return TimeZoneInfo.FindSystemTimeZoneById("Europe/Kiev");
-            }
-            catch
-            {
-                return TimeZoneInfo.Utc;
-            }
-        }
-    }
-
     private sealed class CurrencyRatesFileDto
     {
         public string? BaseCurrency { get; set; }
@@ -259,5 +222,7 @@ public sealed class CurrencyRatesScheduler : BackgroundService
         public string? UpdatedAtUtc { get; set; }
         public string? Source { get; set; }
         public string? Disclaimer { get; set; }
+        public bool? RefreshSucceeded { get; set; }
+        public string? RefreshError { get; set; }
     }
 }

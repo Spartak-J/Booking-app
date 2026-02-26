@@ -193,9 +193,9 @@ namespace UserApiService.Services
                     id = c.id,
                     Username = c.Username,
                     Lastname = c.Lastname,
-                    BirthDate = c.BirthDate,
                     Email = c.Email,
                     PhoneNumber = c.PhoneNumber,
+                    BirthDate = c.BirthDate,
                     RoleName = "Client",
                     CountryId = c.CountryId,
                     Discount = c.Discount,
@@ -238,11 +238,11 @@ namespace UserApiService.Services
                 {
                     Username = o.Username,
                     Lastname = o.Lastname,
-                    BirthDate = o.BirthDate,
                     Email = o.Email,
                     PhoneNumber = o.PhoneNumber,
-                    CountryId = o.CountryId,
+                    BirthDate = o.BirthDate,
                     RoleName = "Owner",
+                    CountryId = o.CountryId,
                     Discount = o.Discount,
 
                     // ===== OwnerOfferLinks =====

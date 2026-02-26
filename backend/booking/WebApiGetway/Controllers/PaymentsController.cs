@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -28,11 +30,17 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("create")]
-    public IActionResult Create([FromBody] CreatePaymentRequest request)
+    public async Task<IActionResult> Create([FromBody] CreatePaymentRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.BookingId) || request.Amount <= 0)
         {
             return BadRequest(new { message = "bookingId and amount are required." });
+        }
+
+        var provider = ResolveProvider(request.Provider);
+        if (provider == "paypal")
+        {
+            return await CreatePayPalPayment(request, cancellationToken);
         }
 
         var publicKey = _configuration["LIQPAY_PUBLIC_KEY"];
@@ -122,13 +130,26 @@ public class PaymentsController : ControllerBase
             return NotFound(new { message = "Payment not found." });
         }
 
-        var details = await TryFetchStatusFromLiqPayAsync(state, cancellationToken);
-        if (details != null)
+        if (string.Equals(state.Provider, "paypal", StringComparison.Ordinal))
         {
-            UpdateStateFromLiqPayDetails(state, details);
-            if (state.IsTokenization)
+            var payPalStatus = await TryFetchPayPalStatusAsync(state, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(payPalStatus))
             {
-                UpsertCardFromTokenizationState(state);
+                state.RawStatus = payPalStatus;
+                state.Status = MapPayPalStatus(payPalStatus);
+                state.UpdatedAtUtc = DateTime.UtcNow;
+            }
+        }
+        else
+        {
+            var details = await TryFetchStatusFromLiqPayAsync(state, cancellationToken);
+            if (details != null)
+            {
+                UpdateStateFromLiqPayDetails(state, details);
+                if (state.IsTokenization)
+                {
+                    UpsertCardFromTokenizationState(state);
+                }
             }
         }
 
@@ -532,6 +553,96 @@ public class PaymentsController : ControllerBase
         });
     }
 
+    private async Task<IActionResult> CreatePayPalPayment(CreatePaymentRequest request, CancellationToken cancellationToken)
+    {
+        var baseUrl = ResolvePayPalBaseUrl();
+        var clientId = _configuration["PAYPAL_CLIENT_ID"];
+        var clientSecret = ResolvePayPalSecret();
+        var returnUrl = FirstNonEmpty(_configuration["PAYPAL_RETURN_URL"], ResolveResultUrl(request.ClientType));
+        var cancelUrl = FirstNonEmpty(_configuration["PAYPAL_CANCEL_URL"], ResolveResultUrl(request.ClientType));
+        if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+        {
+            return StatusCode(500, new { message = "PayPal env is not configured (PAYPAL_BASE_URL/PAYPAL_API_BASE, PAYPAL_CLIENT_ID, PAYPAL_SECRET/PAYPAL_CLIENT_SECRET)." });
+        }
+        if (string.IsNullOrWhiteSpace(returnUrl) || string.IsNullOrWhiteSpace(cancelUrl))
+        {
+            return StatusCode(500, new { message = "PAYPAL_RETURN_URL / PAYPAL_CANCEL_URL are not configured." });
+        }
+
+        var amount = Math.Round(request.Amount, 2, MidpointRounding.AwayFromZero);
+        var currency = string.IsNullOrWhiteSpace(request.Currency) ? "UAH" : request.Currency.ToUpperInvariant();
+        var token = await GetPayPalAccessTokenAsync(baseUrl, clientId, clientSecret, cancellationToken);
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return StatusCode(502, new { message = "Failed to obtain PayPal access token." });
+        }
+
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var payload = new
+        {
+            intent = "CAPTURE",
+            purchase_units = new[]
+            {
+                new
+                {
+                    reference_id = request.BookingId,
+                    amount = new
+                    {
+                        currency_code = currency,
+                        value = amount.ToString("0.00", CultureInfo.InvariantCulture)
+                    }
+                }
+            },
+            application_context = new
+            {
+                return_url = returnUrl,
+                cancel_url = cancelUrl
+            }
+        };
+
+        using var response = await httpClient.PostAsJsonAsync($"{baseUrl.TrimEnd('/')}/v2/checkout/orders", payload, cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("PayPal order creation failed: {StatusCode} {Body}", response.StatusCode, body);
+            return StatusCode((int)response.StatusCode, new { message = "PayPal order creation failed.", details = body });
+        }
+
+        using var doc = JsonDocument.Parse(body);
+        var root = doc.RootElement;
+        var payPalOrderId = TryReadString(root, "id");
+        var rawStatus = TryReadString(root, "status") ?? "CREATED";
+        var approvalUrl = TryReadApprovalUrl(root);
+        if (string.IsNullOrWhiteSpace(payPalOrderId) || string.IsNullOrWhiteSpace(approvalUrl))
+        {
+            return StatusCode(502, new { message = "PayPal order response is invalid." });
+        }
+
+        var paymentId = payPalOrderId;
+        Payments[paymentId] = new PaymentState
+        {
+            PaymentId = paymentId,
+            BookingId = request.BookingId,
+            Amount = amount,
+            Currency = currency,
+            Method = string.IsNullOrWhiteSpace(request.Method) ? "pay" : request.Method,
+            Status = MapPayPalStatus(rawStatus),
+            RawStatus = rawStatus,
+            Provider = "paypal",
+            PayPalOrderId = payPalOrderId,
+            CreatedAtUtc = DateTime.UtcNow,
+        };
+
+        return Ok(new
+        {
+            paymentId,
+            status = MapPayPalStatus(rawStatus),
+            redirectUrl = approvalUrl,
+        });
+    }
+
     private async Task<LiqPayStatusDetails?> TryFetchStatusFromLiqPayAsync(PaymentState state, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(state.LiqPayOrderId))
@@ -731,6 +842,125 @@ public class PaymentsController : ControllerBase
             _ => null,
         };
 
+    private static string ResolveProvider(string? provider)
+    {
+        if (string.Equals(provider?.Trim(), "paypal", StringComparison.OrdinalIgnoreCase))
+        {
+            return "paypal";
+        }
+
+        return "liqpay";
+    }
+
+    private string? ResolvePayPalBaseUrl() =>
+        FirstNonEmpty(_configuration["PAYPAL_BASE_URL"], _configuration["PAYPAL_API_BASE"]);
+
+    private string? ResolvePayPalSecret() =>
+        FirstNonEmpty(_configuration["PAYPAL_SECRET"], _configuration["PAYPAL_CLIENT_SECRET"]);
+
+    private async Task<string?> GetPayPalAccessTokenAsync(string baseUrl, string clientId, string clientSecret, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var client = new HttpClient();
+            var auth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl.TrimEnd('/')}/v1/oauth2/token")
+            {
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["grant_type"] = "client_credentials",
+                })
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", auth);
+
+            using var response = await client.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogWarning("PayPal token request failed: {StatusCode} {Body}", response.StatusCode, body);
+                return null;
+            }
+
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = JsonDocument.Parse(responseBody);
+            return TryReadString(doc.RootElement, "access_token");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "PayPal token request exception");
+            return null;
+        }
+    }
+
+    private async Task<string?> TryFetchPayPalStatusAsync(PaymentState state, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(state.PayPalOrderId))
+        {
+            return null;
+        }
+
+        var baseUrl = ResolvePayPalBaseUrl();
+        var clientId = _configuration["PAYPAL_CLIENT_ID"];
+        var clientSecret = ResolvePayPalSecret();
+        if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+        {
+            return null;
+        }
+
+        var token = await GetPayPalAccessTokenAsync(baseUrl, clientId, clientSecret, cancellationToken);
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var client = new HttpClient();
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl.TrimEnd('/')}/v2/checkout/orders/{state.PayPalOrderId}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            using var response = await client.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = JsonDocument.Parse(body);
+            return TryReadString(doc.RootElement, "status");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "PayPal status fetch failed for payment {PaymentId}", state.PaymentId);
+            return null;
+        }
+    }
+
+    private static string? TryReadApprovalUrl(JsonElement root)
+    {
+        if (!root.TryGetProperty("links", out var links) || links.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        foreach (var item in links.EnumerateArray())
+        {
+            var rel = TryReadString(item, "rel");
+            if (!string.Equals(rel, "approve", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(rel, "payer-action", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var href = TryReadString(item, "href");
+            if (!string.IsNullOrWhiteSpace(href))
+            {
+                return href;
+            }
+        }
+
+        return null;
+    }
+
     private static string MapLiqPayStatus(string? liqPayStatus)
     {
         var s = liqPayStatus?.ToLowerInvariant();
@@ -748,6 +978,21 @@ public class PaymentsController : ControllerBase
             "error" => "failed",
             "unsubscribed" => "cancelled",
             "cancelled" => "cancelled",
+            _ => "created",
+        };
+    }
+
+    private static string MapPayPalStatus(string? payPalStatus)
+    {
+        var s = payPalStatus?.ToUpperInvariant();
+        return s switch
+        {
+            "COMPLETED" => "paid",
+            "APPROVED" => "hold",
+            "PAYER_ACTION_REQUIRED" => "created",
+            "CREATED" => "created",
+            "SAVED" => "created",
+            "VOIDED" => "cancelled",
             _ => "created",
         };
     }
@@ -774,6 +1019,7 @@ public class PaymentsController : ControllerBase
         public string Currency { get; set; } = "UAH";
         public string Method { get; set; } = "pay";
         public string ClientType { get; set; } = "web";
+        public string Provider { get; set; } = "liqpay";
     }
 
     public sealed class ConfirmHoldRequest
@@ -798,9 +1044,11 @@ public class PaymentsController : ControllerBase
         public decimal Amount { get; set; }
         public string Currency { get; set; } = "UAH";
         public string Method { get; set; } = "pay";
+        public string Provider { get; set; } = "liqpay";
         public string Status { get; set; } = "created";
         public string? RawStatus { get; set; }
         public string? LiqPayOrderId { get; set; }
+        public string? PayPalOrderId { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAtUtc { get; set; }
         public bool IsTokenization { get; set; }
