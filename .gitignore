@@ -178,7 +178,6 @@ ios/
 frontend/
 
 # Local docs/notes
-.github/
 AGENTS.md
 API.txt
 PAYMENT.md
