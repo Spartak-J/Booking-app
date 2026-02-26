@@ -18,15 +18,11 @@ export type AdminMenuItem = {
 type Props = {
   title: string;
   items: AdminMenuItem[];
-  onBack: () => void;
-  onMenu: () => void;
 };
 
 export const AdminMenuScreenView: React.FC<Props> = ({
   title,
   items,
-  onBack,
-  onMenu,
 }) => {
   const { tokens } = useTheme();
   const styles = useMemo(() => getStyles(tokens), [tokens]);
@@ -38,10 +34,8 @@ export const AdminMenuScreenView: React.FC<Props> = ({
       <View style={styles.content}>
         <HeaderBar
           title={title}
-          onBack={onBack}
-          onMenu={onMenu}
-          showBack
-          showMenu
+          showBack={false}
+          showMenu={false}
           showSearch={false}
         />
 

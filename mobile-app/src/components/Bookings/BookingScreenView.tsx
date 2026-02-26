@@ -184,7 +184,7 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
         try {
           const totalAmount = booking.totalPrice || (offer?.pricePerNight ?? 0) * nights;
           const payment = await paymentService.createPayment({
-            bookingId: booking.id,
+            bookingId: booking.orderId,
             amount: totalAmount,
             currency: 'UAH',
             method: 'pay',
@@ -206,7 +206,7 @@ export const BookingScreenView: React.FC<BookingScreenViewProps> = ({
       queryClient.invalidateQueries({ queryKey: ['bookings', userId ?? ''] });
       queryClient.invalidateQueries({ queryKey: ['owner-bookings'] });
       onBookingSuccess({
-        bookingId: booking.id,
+        bookingId: booking.orderId,
         offerId,
         offerTitle: offer?.title,
         totalPrice: booking.totalPrice,

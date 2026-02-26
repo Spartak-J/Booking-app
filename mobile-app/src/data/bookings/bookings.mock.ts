@@ -2,6 +2,7 @@ import { Booking } from '@/types';
 
 export const BOOKINGS: Booking[] = [
   {
+    orderId: 'booking-1',
     id: 'booking-1',
     offerId: 'offer-1',
     hotelId: 'hotel-1',
@@ -14,6 +15,7 @@ export const BOOKINGS: Booking[] = [
     paymentType: 'card',
   },
   {
+    orderId: 'booking-3',
     id: 'booking-3',
     offerId: 'offer-3',
     hotelId: 'hotel-3',
@@ -26,6 +28,7 @@ export const BOOKINGS: Booking[] = [
     paymentType: 'card',
   },
   {
+    orderId: 'booking-4',
     id: 'booking-4',
     offerId: 'offer-4',
     hotelId: 'hotel-4',

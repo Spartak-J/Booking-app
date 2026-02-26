@@ -13,6 +13,8 @@ export type CurrencyRatesResponse = {
   updatedAtUtc?: string;
   source?: string;
   disclaimer?: string;
+  refreshSucceeded?: boolean;
+  refreshError?: string;
 };
 
 const currencyEndpoints = (ENDPOINTS as unknown as { currency?: Partial<CurrencyEndpoints> })

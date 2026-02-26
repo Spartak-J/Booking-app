@@ -8,10 +8,12 @@ export const ENDPOINTS = {
   },
   user: {
     me: (lang: string) => `/User/me/${lang}`,
+    myOrders: (lang: string) => `/User/me/orders/${lang}`,
     byId: (id: string | number) => `/User/get/${id}`,
     all: '/User/get-all',
     update: '/User/me/update',
     historyOffers: (lang: string) => `/Bff/me/offers/history/${lang}`,
+    myOffers: (lang: string) => `/User/me/offers/${lang}`,
     addFavoriteOffer: (offerId: string | number) => `/Bff/favorites/offer/${offerId}`,
   },
   offers: {
@@ -35,6 +37,7 @@ export const ENDPOINTS = {
   },
   booking: {
     create: (lang: string) => `/Bff/create/booking-order/${lang}`,
+    byOffer: (offerId: string | number, lang: string) => `/Bff/offer/${offerId}/orders/${lang}`,
     updateStatus: (orderId: string | number) => `/Bff/update_status/booking/${orderId}`,
     all: '/Order/get-all',
     byId: (id: string | number) => `/Order/get/${id}`,
@@ -64,5 +67,8 @@ export const ENDPOINTS = {
   },
   currency: {
     rates: '/Bff/currency/rates',
+  },
+  admin: {
+    health: '/Bff/admin/health',
   },
 };

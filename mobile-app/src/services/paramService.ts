@@ -6,6 +6,21 @@ import { OWNER_AMENITIES_MOCK } from '@/data/hotels/amenities.mock';
 
 export type Category = { id: string; name: string };
 export type Amenity = { id: string; name: string };
+export type OwnerAmenitySectionKey =
+  | 'accommodationType'
+  | 'amenities'
+  | 'housingWith'
+  | 'bookingRules'
+  | 'freeCancellation';
+export type OwnerAmenitySection = {
+  key: OwnerAmenitySectionKey;
+  title: string;
+  items: Amenity[];
+};
+export type OwnerAmenitySectionsResponse = {
+  sections: OwnerAmenitySection[];
+  hasPetsAllowedOption: boolean;
+};
 
 const AMENITY_SECTION_LABELS = [
   'тип розміщення',
@@ -26,6 +41,8 @@ const AMENITY_SECTION_LABELS = [
 ];
 
 const normalize = (value?: string | null) => (value ?? '').trim().toLowerCase();
+const FREE_CANCELLATION_LABELS = ['безкоштовне скасування', 'free cancellation'];
+const PETS_ALLOWED_LABELS = ['можна з тваринами', 'pets allowed'];
 
 const toMockAmenities = (): Amenity[] =>
   OWNER_AMENITIES_MOCK.map((name, idx) => ({ id: String(idx + 1), name }));
@@ -46,6 +63,27 @@ const normalizeAmenities = (list: any[]): Amenity[] => {
   });
 
   return Array.from(map.values());
+};
+
+const mapCategoryItems = (category: any): Amenity[] => {
+  const list: any[] = Array.isArray(category?.items) ? category.items : [];
+  return normalizeAmenities(list);
+};
+
+const splitBookingRuleItems = (items: Amenity[]) => {
+  const freeCancellation: Amenity[] = [];
+  const bookingRules: Amenity[] = [];
+
+  items.forEach((item) => {
+    const title = normalize(item.name);
+    if (FREE_CANCELLATION_LABELS.some((label) => title.includes(label))) {
+      freeCancellation.push(item);
+      return;
+    }
+    bookingRules.push(item);
+  });
+
+  return { bookingRules, freeCancellation };
 };
 
 export const paramService = {
@@ -78,6 +116,79 @@ export const paramService = {
     } catch (error) {
       console.warn('[paramService.getAmenities] API fallback to mock list', error);
       return toMockAmenities();
+    }
+  },
+  getOwnerAmenitySections: async (): Promise<OwnerAmenitySectionsResponse> => {
+    if (USE_MOCKS) {
+      return {
+        sections: [
+          { key: 'amenities', title: 'Зручності', items: toMockAmenities() },
+        ],
+        hasPetsAllowedOption: false,
+      };
+    }
+
+    const lang = getApiLang();
+    try {
+      const { data } = await apiClient.get<any>(ENDPOINTS.params.categories(lang));
+      const categories: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+
+      const accommodationTypeCategory = categories.find((item) => String(item?.id) === '1');
+      const amenitiesCategory = categories.find((item) => String(item?.id) === '3');
+      const housingWithCategory = categories.find((item) => String(item?.id) === '4');
+      const bookingRulesCategory = categories.find((item) => String(item?.id) === '7');
+
+      const accommodationTypeItems = mapCategoryItems(accommodationTypeCategory);
+      const amenitiesItems = mapCategoryItems(amenitiesCategory);
+      const housingWithItems = mapCategoryItems(housingWithCategory);
+      const bookingItems = mapCategoryItems(bookingRulesCategory);
+      const { bookingRules, freeCancellation } = splitBookingRuleItems(bookingItems);
+
+      const sections: OwnerAmenitySection[] = [];
+      const addSection = (section: OwnerAmenitySection) => {
+        if (section.items.length > 0) {
+          sections.push(section);
+        }
+      };
+
+      addSection({
+        key: 'accommodationType',
+        title: String(accommodationTypeCategory?.title ?? accommodationTypeCategory?.name ?? 'Тип розміщення'),
+        items: accommodationTypeItems,
+      });
+      addSection({
+        key: 'amenities',
+        title: String(amenitiesCategory?.title ?? amenitiesCategory?.name ?? 'Зручності'),
+        items: amenitiesItems,
+      });
+      addSection({
+        key: 'housingWith',
+        title: String(housingWithCategory?.title ?? housingWithCategory?.name ?? 'Житло з'),
+        items: housingWithItems,
+      });
+      addSection({
+        key: 'bookingRules',
+        title: String(bookingRulesCategory?.title ?? bookingRulesCategory?.name ?? 'Правила бронювання'),
+        items: bookingRules,
+      });
+      addSection({
+        key: 'freeCancellation',
+        title: freeCancellation.length > 0 ? freeCancellation[0].name : 'Безкоштовне скасування',
+        items: freeCancellation,
+      });
+
+      const hasPetsAllowedOption = amenitiesItems.some((item) => {
+        const title = normalize(item.name);
+        return PETS_ALLOWED_LABELS.some((label) => title.includes(label));
+      });
+
+      return { sections, hasPetsAllowedOption };
+    } catch (error) {
+      console.warn('[paramService.getOwnerAmenitySections] API fallback to mock list', error);
+      return {
+        sections: [{ key: 'amenities', title: 'Зручності', items: toMockAmenities() }],
+        hasPetsAllowedOption: false,
+      };
     }
   },
 };

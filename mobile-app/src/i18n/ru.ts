@@ -255,7 +255,7 @@ const ru = {
   'owner.form.price.helper': 'Укажите стоимость за ночь',
   'owner.form.guests': 'Гостей',
   'owner.form.bedrooms': 'Спален',
-  'owner.form.photo': 'Фото (URL)',
+  'owner.form.photo': 'Фото',
   'owner.form.amenities': 'Удобства',
   'owner.form.save': 'Сохранить',
   'owner.form.saveProgress': 'Сохраняем...',

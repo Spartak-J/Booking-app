@@ -1,4 +1,5 @@
 import { DEFAULT_LANG } from '@/config/constants';
+import { API_BASE_URL } from '@/config/constants';
 import { Role, User, Offer, City, Booking, Review, OwnerProfile, Room } from '@/types';
 import { useLanguageStore } from '@/store/languageStore';
 
@@ -9,6 +10,40 @@ const STATUS_MAP: Record<string, Booking['status']> = {
   completed: 'completed',
   cancelled: 'cancelled',
   canceled: 'cancelled',
+};
+
+const LOCALHOST_SET = new Set(['localhost', '127.0.0.1', '::1']);
+
+const getApiBaseUrlParts = (): URL | null => {
+  try {
+    return new URL(API_BASE_URL);
+  } catch {
+    return null;
+  }
+};
+
+const toAbsoluteImageUrl = (value?: string): string => {
+  const normalizedValue = (value ?? '').trim();
+  if (!normalizedValue) return '';
+
+  if (/^https?:\/\//i.test(normalizedValue)) {
+    try {
+      const current = new URL(normalizedValue);
+      if (!LOCALHOST_SET.has(current.hostname)) return normalizedValue;
+      const apiBase = getApiBaseUrlParts();
+      if (!apiBase) return normalizedValue;
+      current.protocol = apiBase.protocol;
+      current.hostname = apiBase.hostname;
+      current.port = apiBase.port;
+      return current.toString();
+    } catch {
+      return normalizedValue;
+    }
+  }
+
+  const normalizedBase = API_BASE_URL.replace(/\/+$/, '');
+  const normalizedPath = normalizedValue.startsWith('/') ? normalizedValue : `/${normalizedValue}`;
+  return `${normalizedBase}${normalizedPath}`;
 };
 
 export const getApiLang = () => {
@@ -131,7 +166,7 @@ const mapRooms = (input: any): Room[] | undefined => {
     id: String(room?.id ?? room?.roomId ?? `room-${index}`),
     title: room?.title ?? room?.name ?? 'Номер',
     price: pickNumber(room?.price ?? room?.pricePerNight ?? room?.pricePerDay ?? 0, 0),
-    image: room?.image ?? room?.imageUrl ?? room?.photoUrl,
+    image: toAbsoluteImageUrl(room?.image ?? room?.imageUrl ?? room?.photoUrl),
   }));
 };
 
@@ -141,6 +176,9 @@ export const mapOfferShort = (input: any): Offer => {
     rentObjRaw?.imagesUrl ??
     rentObjRaw?.images?.map((img: any) => img?.url ?? img) ??
     (rentObjRaw?.mainImageUrl ? [rentObjRaw.mainImageUrl] : []);
+  const normalizedImages = (Array.isArray(images) ? images : [])
+    .map((item: unknown) => toAbsoluteImageUrl(String(item ?? '')))
+    .filter(Boolean);
 
   const city: City = {
     id: String(rentObjRaw?.cityId ?? ''),
@@ -177,7 +215,7 @@ export const mapOfferShort = (input: any): Offer => {
     ),
     bedrooms: pickNumber(rentObjRaw?.bedroomsCount ?? rentObjRaw?.roomCount ?? 1, 1),
     amenities: [],
-    images,
+    images: normalizedImages,
     ownerId: String(input?.ownerId ?? ''),
     owner: mapOwnerProfile(input?.owner ?? input?.ownerProfile),
     isActive: true,
@@ -193,11 +231,14 @@ export const mapOfferFull = (input: any): Offer => {
     rentObjRaw?.imagesUrl ??
     rentObjRaw?.images?.map((img: any) => img?.url ?? img) ??
     (rentObjRaw?.mainImageUrl ? [rentObjRaw.mainImageUrl] : base.images);
+  const normalizedImages = (Array.isArray(images) ? images : [])
+    .map((item: unknown) => toAbsoluteImageUrl(String(item ?? '')))
+    .filter(Boolean);
 
   return {
     ...base,
     description: input?.description ?? base.description,
-    images,
+    images: normalizedImages,
     amenities:
       rentObjRaw?.paramValues?.map((p: any) => p?.paramItemTitle ?? p?.title).filter(Boolean) ?? [],
     owner: mapOwnerProfile(input?.owner ?? input?.ownerProfile) ?? base.owner,
@@ -206,18 +247,26 @@ export const mapOfferFull = (input: any): Offer => {
 };
 
 export const mapBooking = (input: any): Booking => ({
-  id: String(input?.id ?? ''),
-  offerId: String(input?.offerId ?? ''),
-  userId: String(input?.clientId ?? input?.userId ?? ''),
-  checkIn: input?.startDate ?? input?.start ?? '',
-  checkOut: input?.endDate ?? input?.end ?? '',
+  orderId: String(input?.OrderId ?? input?.orderId ?? input?.id ?? ''),
+  id: String(input?.OrderId ?? input?.orderId ?? input?.id ?? ''),
+  offerId: String(input?.offerId ?? input?.OfferId ?? ''),
+  userId: String(input?.clientId ?? input?.ClientId ?? input?.userId ?? ''),
+  checkIn: input?.startDate ?? input?.StartDate ?? input?.start ?? '',
+  checkOut: input?.endDate ?? input?.EndDate ?? input?.end ?? '',
   guests: pickNumber(input?.guests ?? 1, 1),
   totalPrice: pickNumber(
-    input?.totalPrice ?? input?.orderPrice ?? input?.taxAmount ?? input?.price,
+    input?.totalPrice ?? input?.TotalPrice ?? input?.orderPrice ?? input?.taxAmount ?? input?.price,
     0,
   ),
-  status: STATUS_MAP[(input?.status ?? '').toLowerCase()] ?? 'pending',
+  status: STATUS_MAP[(input?.status ?? input?.Status ?? '').toLowerCase()] ?? 'pending',
   paymentType: undefined,
+  title: input?.title ?? input?.Title,
+  clientNote: input?.clientNote ?? input?.ClientNote,
+  clientPhoneNumber: input?.clientPhoneNumber ?? input?.ClientPhoneNumber,
+  clientEmail: input?.clientEmail ?? input?.ClientEmail,
+  mainGuestFirstName: input?.mainGuestFirstName ?? input?.MainGuestFirstName,
+  mainGuestLastName: input?.mainGuestLastName ?? input?.MainGuestLastName,
+  mainImageUrl: input?.mainImageUrl ?? input?.MainImageUrl,
 });
 
 export const mapReview = (input: any): Review => ({

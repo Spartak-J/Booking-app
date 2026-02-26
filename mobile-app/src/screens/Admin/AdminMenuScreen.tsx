@@ -71,8 +71,6 @@ const AdminMenuScreen: React.FC = () => {
     <AdminMenuScreenView
       title={greeting}
       items={items}
-      onBack={() => navigation.goBack()}
-      onMenu={() => navigation.navigate(Routes.AdminMenu)}
     />
   );
 };

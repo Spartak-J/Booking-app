@@ -33,11 +33,13 @@ export const useAuth = () => {
     process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? extra.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
   const googleWebClientId =
     process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? extra.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+  const googleExpoClientId =
+    process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID ?? extra.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID;
 
   const [googleRequest, , promptGoogleAsync] = Google.useIdTokenAuthRequest({
     androidClientId: googleAndroidClientId,
     iosClientId: googleIosClientId,
-    webClientId: googleWebClientId,
+    webClientId: googleWebClientId ?? googleExpoClientId,
   });
 
   const login = async (payload: LoginPayload) => {

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import AdminToolsStatusPanel from '@/components/Admin/AdminToolsStatusPanel';
 import { Card, ListItem, ScreenShell, Typography } from '@/ui';
 import { useTheme, spacing } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -10,16 +11,26 @@ type Props = {
   onBack: () => void;
   onOpenUsers: () => void;
   onOpenOffers: () => void;
-  onOpenTools: () => void;
   onOpenMessages: () => void;
+  systemStatus?: React.ComponentProps<typeof AdminToolsStatusPanel>['data'];
+  systemStatusLoading?: boolean;
+  onRefreshCurrency?: () => void;
+  currencyRefreshing?: boolean;
+  currencyRefreshInfo?: string;
+  currencyUpdatedAtLabel?: string;
 };
 
 const SettingsScreenView: React.FC<Props> = ({
   onBack,
   onOpenUsers,
   onOpenOffers,
-  onOpenTools,
   onOpenMessages,
+  systemStatus,
+  systemStatusLoading,
+  onRefreshCurrency,
+  currencyRefreshing,
+  currencyRefreshInfo,
+  currencyUpdatedAtLabel,
 }) => {
   const { tokens } = useTheme();
   const { t } = useTranslation();
@@ -37,12 +48,6 @@ const SettingsScreenView: React.FC<Props> = ({
       title: t('profile.settings.item.offers'),
       icon: 'home-city-outline' as const,
       onPress: onOpenOffers,
-    },
-    {
-      id: 'tools',
-      title: t('profile.settings.item.tools'),
-      icon: 'toolbox-outline' as const,
-      onPress: onOpenTools,
     },
     {
       id: 'messages',
@@ -63,6 +68,15 @@ const SettingsScreenView: React.FC<Props> = ({
             {t('profile.settings.summary.body')}
           </Typography>
         </Card>
+
+        <AdminToolsStatusPanel
+          data={systemStatus}
+          loading={systemStatusLoading}
+          onRefreshCurrency={onRefreshCurrency}
+          currencyRefreshing={currencyRefreshing}
+          currencyRefreshInfo={currencyRefreshInfo}
+          currencyUpdatedAtLabel={currencyUpdatedAtLabel}
+        />
 
         <View style={styles.list}>
           {menuItems.map((item) => (

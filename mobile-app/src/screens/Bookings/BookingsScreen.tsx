@@ -82,8 +82,8 @@ export const BookingsScreen = () => {
           const hotel = hotels.find((entry) => entry.id === item.hotelId);
           return {
             // Keep render keys stable even if mocks accidentally duplicate booking ids.
-            id: `${item.id}-${item.hotelId ?? 'hotel'}-${item.checkIn}`,
-            bookingId: item.id,
+            id: `${item.orderId}-${item.hotelId ?? 'hotel'}-${item.checkIn}`,
+            bookingId: item.orderId,
             hotelId: item.hotelId,
             title: hotel?.name ?? 'Jam Hotel Staroyevreyska',
             image: imageMap[pastHotelId] ?? pastImage1,

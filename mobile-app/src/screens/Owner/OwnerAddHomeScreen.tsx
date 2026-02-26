@@ -34,9 +34,9 @@ export const OwnerAddHomeScreen = () => {
   const offerId = route.params?.offerId;
   const isEditMode = Boolean(offerId);
 
-  const { data: amenitiesData, isLoading: loadingAmenities } = useQuery({
-    queryKey: ['amenities'],
-    queryFn: paramService.getAmenities,
+  const { data: amenitySectionsData, isLoading: loadingAmenities } = useQuery({
+    queryKey: ['owner-amenity-sections'],
+    queryFn: paramService.getOwnerAmenitySections,
   });
 
   const [titleDraft, setTitleDraft] = useState<string | null>(null);
@@ -68,6 +68,16 @@ export const OwnerAddHomeScreen = () => {
   const doubleBeds = doubleBedsDraft ?? 1;
   const amenities = amenitiesDraft ?? existingOffer?.amenities ?? [];
   const photos = photosDraft ?? existingOffer?.images ?? [];
+  const normalizeText = (value?: string) => (value ?? '').trim().toLowerCase();
+  const petsLabels = ['можна з тваринами', 'pets allowed'];
+  const petOptionName = useMemo(() => {
+    const allItems = (amenitySectionsData?.sections ?? []).flatMap((section) => section.items);
+    const found = allItems.find((item) =>
+      petsLabels.some((label) => normalizeText(item.name).includes(label)),
+    );
+    return found?.name;
+  }, [amenitySectionsData]);
+  const petsAllowed = petOptionName ? amenities.includes(petOptionName) : false;
 
   const requiredErrors = useMemo(
     () => ({
@@ -112,6 +122,15 @@ export const OwnerAddHomeScreen = () => {
     );
   };
 
+  const togglePetsAllowed = () => {
+    if (!petOptionName) return;
+    setAmenitiesDraft(
+      petsAllowed
+        ? amenities.filter((item) => item !== petOptionName)
+        : [...amenities, petOptionName],
+    );
+  };
+
   const mutation = useMutation({
     mutationFn: async () => {
       const payload = {
@@ -136,7 +155,7 @@ export const OwnerAddHomeScreen = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['owner-homes', owner?.id] });
       queryClient.invalidateQueries({ queryKey: ['offers'] });
-      queryClient.invalidateQueries({ queryKey: ['amenities'] });
+      queryClient.invalidateQueries({ queryKey: ['owner-amenity-sections'] });
       if (offerId) {
         queryClient.invalidateQueries({ queryKey: ['owner-offer', offerId] });
       }
@@ -320,30 +339,43 @@ export const OwnerAddHomeScreen = () => {
                 <Loader variant="skeleton" height={48} />
               ) : (
                 <View style={styles.amenitiesList}>
-                  {(amenitiesData ?? []).map((item) => {
-                    const isChecked = amenities.includes(item.name);
-                    return (
-                      <View key={item.name} style={styles.amenityRow}>
-                        <Typography variant="body" tone="primary" style={styles.amenityText}>
-                          {item.name}
-                        </Typography>
-                        <IconButton
-                          onPress={() => toggleAmenity(item.name)}
-                          icon={
-                            <MaterialCommunityIcons
-                              name="check"
-                              size={s(14)}
-                              color={isChecked ? tokens.textPrimary : tokens.bgField}
-                            />
-                          }
-                          size="sm"
-                          variant="outlined"
-                          style={[styles.checkbox, isChecked ? styles.checkboxActive : null]}
-                          preserveIconColor
-                        />
+                  {(amenitySectionsData?.sections ?? []).map((section) => (
+                    <View key={section.key} style={styles.amenitySection}>
+                      <Typography variant="subtitle" tone="primary" style={styles.amenitySectionTitle}>
+                        {section.title}
+                      </Typography>
+                      <View style={styles.amenitySectionItems}>
+                        {section.items
+                          .filter((item) =>
+                            !petsLabels.some((label) => normalizeText(item.name).includes(label)),
+                          )
+                          .map((item) => {
+                          const isChecked = amenities.includes(item.name);
+                          return (
+                            <View key={item.id} style={styles.amenityRow}>
+                              <Typography variant="body" tone="primary" style={styles.amenityText}>
+                                {item.name}
+                              </Typography>
+                              <IconButton
+                                onPress={() => toggleAmenity(item.name)}
+                                icon={
+                                  <MaterialCommunityIcons
+                                    name="check"
+                                    size={s(14)}
+                                    color={isChecked ? tokens.textPrimary : tokens.bgField}
+                                  />
+                                }
+                                size="sm"
+                                variant="outlined"
+                                style={[styles.checkbox, isChecked ? styles.checkboxActive : null]}
+                                preserveIconColor
+                              />
+                            </View>
+                          );
+                          })}
                       </View>
-                    );
-                  })}
+                    </View>
+                  ))}
                 </View>
               )}
             </View>
@@ -369,6 +401,20 @@ export const OwnerAddHomeScreen = () => {
                   0,
                   10,
                 )}
+                {petOptionName ? (
+                  <View style={styles.counterRowItem}>
+                    <Typography variant="body" tone="primary" style={styles.counterLabel}>
+                      {petOptionName}
+                    </Typography>
+                    <Button
+                      size="small"
+                      variant="ghost"
+                      title={petsAllowed ? t('bookings.confirm.yes') : t('bookings.confirm.no')}
+                      onPress={togglePetsAllowed}
+                      style={styles.petToggleButton}
+                    />
+                  </View>
+                ) : null}
               </View>
             </View>
 
@@ -483,6 +529,15 @@ const getStyles = (tokens: Record<string, string>) =>
       textAlign: 'right',
     },
     amenitiesList: {
+      gap: spacing.md,
+    },
+    amenitySection: {
+      gap: spacing.xs,
+    },
+    amenitySectionTitle: {
+      marginBottom: spacing.xs,
+    },
+    amenitySectionItems: {
       gap: spacing.xs,
     },
     amenityRow: {
@@ -539,6 +594,10 @@ const getStyles = (tokens: Record<string, string>) =>
     counterBtnText: {
       ...(typography.subtitle as object),
       lineHeight: 8,
+    },
+    petToggleButton: {
+      minWidth: s(96),
+      borderRadius: radius.round,
     },
     priceRow: {
       flexDirection: 'row',

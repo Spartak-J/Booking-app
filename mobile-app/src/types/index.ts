@@ -79,7 +79,8 @@ export interface Offer {
 }
 
 export interface Booking {
-  id: string;
+  orderId: string;
+  id?: string;
   offerId: string;
   hotelId?: string;
   userId: string;
@@ -89,6 +90,13 @@ export interface Booking {
   totalPrice: number;
   status: 'active' | 'cancelled' | 'pending' | 'completed';
   paymentType?: PaymentType;
+  title?: string;
+  clientNote?: string;
+  clientPhoneNumber?: string;
+  clientEmail?: string;
+  mainGuestFirstName?: string;
+  mainGuestLastName?: string;
+  mainImageUrl?: string;
 }
 
 export interface Payment {

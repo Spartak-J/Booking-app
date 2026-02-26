@@ -46,14 +46,14 @@ export const AuthScreenView: React.FC<Props> = ({ mode }) => {
 
   const schema = useMemo(() => {
     const base = {
-      email: yup.string().required(),
+      email: yup.string().email(t('auth.errors.email')).required(t('auth.errors.requiredEmail')),
       password: yup.string().required(),
     };
     if (mode === 'register') {
       return yup.object({ ...base, name: yup.string().required() });
     }
     return yup.object(base);
-  }, [mode]);
+  }, [mode, t]);
 
   const {
     control,

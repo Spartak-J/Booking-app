@@ -46,6 +46,12 @@ const makeGuestNote = (bookingId: string) =>
     ? 'У зв’язку зі складною ситуацією зі світлом, чи є у вас генератор або альтернатива?'
     : 'Будемо о 15:00, потрібен код від дверей.';
 
+const extractNotePart = (note: string | undefined, key: string): string | undefined => {
+  if (!note) return undefined;
+  const match = note.match(new RegExp(`${key}:\\s*([^|]+)`));
+  return match?.[1]?.trim();
+};
+
 const resolveVisualStatus = (
   status: 'active' | 'pending' | 'cancelled' | 'completed',
   checkIn: string,
@@ -214,12 +220,15 @@ export const OwnerBookingsScreen = () => {
         const dateRange = formatDateRange(item.checkIn, item.checkOut);
         const guestsLabel = `${item.guests} ${t('owner.bookings.guestsShort')}`;
         const roomTypeLabel = offer?.type ? t(`owner.form.type.${offer.type}` as any) : undefined;
-        const guestName = 'Ірина';
-        const guestPhone = '+380 97 635 88 94';
-        const guestEmail = 'iryna94@gmail.com';
-        const note = makeGuestNote(item.id);
+        const guestName = [item.mainGuestFirstName, item.mainGuestLastName]
+          .filter(Boolean)
+          .join(' ')
+          .trim() || undefined;
+        const guestPhone = item.clientPhoneNumber ?? extractNotePart(item.clientNote, 'Phone');
+        const guestEmail = item.clientEmail ?? extractNotePart(item.clientNote, 'Email');
+        const note = item.clientNote?.trim() || makeGuestNote(item.orderId);
         return {
-          id: item.id,
+          id: item.orderId,
           dateRange,
           checkIn: item.checkIn,
           guestsLabel,

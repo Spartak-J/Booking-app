@@ -117,7 +117,7 @@ export const BookingDetailsScreenView: React.FC<BookingDetailsScreenViewProps> =
               {
                 text: t('bookings.confirm.yes'),
                 style: 'destructive',
-                onPress: () => cancelMutation.mutate(booking.id),
+                onPress: () => cancelMutation.mutate(booking.orderId),
               },
             ])
           }

@@ -66,8 +66,9 @@ export const authService = {
       return { token: `mock-token-${user.id}`, user };
     }
     try {
+      const normalizedEmail = payload.email.trim().toLowerCase();
       const { data } = await apiClient.post<any>(ENDPOINTS.auth.login, {
-        login: payload.email.trim(),
+        login: normalizedEmail,
         password: payload.password,
       });
 
@@ -75,11 +76,11 @@ export const authService = {
         data?.token ?? data?.Token ?? data?.data?.token ?? data?.data?.Token ?? '';
       if (!token) throw new Error('Токен не получен при логине');
       const user = await fetchProfile(token);
-      const forcedRole = resolveRoleByEmail(payload.email);
+      const forcedRole = resolveRoleByEmail(normalizedEmail);
       const resolvedUser: User = forcedRole ? { ...user, role: forcedRole } : user;
       return { token, user: resolvedUser };
     } catch (error) {
-      throw toUserFacingApiError(error, 'Неверный логин или пароль.');
+      throw toUserFacingApiError(error, 'Неверный email или пароль.');
     }
   },
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {

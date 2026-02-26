@@ -8,7 +8,7 @@ export const BookingRepository = {
   },
 
   async getById(id: string): Promise<Booking | undefined> {
-    return Promise.resolve(BOOKINGS.find((booking) => booking.id === id));
+    return Promise.resolve(BOOKINGS.find((booking) => booking.orderId === id || booking.id === id));
   },
 
   async getByHotelId(hotelId: string): Promise<Booking[]> {
@@ -25,7 +25,7 @@ export const BookingRepository = {
   },
 
   async updateStatus(id: string, status: Booking['status']): Promise<Booking | undefined> {
-    const index = BOOKINGS.findIndex((booking) => booking.id === id);
+    const index = BOOKINGS.findIndex((booking) => booking.orderId === id || booking.id === id);
     if (index < 0) return Promise.resolve(undefined);
     BOOKINGS[index] = { ...BOOKINGS[index], status };
     return Promise.resolve(BOOKINGS[index]);

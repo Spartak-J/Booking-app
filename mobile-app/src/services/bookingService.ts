@@ -125,8 +125,10 @@ const createLocalBooking = async (payload: CreateBookingPayload) => {
         (1000 * 60 * 60 * 24),
     ),
   );
+  const mockOrderId = `mock-booking-${Date.now()}`;
   const booking: Booking = {
-    id: `mock-booking-${Date.now()}`,
+    orderId: mockOrderId,
+    id: mockOrderId,
     offerId: payload.offerId,
     hotelId: hotel?.id,
     userId: payload.userId ?? 'user-1',
@@ -194,14 +196,13 @@ export const bookingService = {
       return { items, total: items.length };
     }
     const local = (await BookingRepository.getAll()).filter((item) => item.userId === userId);
+    const lang = getApiLang();
     try {
-      const { data } = await apiClient.get<any>(ENDPOINTS.booking.all);
+      const { data } = await apiClient.get<any>(ENDPOINTS.user.myOrders(lang));
       const list: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-      const fromApi = list
-        .filter((order) => String(order?.clientId ?? order?.userId) === userId)
-        .map(mapBooking);
+      const fromApi = list.map(mapBooking);
       const merged = [...local, ...fromApi];
-      const unique = Array.from(new Map(merged.map((item) => [item.id, item])).values());
+      const unique = Array.from(new Map(merged.map((item) => [item.orderId, item])).values());
       return { items: unique, total: unique.length };
     } catch (error) {
       console.warn('[bookingService.getUserBookings] API fallback to empty list', error);
@@ -219,21 +220,33 @@ export const bookingService = {
       return { items, total: items.length };
     }
     try {
-      const ordersRes = await apiClient.get<any>(ENDPOINTS.booking.all);
-      const orders: any[] = Array.isArray(ordersRes.data)
-        ? ordersRes.data
-        : (ordersRes.data?.data ?? []);
-
-      const offersRes = await apiClient.get<any>(ENDPOINTS.offers.allRaw);
+      const lang = getApiLang();
+      const offersRes = await apiClient.get<any>(ENDPOINTS.user.myOffers(lang));
       const offers: any[] = Array.isArray(offersRes.data)
         ? offersRes.data
         : (offersRes.data?.data ?? []);
       const ownerOfferIds = offers
-        .filter((o) => String(o?.ownerId ?? '') === ownerId)
-        .map((o) => String(o?.id));
+        .map((o) => String(o?.id ?? o?.offerId ?? ''))
+        .filter(Boolean);
 
-      const items = orders
-        .filter((o) => ownerOfferIds.includes(String(o?.offerId)))
+      const targetOfferIds = filters?.offerId
+        ? ownerOfferIds.filter((id) => id === filters.offerId)
+        : ownerOfferIds;
+
+      const ordersByOffer = await Promise.all(
+        targetOfferIds.map(async (offerId) => {
+          try {
+            const response = await apiClient.get<any>(ENDPOINTS.booking.byOffer(offerId, lang));
+            const payload = response.data;
+            return Array.isArray(payload) ? payload : (payload?.data ?? []);
+          } catch {
+            return [];
+          }
+        }),
+      );
+
+      const items = ordersByOffer
+        .flat()
         .map(mapBooking)
         .filter((booking) => matchesOffer(booking, filters))
         .filter((booking) => matchesDateRange(booking, filters));
@@ -245,7 +258,7 @@ export const bookingService = {
   },
   getById: async (bookingId: string) => {
     if (USE_MOCKS) {
-      const booking = BOOKINGS.find((item) => item.id === bookingId);
+      const booking = BOOKINGS.find((item) => item.orderId === bookingId || item.id === bookingId);
       if (!booking) return undefined;
       const offer = mockOffers.find((o) => o.id === booking.offerId);
       const hotel = await findHotelForOffer(offer);
