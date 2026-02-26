@@ -1,28 +1,32 @@
 name: Frontend CI/CD
-
 on:
   push:
-    branches: 
+    branches:
       - devops/frontend-deployment
       - Inna
+      - main
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
+      - name: Notify Telegram build start
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="🔨 Frontend build started%0A📌 Branch: ${{ github.ref_name }}%0A👤 Author: ${{ github.actor }}"
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: spartakj
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
+
       - name: Build Docker Image
         working-directory: ./frontend
         run: |
@@ -31,19 +35,33 @@ jobs:
             -t spartakj/booking-frontend:latest \
             -t spartakj/booking-frontend:${{ github.sha }} \
             .
-      
+
       - name: Push to DockerHub
         run: |
           docker push spartakj/booking-frontend:latest
           docker push spartakj/booking-frontend:${{ github.sha }}
-      
+
       - name: Test container
         run: |
           docker run -d -p 3001:80 --name test-container spartakj/booking-frontend:latest
           sleep 5
           curl -f http://localhost:3001 || exit 1
           docker stop test-container
-      
+
+      - name: Notify Telegram success
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="✅ Frontend built and pushed!%0A📌 Branch: ${{ github.ref_name }}%0A👤 Author: ${{ github.actor }}%0A🐳 spartakj/booking-frontend:latest%0A🌐 https://booking-oselya.pp.ua"
+
+      - name: Notify Telegram failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="❌ Frontend build FAILED!%0A📌 Branch: ${{ github.ref_name }}%0A👤 Author: ${{ github.actor }}%0A🔗 ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
       - name: Summary
         run: |
           echo "### Frontend Deployment Successful!" >> $GITHUB_STEP_SUMMARY
@@ -54,7 +72,6 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     name: Container Security Scan
-    
     steps:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -62,7 +79,7 @@ jobs:
           image-ref: spartakj/booking-frontend:latest
           format: 'table'
           severity: 'CRITICAL,HIGH'
-      
+
       - name: Summary
         if: always()
         run: |
