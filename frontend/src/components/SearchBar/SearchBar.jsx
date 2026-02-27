@@ -27,18 +27,38 @@ export const SearchBar = ({
   const [searchParams] = useSearchParams();
   const cityId = searchParams.get("cityId") || localStorage.getItem("locationId") || null;
   const cityName = localStorage.getItem("city") || "";
-  const startDateStr = searchParams.get("startDate") || localStorage.getItem("startDate") || new Date().toISOString();
-  const endDateStr = searchParams.get("endDate") || localStorage.getItem("endDate") || new Date(Date.now() + 86400000).toISOString();
-  const adults = Number(searchParams.get("adults") || localStorage.getItem("adults") || 1);
+ const adults = Number(searchParams.get("adults") || localStorage.getItem("adults") || 1);
   const children = Number(searchParams.get("children") || localStorage.getItem("children") || 0);
   const rooms = Number(searchParams.get("rooms") || localStorage.getItem("rooms") || 1);
 
-  const [dateRange, setDateRange] = useState({
-    start: startDateStr ? new Date(startDateStr) : null,
-    end: endDateStr ? new Date(endDateStr) : null,
-  });
+const parseLocalDate = (str) => {
+  if (!str) return null;
+  const parts = str.split("-");
+  if (parts.length !== 3) return null;
+  const [year, month, day] = parts.map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day); // локальная дата 00:00
+};
 
+const today = new Date();
 
+const startDateStr =
+  searchParams.get("startDate") ||
+  localStorage.getItem("startDate") ||
+  `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+const endDateStr =
+  searchParams.get("endDate") ||
+  localStorage.getItem("endDate") ||
+  `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()+1).padStart(2,'0')}`;
+
+const [dateRange, setDateRange] = useState({
+  start: parseLocalDate(startDateStr),
+  end: parseLocalDate(endDateStr),
+});
+console.log( "Time-"); 
+console.log({ startDateStr, endDateStr, dateRange });
+console.log({ dateRange });
   const [location, setLocation] = useState(cityName);
   const [locationId, setLocationId] = useState(null);
    const [slug, setSlug] = useState("");
@@ -63,6 +83,14 @@ export const SearchBar = ({
 
   const [isGuestOpen, setIsGuestOpen] = useState(false);
 
+const formatLocalDate = (date) => {
+  if (!date) return "";
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
   const handleSearch = () => {
     if (!locationId) {
       alert("Пожалуйста, выберите город");
@@ -76,8 +104,8 @@ export const SearchBar = ({
 
     const combinedParams = {
       cityId: locationId,
-      startDate: dateRange.start.toISOString(),
-      endDate: dateRange.end.toISOString(),
+      startDate: formatLocalDate(dateRange.start),
+      endDate: formatLocalDate(dateRange.end),
       adults: guests.adults,
       children: guests.children,
       rooms: guests.rooms,

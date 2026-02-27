@@ -178,6 +178,7 @@ namespace WebApiGetway.Controllers
             [FromQuery] int rooms,
             [FromQuery] string paramItemFilters = null)
         {
+
             decimal userDiscountPercent = 0;
             int? userId = null;
 
@@ -235,7 +236,7 @@ namespace WebApiGetway.Controllers
                     dateConflictCache[cacheKey] = hasConflict;
                 }
 
-                if (!hasConflict)
+                if (hasConflict)
                     continue;
 
                 if (!filterDicts.Any())
@@ -275,11 +276,11 @@ namespace WebApiGetway.Controllers
 
             //получаем рейтинг
             var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Get, idList);
-            if (ratingObjResult is not OkObjectResult okRating)
-                return ratingObjResult;
-            var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
-
-            BffHelper.UpdateOfferListWithRating(updateOfferDictList, ratingDictList);
+            if (ratingObjResult is OkObjectResult okRating)
+            {
+                var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
+                BffHelper.UpdateOfferListWithRating(updateOfferDictList, ratingDictList);
+            }
             return Ok(updateOfferDictList);
         }
 
@@ -1669,7 +1670,7 @@ namespace WebApiGetway.Controllers
                 var countryTitle = countryDictList[0]["title"].ToString();
 
 
-                var reviewRequest = ReviewDto.MapToDto(request, orderId, userId);
+                var reviewRequest = ReviewDto.MapToDto(request, orderId, userId, offerId);
                 //var orderResult = await _gateway.ForwardRequestAsync<object>(
                 //        "OrderApiService",
                 //        $"/api/Order/{orderId}/get/offerId",
@@ -1763,7 +1764,7 @@ namespace WebApiGetway.Controllers
 
 
 
-                var revievResponse = ReviewDto.MapToDto(request, orderId, userId);
+                var revievResponse = ReviewDto.MapToDto(request, orderId, userId,offerId);
                 revievResponse.UserName = userName;
                 revievResponse.UserCountry = countryTitle;
                 revievResponse.Title = request.Comment;
@@ -1918,6 +1919,7 @@ namespace WebApiGetway.Controllers
              [FromBody] CreateReviewRequest request,
              int reviewId,
              int orderId,
+             int offerId,
              string lang)
         {
 
@@ -1929,7 +1931,7 @@ namespace WebApiGetway.Controllers
             //if (userIdRequest == userId &&  status == "Completed")
             if (userIdRequest == userId)
             {
-                var reviewRequest = ReviewDto.MapToDto(request, orderId, userId);
+                var reviewRequest = ReviewDto.MapToDto(request, orderId, userId, offerId);
 
                 var reviewObjResult = await _gateway.ForwardRequestAsync(
                       "ReviewApiService",
@@ -2811,9 +2813,9 @@ namespace WebApiGetway.Controllers
         //-----проверка на конфликт дат обьявления-----
         private async Task<bool> HasDateConflictAsync(int offerId, DateTime start, DateTime end)
         {
-            var ordersIdListResult = await _gateway.ForwardRequestAsync<object>(
+            var ordersIdListResult = await _gateway.ForwardRequestAsync<List<int>>(
                 "OfferApiService",
-                $"/api/offer/{offerId}/get/orders/id",
+                $"/api/offer/{offerId}/get/orders",
                 HttpMethod.Get,
                 null);
 
@@ -2825,6 +2827,7 @@ namespace WebApiGetway.Controllers
             {
                 var json = JsonSerializer.Serialize(okOrders.Value);
                 ordersIdList = JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>();
+                if ((ordersIdList?.Count ?? 0) == 0) return false;
             }
             catch
             {

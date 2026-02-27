@@ -93,6 +93,7 @@ namespace UserApiService.Services
             };
 
             newUser.Username = request.Username;
+            newUser.BirthDate = request.BirthDate;
             newUser.PasswordHash = hash;
             newUser.PasswordSalt = salt;
             newUser.Email = request.Email;

@@ -322,7 +322,7 @@ const buildOfferBooking = () => {
   }}
   className={`${styles.input} btn-h-59 btn-br-r-20 p-10`}
   classNamePrefix="countrySelect"
-  placeholder={t("Profile.AccountPanel.select_country")}
+  placeholder={t("Prrofile.AccountPanel.select_country")}
   isSearchable={false} 
 />
 

@@ -22,7 +22,7 @@ const citiesListMock = [
   { id: 8, slug: 'bukovel', title: 'Буковель', imageSrc: "/img/city/Bukovel.svg" },
 ];
 
-const TEN_MINUTES = 10 * 60 * 1000; // 10 минут в мс
+const TEN_MINUTES = 1 * 60 * 1000; // 10 минут в мс
 
 export const CityCard_carousel = () => {
   const { locationApi } = useContext(ApiContext);

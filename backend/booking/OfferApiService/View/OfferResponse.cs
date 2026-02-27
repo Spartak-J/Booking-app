@@ -63,10 +63,6 @@ namespace OfferApiService.View
         //public int RentObjId { get; set; }
         public RentObjResponse? RentObj { get; set; }
 
-        public IEnumerable<BookedDateResponse> BookedDates { get; set; } = new List<BookedDateResponse>();
-
-
-
         public double Rating { get; set; }
 
         public bool? IsRecommended { get; set; }

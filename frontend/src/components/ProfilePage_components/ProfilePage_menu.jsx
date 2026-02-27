@@ -119,6 +119,7 @@ export const ProfilePageMenu = ({ user }) => {
           <Text text={firstLetter} type="m_600_s_24" />
         </div>
          <Text text={user?.username} type="m_600_s_24" />
+        <Text text={`${user?.lastname || ""}`} type="m_600_s_24" />
       </div>
      
       <div className={styles.profilePageMenu__title}>

@@ -27,6 +27,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IEntityStatsService, EntityStatsService>();
 
 builder.Services.AddScoped<IRabbitMqService, RabbitMqService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

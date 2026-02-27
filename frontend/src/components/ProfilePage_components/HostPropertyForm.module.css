@@ -229,7 +229,8 @@ max-width: 0;
 }
 
 .checkbox {
-  display: flex;
+  display: flex !important;
+  flex-direction: row;
   justify-content: space-between;
   gap: 8px;
 }
