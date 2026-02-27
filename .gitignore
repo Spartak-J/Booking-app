@@ -175,7 +175,6 @@ package.json
 package-lock.json
 splashscreen_logo*.png
 ios/
-frontend/
 
 # Local docs/notes
 AGENTS.md
