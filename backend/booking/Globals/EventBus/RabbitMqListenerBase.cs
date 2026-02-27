@@ -26,47 +26,47 @@ namespace Globals.EventBus
 
         public void Connect(string hostname = "rabbitmq")
         {
-            var factory = new ConnectionFactory { HostName = hostname };
-            int retries = 5;
+            //var factory = new ConnectionFactory { HostName = hostname };
+            //int retries = 5;
 
-            while (true)
-            {
-                try
-                {
-                    _connection = factory.CreateConnection();
-                    break;
-                }
-                catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
-                {
-                    retries--;
-                    if (retries == 0)
-                        throw;
+            //while (true)
+            //{
+            //    try
+            //    {
+            //        _connection = factory.CreateConnection();
+            //        break;
+            //    }
+            //    catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
+            //    {
+            //        retries--;
+            //        if (retries == 0)
+            //            throw;
 
-                    Console.WriteLine($"Не удалось подключиться к RabbitMQ. Осталось попыток: {retries}. Ошибка: {ex.Message}");
-                    Task.Delay(2000);
-                }
-            }
+            //        Console.WriteLine($"Не удалось подключиться к RabbitMQ. Осталось попыток: {retries}. Ошибка: {ex.Message}");
+            //        Task.Delay(2000);
+            //    }
+            //}
 
-            _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            //_channel = _connection.CreateModel();
+            //_channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
         }
 
         protected override  Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            stoppingToken.ThrowIfCancellationRequested();
+            //stoppingToken.ThrowIfCancellationRequested();
 
-            Connect();
+            //Connect();
 
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (ch, ea) =>
-            {
-                var content = Encoding.UTF8.GetString(ea.Body.ToArray());
-                var msgObj = JsonSerializer.Deserialize<RabbitMQMessageBase>(content);
-                HandleMessage(msgObj);
-                _channel.BasicAck(ea.DeliveryTag, false);
-            };
+            //var consumer = new EventingBasicConsumer(_channel);
+            //consumer.Received += (ch, ea) =>
+            //{
+            //    var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+            //    var msgObj = JsonSerializer.Deserialize<RabbitMQMessageBase>(content);
+            //    HandleMessage(msgObj);
+            //    _channel.BasicAck(ea.DeliveryTag, false);
+            //};
 
-            _channel.BasicConsume(_queueName, false, consumer);
+            //_channel.BasicConsume(_queueName, false, consumer);
 
             return Task.CompletedTask;
         }

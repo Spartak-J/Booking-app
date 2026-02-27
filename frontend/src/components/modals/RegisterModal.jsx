@@ -33,6 +33,7 @@ export const RegisterModal = ({ setIsModalOpen }) => {
     const [displayPassword, setDisplayPassword] = useState("");
     const [countries, setCountries] = useState([]);
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [displayConfirmPassword, setDisplayConfirmPassword] = useState("");
     const [errors, setErrors] = useState({});
 
 
@@ -95,6 +96,38 @@ export const RegisterModal = ({ setIsModalOpen }) => {
         }
     }, [formData.countryId, countries]);
 
+
+    const handleConfirmPasswordChange = (e) => {
+        const value = e.target.value;
+
+        const newDisplay = value;
+        const oldDisplay = displayConfirmPassword;
+        const oldPassword = confirmPassword;
+
+        let newPassword = oldPassword;
+
+        if (newDisplay.length > oldDisplay.length) {
+            const addedChar = newDisplay[newDisplay.length - 1];
+            newPassword += addedChar;
+        } else if (newDisplay.length < oldDisplay.length) {
+            newPassword = oldPassword.slice(0, newDisplay.length);
+        }
+
+        setConfirmPassword(newPassword);
+
+        if (newPassword.length === 0) {
+            setDisplayConfirmPassword("");
+            return;
+        }
+
+        setDisplayConfirmPassword(
+            "●".repeat(newPassword.length - 1) + newPassword.slice(-1)
+        );
+
+        setTimeout(() => {
+            setDisplayConfirmPassword("●".repeat(newPassword.length));
+        }, 300);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -387,8 +420,8 @@ export const RegisterModal = ({ setIsModalOpen }) => {
 
                     <input
                         type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        value={displayConfirmPassword}
+                        onChange={handleConfirmPasswordChange}
                         placeholder={t("Auth.register.confirm_password")}
                         className={`${styles.input} btn-h-120 btn-w-1165 btn-br-r-20 p-10`}
                         required

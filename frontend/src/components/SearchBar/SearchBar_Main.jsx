@@ -24,7 +24,7 @@ export const SearchBar_Main = () => {
   const [locationId, setLocationId] = useState(null);
   const [hotels, setHotels] = useState([]);
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
- const [slug, setSlug] = useState("");
+  const [slug, setSlug] = useState("");
   const [guests, setGuests] = useState({
     rooms: 1,
     adults: 1,
@@ -33,6 +33,14 @@ export const SearchBar_Main = () => {
 
   const [isGuestOpen, setIsGuestOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const formatLocalDate = (date) => {
+    if (!date) return "";
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
 
 
   const handleSearch = () => {
@@ -48,8 +56,8 @@ export const SearchBar_Main = () => {
 
     const params = new URLSearchParams({
       cityId: locationId,
-      startDate: dateRange.start.toISOString(),
-      endDate: dateRange.end.toISOString(),
+      startDate: formatLocalDate(dateRange.start),
+      endDate: formatLocalDate(dateRange.end),
       adults: guests.adults,
       children: guests.children,
       rooms: guests.rooms,
@@ -87,7 +95,7 @@ export const SearchBar_Main = () => {
           icon_title="calendar_big"
           icon_size="50"
           classTitle={`btn-h-70 `}
-           input_className={`${styles.input_date_title_Main_txt}`}
+          input_className={`${styles.input_date_title_Main_txt}`}
           setDateRange={setDateRange}
         />
 
@@ -99,7 +107,7 @@ export const SearchBar_Main = () => {
           />
           <button
             onClick={() => setIsGuestOpen(!isGuestOpen)}
-            className= {`${styles.input_guest} ${styles.input_guest_Main_txt}`}
+            className={`${styles.input_guest} ${styles.input_guest_Main_txt}`}
           >
             {`${guests.adults + guests.children} ${t("Search.guests")}`}
           </button>

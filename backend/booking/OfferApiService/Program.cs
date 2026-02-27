@@ -29,7 +29,6 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddScoped<IOfferService, OfferService>();
-builder.Services.AddScoped<IBookedDateService, BookedDateService>();
 
 builder.Services.AddScoped<IParamsCategoryService, ParamsCategoryService>();
 builder.Services.AddScoped<IRentObjService, RentObjService>();

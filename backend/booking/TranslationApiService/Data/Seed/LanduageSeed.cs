@@ -3438,15 +3438,15 @@ new AttractionTranslation
     Address = "Парк Глоби, Дніпро"
 },
 
-// "Вулиця Короленка",
+// "Dnipro Planetarium"
 new AttractionTranslation
 {
     id = 59,
     EntityId = 30,
     Lang = "en",
-    Title = "Korolenka Street",
-    Description = "Korolenka Street in Dnipro is a charming thoroughfare known for its historical buildings, cafes, and local shops. The street reflects the city’s architectural heritage and offers a pleasant route for walking and sightseeing.",
-    Address = "Korolenka Street, Dnipro"
+    Title = "Dnipro Planetarium",
+    Description = "Dnipro Planetarium is a modern astronomical center offering immersive shows about space, stars, and the universe. Equipped with advanced projection technology, it provides educational programs, interactive exhibits, and engaging experiences for visitors of all ages.",
+    Address = "10 Krutohirnyi Descent, Dnipro"
 },
 
 new AttractionTranslation
@@ -3454,19 +3454,19 @@ new AttractionTranslation
     id = 60,
     EntityId = 30,
     Lang = "uk",
-    Title = "Вулиця Короленка",
-    Description = "Вулиця Короленка у Дніпрі — чарівна вулиця, відома своїми історичними будівлями, кафе та місцевими крамницями. Вулиця відображає архітектурну спадщину міста та пропонує приємний маршрут для прогулянок і огляду визначних місць.",
-    Address = "Вулиця Короленка, Дніпро"
+    Title = "Планетарій Дніпра",
+    Description = "Планетарій Дніпра — сучасний астрономічний центр, що пропонує захопливі шоу про космос, зірки та Всесвіт. Оснащений сучасними проєкційними технологіями, він проводить освітні програми, інтерактивні виставки та пізнавальні заходи для відвідувачів різного віку.",
+    Address = "Крутогірний узвіз, 10, Дніпро"
 },
-// "Парк ім. Гагаріна",
+// "Dnipro Aerospace Center"
 new AttractionTranslation
 {
     id = 61,
     EntityId = 31,
     Lang = "en",
-    Title = "Gagarin Park",
-    Description = "Gagarin Park in Dnipro is a green oasis in the city, offering walking paths, playgrounds, and recreational areas. It’s a favorite destination for families, joggers, and those seeking outdoor relaxation in an urban environment.",
-    Address = "Gagarin Park, Dnipro"
+    Title = "National Aerospace Education Center of Youth named after Makarov",
+    Description = "The National Aerospace Education Center of Youth in Dnipro is a unique museum and educational complex dedicated to space exploration and rocket engineering. Visitors can see real spacecraft, rocket models, and interactive exhibits highlighting Dnipro’s key role in the aerospace industry.",
+    Address = "26 Haharina Avenue, Dnipro"
 },
 
 new AttractionTranslation
@@ -3474,9 +3474,9 @@ new AttractionTranslation
     id = 62,
     EntityId = 31,
     Lang = "uk",
-    Title = "Парк ім. Гагаріна",
-    Description = "Парк імені Гагаріна у Дніпрі — зелена оаза в місті з прогулянковими доріжками, дитячими майданчиками та зонами відпочинку. Це улюблене місце для сімей, бігунів та всіх, хто шукає відпочинок на свіжому повітрі в міському середовищі.",
-    Address = "Парк ім. Гагаріна, Дніпро"
+    Title = "Національний центр аерокосмічної освіти молоді ім. Макарова",
+    Description = "Національний центр аерокосмічної освіти молоді у Дніпрі — унікальний музейно-освітній комплекс, присвячений дослідженню космосу та ракетобудуванню. Тут представлені справжні космічні апарати, макети ракет та інтерактивні експозиції, що демонструють ключову роль Дніпра в аерокосмічній галузі.",
+    Address = "проспект Гагаріна, 26, Дніпро"
 },
 
 // "Дніпровський театр опери та балету",
@@ -3629,15 +3629,15 @@ new AttractionTranslation
     Address = "Музей народної архітектури та побуту, Ужгород"
 },
 
-// "Площа Корятовича",
+// "Ужгородська набережна"
 new AttractionTranslation
 {
     id = 109,
     EntityId = 55,
     Lang = "en",
-    Title = "Koryatovych Square",
-    Description = "Koryatovych Square is a central square in Uzhhorod, surrounded by historic buildings and cultural landmarks. It serves as a hub for events, social gatherings, and local festivals.",
-    Address = "Koryatovych Square, Uzhhorod"
+    Title = "Uzhhorod Riverside Promenade",
+    Description = "The Uzhhorod Riverside Promenade is a scenic riverside area along the Uzh River, perfect for walking, relaxing, and enjoying views of the city’s historic center. It hosts seasonal events and local gatherings.",
+    Address = "Uzhhorod Riverside Promenade, Uzhhorod"
 },
 
 new AttractionTranslation
@@ -3645,20 +3645,20 @@ new AttractionTranslation
     id = 110,
     EntityId = 55,
     Lang = "uk",
-    Title = "Площа Корятовича",
-    Description = "Площа Корятовича — центральна площа Ужгорода, оточена історичними будівлями та культурними пам’ятками. Використовується для заходів, соціальних зустрічей та місцевих фестивалів.",
-    Address = "Площа Корятовича, Ужгород"
+    Title = "Ужгородська набережна",
+    Description = "Ужгородська набережна — мальовнича зона вздовж річки Уж, ідеальна для прогулянок, відпочинку та споглядання історичного центру міста. Тут проводяться сезонні заходи та місцеві зібрання.",
+    Address = "Ужгородська набережна, Ужгород"
 },
 
-// "Замкова гора",
+// "Невицький замок"
 new AttractionTranslation
 {
     id = 111,
     EntityId = 56,
     Lang = "en",
-    Title = "Castle Hill",
-    Description = "Castle Hill in Uzhhorod is a historic hilltop area featuring scenic views of the city, remnants of fortifications, and pathways for walking. It is a popular spot for sightseeing and photography.",
-    Address = "Castle Hill, Uzhhorod"
+    Title = "Nevytsky Castle",
+    Description = "Nevytsky Castle, located near Uzhhorod in the village of Nevytske, is a historic medieval castle perched on a hill. Visitors can explore the ruins, enjoy panoramic views, and learn about its rich history.",
+    Address = "Nevytsky Castle, Nevytske"
 },
 
 new AttractionTranslation
@@ -3666,11 +3666,183 @@ new AttractionTranslation
     id = 112,
     EntityId = 56,
     Lang = "uk",
-    Title = "Замкова гора",
-    Description = "Замкова гора в Ужгороді — історичний пагорб з мальовничим видом на місто, залишками фортифікацій та пішохідними доріжками. Популярне місце для огляду пам’яток та фотографій.",
-    Address = "Замкова гора, Ужгород"
+    Title = "Невицький замок",
+    Description = "Невицький замок, розташований біля Ужгорода в селі Невицьке, — історичний середньовічний замок на пагорбі. Відвідувачі можуть оглянути руїни, насолодитися панорамними краєвидами та дізнатися про його багату історію.",
+    Address = "Невицький замок, село Невицьке"
 },
 
+
+// =================== Запоріжжя ===================
+
+
+// "Хортиця"
+new AttractionTranslation
+{
+    id = 149,
+    EntityId = 57,
+    Lang = "en",
+    Title = "Khortytsia Island, Zaporizhzhia",
+    Description = "Khortytsia Island is the largest island on the Dnipro River and a historical symbol of the Zaporizhian Cossacks. Visitors can explore scenic landscapes, ancient fortifications, and cultural museums.",
+    Address = "Khortytsia Island, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 150,
+    EntityId = 57,
+    Lang = "uk",
+    Title = "Хортиця, Запоріжжя",
+    Description = "Острів Хортиця — найбільший острів на річці Дніпро та історичний символ запорізьких козаків. Відвідувачі можуть оглянути мальовничі ландшафти, давні фортифікації та культурні музеї.",
+    Address = "Хортиця, Запоріжжя"
+},
+
+
+// "Музей історії запорізького козацтва"
+new AttractionTranslation
+{
+    id = 151,
+    EntityId = 58,
+    Lang = "en",
+    Title = "Zaporizhian Cossacks History Museum",
+    Description = "The museum showcases the rich history of the Zaporizhian Cossacks with exhibits of weapons, artifacts, and interactive displays detailing their culture and way of life.",
+    Address = "Zaporizhian Cossacks History Museum, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 152,
+    EntityId = 58,
+    Lang = "uk",
+    Title = "Музей історії запорізького козацтва",
+    Description = "Музей представляє багату історію запорізьких козаків через експонати зброї, артефактів та інтерактивні виставки, що розкривають їхню культуру та побут.",
+    Address = "Музей історії запорізького козацтва, Запоріжжя"
+},
+// "Парк Дубовий Гай"
+new AttractionTranslation
+{
+    id = 153,
+    EntityId = 59,
+    Lang = "en",
+    Title = "Dubovyi Hai Park, Zaporizhzhia",
+    Description = "Dubovyi Hai Park is a large green space with walking trails, playgrounds, and recreational areas, ideal for family leisure and outdoor activities.",
+    Address = "Dubovyi Hai Park, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 154,
+    EntityId = 59,
+    Lang = "uk",
+    Title = "Парк Дубовий Гай, Запоріжжя",
+    Description = "Парк Дубовий Гай — велика зелена зона з пішохідними доріжками, дитячими майданчиками та зонами відпочинку, ідеальна для сімейного відпочинку та активного дозвілля.",
+    Address = "Парк Дубовий Гай, Запоріжжя"
+},
+
+
+// "Дніпровська набережна"
+new AttractionTranslation
+{
+    id = 155,
+    EntityId = 60,
+    Lang = "en",
+    Title = "Dnipro Embankment, Zaporizhzhia",
+    Description = "The Dnipro Embankment in Zaporizhzhia is a scenic riverside promenade with walking paths, cafes, and recreational spaces, perfect for leisure and family outings.",
+    Address = "Dnipro Embankment, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 156,
+    EntityId = 60,
+    Lang = "uk",
+    Title = "Дніпровська набережна, Запоріжжя",
+    Description = "Дніпровська набережна в Запоріжжі — мальовнича набережна з пішохідними доріжками, кафе та зонами відпочинку, ідеальна для прогулянок та сімейного відпочинку.",
+    Address = "Дніпровська набережна, Запоріжжя"
+},
+
+// "Музей локомотивів"
+new AttractionTranslation
+{
+    id = 157,
+    EntityId = 61, 
+    Lang = "en",
+    Title = "Locomotive Museum, Zaporizhzhia",
+    Description = "The Locomotive Museum in Zaporizhzhia showcases historic trains and railway artifacts, offering visitors an interactive and educational experience about rail transport.",
+    Address = "Locomotive Museum, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 158,
+    EntityId = 61,  
+    Lang = "uk",
+    Title = "Музей локомотивів, Запоріжжя",
+    Description = "Музей локомотивів у Запоріжжі представляє історичні потяги та залізничні артефакти, пропонуючи відвідувачам інтерактивний та пізнавальний досвід знайомства з залізничним транспортом.",
+    Address = "Музей локомотивів, Запоріжжя"
+},
+
+// "Музей техніки «Фаетон»"
+new AttractionTranslation
+{
+    id = 159,
+    EntityId = 62,
+    Lang = "en",
+    Title = "Fayeton Technical Museum, Zaporizhzhia",
+    Description = "Fayeton Technical Museum in Zaporizhzhia showcases a unique collection of historical vehicles, machinery, and technological exhibits, offering an interactive experience for visitors of all ages.",
+    Address = "Fayeton Technical Museum, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 160,
+    EntityId = 62,
+    Lang = "uk",
+    Title = "Музей техніки «Фаетон», Запоріжжя",
+    Description = "Музей техніки «Фаетон» у Запоріжжі представляє унікальну колекцію історичних транспортних засобів, машин та технологічних експонатів, пропонуючи інтерактивний досвід для відвідувачів усіх вікових груп.",
+    Address = "Музей техніки «Фаетон», Запоріжжя"
+},
+
+// "Запорізька ГЕС (Дніпровська дамба)"
+new AttractionTranslation
+{
+    id = 161,
+    EntityId = 63,
+    Lang = "en",
+    Title = "Zaporizhzhia HydroPower Plant (Dnipro Dam)",
+    Description = "The Zaporizhzhia Hydroelectric Power Plant, also known as the Dnipro Dam, is a massive engineering landmark on the Dnipro River. It offers impressive views of the river and industrial architecture, attracting visitors interested in engineering, history, and energy production.",
+    Address = "Zaporizhzhia HydroPower Plant, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 162,
+    EntityId = 63,
+    Lang = "uk",
+    Title = "Запорізька ГЕС (Дніпровська дамба)",
+    Description = "Запорізька гідроелектростанція, відома як Дніпровська дамба, — це велична інженерна пам’ятка на річці Дніпро. Вона пропонує вражаючі види на річку та промислову архітектуру, приваблюючи відвідувачів, зацікавлених в інженерії, історії та виробництві енергії.",
+    Address = "Запорізька ГЕС, Запоріжжя"
+},
+
+// "Музей авіації та космонавтики"
+new AttractionTranslation
+{
+    id = 163,
+    EntityId = 64,
+    Lang = "en",
+    Title = "Aviation and Cosmonautics Museum, Zaporizhzhia",
+    Description = "The Aviation and Cosmonautics Museum in Zaporizhzhia showcases historic aircraft, spacecraft models, and exhibits on aviation history and space exploration, making it a must-visit for technology and science enthusiasts.",
+    Address = "Aviation and Cosmonautics Museum, Zaporizhzhia"
+},
+
+new AttractionTranslation
+{
+    id = 164,
+    EntityId = 64,
+    Lang = "uk",
+    Title = "Музей авіації та космонавтики, Запоріжжя",
+    Description = "Музей авіації та космонавтики в Запоріжжі представляє історичні літаки, моделі космічних апаратів та експозиції з історії авіації та освоєння космосу, що робить його обов’язковим для відвідування для поціновувачів науки та техніки.",
+    Address = "Музей авіації та космонавтики, Запоріжжя"
+},
 
 // =================== Івано-Франківськ ===================
 
@@ -3822,25 +3994,25 @@ new AttractionTranslation
     Address = "Бастіон, Івано-Франківськ"
 },
 
-// "Сквер ім. Франка",
+// "Ivano-Frankivsk City Lake"
 new AttractionTranslation
 {
-    id = 179,
+    id = 143,
     EntityId = 72,
     Lang = "en",
-    Title = "Franko Square",
-    Description = "Franko Square is a charming urban park in Ivano-Frankivsk, dedicated to the renowned Ukrainian writer Ivan Franko. The square features landscaped gardens, monuments, and is a popular gathering spot for locals and tourists alike.",
-    Address = "Franko Square, Ivano-Frankivsk"
+    Title = "Ivano-Frankivsk City Lake",
+    Description = "Ivano-Frankivsk City Lake is a picturesque recreational area and one of the most popular places in the city. Visitors can enjoy scenic walking paths, small bridges, the romantic 'Island of Love,' and beautiful sunset views over the water. It is a favorite spot for relaxation, sports, and photography.",
+    Address = "City Lake, Ivano-Frankivsk"
 },
 
 new AttractionTranslation
 {
-    id = 180,
+    id = 144,
     EntityId = 72,
     Lang = "uk",
-    Title = "Сквер ім. Франка",
-    Description = "Сквер ім. Франка — затишний міський парк Івано-Франківська, присвячений відомому українському письменнику Івану Франку. Сквер має ландшафтні сади, пам’ятники та є популярним місцем відпочинку для місцевих жителів та туристів.",
-    Address = "Сквер ім. Франка, Івано-Франківськ"
+    Title = "Міське озеро",
+    Description = "Міське озеро в Івано-Франківську — мальовнича зона відпочинку та одне з найпопулярніших місць міста. Тут можна насолодитися прогулянками набережною, містками, романтичним «Островом кохання» та чудовими заходами сонця над водою. Це улюблене місце для відпочинку, спорту та фотосесій.",
+    Address = "Міське озеро, Івано-Франківськ"
 },
 
 // =================== Буковель ===================
@@ -3931,15 +4103,15 @@ new AttractionTranslation
     Address = "Канатна дорога Буковель, Буковель"
 },
 
-// "Підйомник №3",
+// "Mavka Aquapark Bukovel"
 new AttractionTranslation
 {
     id = 189,
     EntityId = 77,
     Lang = "en",
-    Title = "Lift No.3",
-    Description = "Lift No.3 at Bukovel provides quick and comfortable access to ski slopes, helping skiers and snowboarders reach higher elevations efficiently. It is part of the resort’s modern lift system.",
-    Address = "Lift No.3, Bukovel"
+    Title = "Mavka Aquapark Bukovel",
+    Description = "Mavka Aquapark in Bukovel is a modern year-round water entertainment complex inspired by Ukrainian mythology. It features indoor and outdoor pools, thrilling water slides, relaxation areas, and family attractions, making it one of the most popular leisure destinations in the Carpathians.",
+    Address = "Vyshnia area, Bukovel"
 },
 
 new AttractionTranslation
@@ -3947,20 +4119,19 @@ new AttractionTranslation
     id = 190,
     EntityId = 77,
     Lang = "uk",
-    Title = "Підйомник №3",
-    Description = "Підйомник №3 у Буковелі забезпечує швидкий та комфортний підйом до гірськолижних трас, допомагаючи лижникам та сноубордистам ефективно діставатися на вершини. Це частина сучасної системи підйомників курорту.",
-    Address = "Підйомник №3, Буковель"
+    Title = "Аквапарк «Мавка» Буковель",
+    Description = "Аквапарк «Мавка» у Буковелі — сучасний всесезонний водний розважальний комплекс, натхненний українською міфологією. Тут є криті та відкриті басейни, водні гірки, зони відпочинку та сімейні атракції, що робить його одним із найпопулярніших місць дозвілля в Карпатах.",
+    Address = "урочище Вишня, Буковель"
 },
-
-// "Гірськолижна траса №7",
+// "Bukovel Adventure Park"
 new AttractionTranslation
 {
     id = 191,
     EntityId = 78,
     Lang = "en",
-    Title = "Ski Slope No.7",
-    Description = "Ski Slope No.7 at Bukovel is designed for skiers of intermediate skill, featuring well-groomed trails and scenic mountain views. It is a popular route for both learning and enjoying the slopes.",
-    Address = "Ski Slope No.7, Bukovel"
+    Title = "Bukovel Adventure Park",
+    Description = "Bukovel Adventure Park is an all-season outdoor recreation area offering activities for families and adventure seekers. Visitors can enjoy tubing tracks, zip-lines, rope courses, and other fun attractions set in the beautiful Carpathian landscape.",
+    Address = "Vyshnia area, Bukovel"
 },
 
 new AttractionTranslation
@@ -3968,9 +4139,9 @@ new AttractionTranslation
     id = 192,
     EntityId = 78,
     Lang = "uk",
-    Title = "Гірськолижна траса №7",
-    Description = "Гірськолижна траса №7 у Буковелі призначена для лижників середнього рівня, з доглянутими трасами та мальовничими гірськими краєвидами. Це популярний маршрут як для навчання, так і для відпочинку на схилах.",
-    Address = "Гірськолижна траса №7, Буковель"
+    Title = "Пригодницький парк Буковель",
+    Description = "Пригодницький парк Буковель — всесезонна зона відпочинку на відкритому повітрі з атракціями для сімей та любителів активного відпочинку. Тут є тюбінгові траси, zip-line, мотузкові маршрути та інші розваги на фоні мальовничих Карпат.",
+    Address = "урочище Вишня, Буковель"
 },
 
 // "Готель «Буковель»",
@@ -3994,15 +4165,15 @@ new AttractionTranslation
     Address = "Готель «Буковель», Буковель"
 },
 
-// "Парк «Буковельська весна»",
+// "Bukovel Central Zone"
 new AttractionTranslation
 {
     id = 195,
     EntityId = 80,
     Lang = "en",
-    Title = "Bukovel Spring Park",
-    Description = "Bukovel Spring Park is a family-friendly outdoor area featuring playgrounds, walking paths, and seasonal events. It's a perfect spot for relaxation, recreation, and enjoying the natural beauty of the Carpathians.",
-    Address = "Bukovel Spring Park, Bukovel"
+    Title = "Bukovel Central Zone",
+    Description = "The Central Zone of Bukovel is the heart of the ski resort, featuring restaurants, shops, entertainment areas, and access points to all main slopes. It is a hub for both winter and summer activities, making it a must-visit location for tourists.",
+    Address = "Central Zone, Bukovel"
 },
 
 new AttractionTranslation
@@ -4010,11 +4181,10 @@ new AttractionTranslation
     id = 196,
     EntityId = 80,
     Lang = "uk",
-    Title = "Парк «Буковельська весна»",
-    Description = "Парк «Буковельська весна» — це сімейна зона на відкритому повітрі з дитячими майданчиками, пішохідними доріжками та сезонними заходами. Ідеальне місце для відпочинку, розваг та насолоди природною красою Карпат.",
-    Address = "Парк «Буковельська весна», Буковель"
+    Title = "Центральна зона Буковеля",
+    Description = "Центральна зона Буковеля — серце курорту, де розташовані ресторани, магазини, розважальні майданчики та точки доступу до основних трас. Це центр зимових та літніх активностей, обов’язковий для відвідування туристами.",
+    Address = "Центральна зона, Буковель"
 },
-
 
 // =================== Львів ===================
 
@@ -4081,26 +4251,26 @@ new AttractionTranslation
     Address = "Високий замок, Львів"
 },
 
-// "Парк імені Івана Франка"
+// Підземелля Ратуші
 new AttractionTranslation
 {
     id = 203,
     EntityId = 84,
     Lang = "en",
-    Title = "Ivan Franko Park, Lviv",
-    Description = "Ivan Franko Park is a peaceful green space in the center of Lviv, perfect for leisurely walks, picnics, and enjoying nature. The park is named after the famous Ukrainian writer Ivan Franko.",
-    Address = "Ivan Franko Park, Lviv"
+    Title = "Town Hall Undergrounds",
+    Description = "The Town Hall Undergrounds in Lviv offer a fascinating glimpse into the city's medieval past. Visitors can explore historical cellars, tunnels, and exhibits about Lviv's urban development, making it a unique interactive experience.",
+    Address = "Town Hall Undergrounds, Lviv"
 },
-
 new AttractionTranslation
 {
     id = 204,
     EntityId = 84,
     Lang = "uk",
-    Title = "Парк імені Івана Франка",
-    Description = "Парк імені Івана Франка — затишна зелена зона в центрі Львова, ідеальна для прогулянок, пікніків та відпочинку на природі. Парк названо на честь відомого українського письменника Івана Франка.",
-    Address = "Парк імені Івана Франка, Львів"
+    Title = "Підземелля Ратуші",
+    Description = "Підземелля Ратуші у Львові пропонують захопливий погляд на середньовічне минуле міста. Відвідувачі можуть досліджувати історичні підвали, тунелі та експозиції про розвиток Львова, що робить цей об’єкт унікальним інтерактивним досвідом.",
+    Address = "Підземелля Ратуші, Львів"
 },
+
 // "Арсенал Львів"
 new AttractionTranslation
 {
@@ -4108,7 +4278,7 @@ new AttractionTranslation
     EntityId = 85,
     Lang = "en",
     Title = "Lviv Arsenal",
-    Description = "Lviv Arsenal is a historic fortress building that once served as an armory. Today it hosts exhibitions and cultural events, offering a glimpse into the city’s military past.",
+    Description = "Lviv Arsenal is a historic fortress building that once served as an armory. The Arsenal Museum in Lviv showcases historical weaponry, armor, and military artifacts. Visitors can enjoy interactive displays and learn about the military history of the region, making it both educational and visually impressive.",
     Address = "Lviv Arsenal, Lviv"
 },
 
@@ -4118,50 +4288,48 @@ new AttractionTranslation
     EntityId = 85,
     Lang = "uk",
     Title = "Арсенал Львів",
-    Description = "Арсенал Львів — історична фортифікаційна споруда, що колись слугувала арсеналом. Сьогодні тут проводяться виставки та культурні заходи, що дають уявлення про військове минуле міста.",
+    Description = "Арсенал Львів — історична фортифікаційна споруда, що колись слугувала арсеналом. Музей зброї (Арсенал) у Львові демонструє історичну зброю, обладунки та військові артефакти. Відвідувачі можуть оглянути інтерактивні експозиції та дізнатися про військову історію регіону, що робить музей цікавим та візуально привабливим.",
     Address = "Арсенал Львів, Львів"
 },
 
-// "Львівська кав’ярня «Світ кави»"
+// Музей шоколаду
 new AttractionTranslation
 {
     id = 207,
     EntityId = 86,
     Lang = "en",
-    Title = "Coffee World Cafe, Lviv",
-    Description = "Coffee World Cafe is a popular Lviv coffee house known for its wide selection of coffee drinks, cozy atmosphere, and local pastries. It’s a favorite spot for both locals and tourists.",
-    Address = "Coffee World Cafe, Lviv"
+    Title = "Chocolate Museum Lviv",
+    Description = "The Chocolate Museum in Lviv offers visitors a delicious and interactive experience. Guests can learn about chocolate making, see live demonstrations, taste various treats, and enjoy a visually stunning exhibition of chocolate art.",
+    Address = "Chocolate Museum, Lviv"
 },
-
 new AttractionTranslation
 {
     id = 208,
     EntityId = 86,
     Lang = "uk",
-    Title = "Львівська кав’ярня «Світ кави»",
-    Description = "Львівська кав’ярня «Світ кави» — популярне місце у Львові, відоме великим вибором кавових напоїв, затишною атмосферою та місцевою випічкою. Улюблене місце як для мешканців, так і для туристів.",
-    Address = "Львівська кав’ярня «Світ кави», Львів"
+    Title = "Музей шоколаду",
+    Description = "Музей шоколаду у Львові пропонує відвідувачам смачний та інтерактивний досвід. Гості можуть дізнатися про виробництво шоколаду, подивитися живі демонстрації, скуштувати різні ласощі та насолодитися візуально привабливою експозицією шоколадного мистецтва.",
+    Address = "Музей шоколаду, Львів"
 },
 
-// "Музей історії релігії"
+// Церква Ольги та Єлизавети
 new AttractionTranslation
 {
     id = 209,
     EntityId = 87,
     Lang = "en",
-    Title = "Museum of Religion History, Lviv",
-    Description = "The Museum of Religion History showcases the rich spiritual heritage of Lviv and Ukraine. Visitors can explore artifacts, icons, and exhibits from various faiths and periods.",
-    Address = "Museum of Religion History, Lviv"
+    Title = "Church of St. Olga and St. Elizabeth",
+    Description = "The Church of St. Olga and St. Elizabeth in Lviv is a stunning neo-Gothic cathedral known for its intricate architecture, stained-glass windows, and historical significance. It is one of the most photogenic landmarks in the city.",
+    Address = "Church of St. Olga and St. Elizabeth, Lviv"
 },
-
 new AttractionTranslation
 {
     id = 210,
     EntityId = 87,
     Lang = "uk",
-    Title = "Музей історії релігії",
-    Description = "Музей історії релігії демонструє багату духовну спадщину Львова та України. Відвідувачі можуть ознайомитися з артефактами, іконами та експонатами різних релігій та епох.",
-    Address = "Музей історії релігії, Львів"
+    Title = "Церква Ольги та Єлизавети",
+    Description = "Церква Ольги та Єлизавети у Львові — чудовий неоготичний храм, відомий своєю витонченою архітектурою, вітражами та історичною цінністю. Це один із найфотогенічніших об’єктів міста.",
+    Address = "Церква Ольги та Єлизавети, Львів"
 },
 
 // "Собор Святого Юра"
@@ -4231,15 +4399,15 @@ new AttractionTranslation
     Address = "Одеський оперний театр, Одеса"
 },
 
-// "Потьомкінські сходи"
+// "Воронцовський палац"
 new AttractionTranslation
 {
     id = 217,
     EntityId = 91,
     Lang = "en",
-    Title = "Potemkin Stairs, Odesa",
-    Description = "Potemkin Stairs are one of Odesa’s most famous landmarks. This monumental stairway connects the city center with the harbor, offering panoramic views and historic significance.",
-    Address = "Potemkin Stairs, Odesa"
+    Title = "Vorontsov Palace, Odesa",
+    Description = "Vorontsov Palace in Odesa is a historic architectural gem, famous for its elegant design, beautiful gardens, and cultural significance. Visitors can explore the palace grounds, admire decorative details, and enjoy the picturesque scenery.",
+    Address = "Vorontsov Palace, Odesa"
 },
 
 new AttractionTranslation
@@ -4247,9 +4415,9 @@ new AttractionTranslation
     id = 218,
     EntityId = 91,
     Lang = "uk",
-    Title = "Потьомкінські сходи, Одеса",
-    Description = "Потьомкінські сходи — одна з найвідоміших пам’яток Одеси. Ця монументальна сходова споруда з’єднує центр міста з портом, пропонуючи панорамні види та історичне значення.",
-    Address = "Потьомкінські сходи, Одеса"
+    Title = "Воронцовський палац, Одеса",
+    Description = "Воронцовський палац в Одесі — історична архітектурна перлина, відома своєю елегантною спорудою, красивими садами та культурним значенням. Відвідувачі можуть прогулятися територією палацу, помилуватися декоративними деталями та насолодитися живописними краєвидами.",
+    Address = "Воронцовський палац, Одеса"
 },
 
 // "Приморський бульвар"
@@ -4359,15 +4527,15 @@ new AttractionTranslation
 
 // =================== Харків ===================
 
-// "Площа Свободи"
+// "Харківський художній музей"
 new AttractionTranslation
 {
     id = 229,
     EntityId = 97,
     Lang = "en",
-    Title = "Freedom Square, Kharkiv",
-    Description = "Freedom Square in Kharkiv is one of the largest city squares in Europe. Surrounded by important government and cultural buildings, it serves as a hub for public events, concerts, and gatherings.",
-    Address = "Freedom Square, Kharkiv"
+    Title = "Kharkiv Art Museum",
+    Description = "The Kharkiv Art Museum houses an extensive collection of Ukrainian and European art, including paintings, sculptures, and temporary exhibitions. A must-visit for art lovers exploring Kharkiv.",
+    Address = "Kharkiv Art Museum, Kharkiv"
 },
 
 new AttractionTranslation
@@ -4375,9 +4543,9 @@ new AttractionTranslation
     id = 230,
     EntityId = 97,
     Lang = "uk",
-    Title = "Площа Свободи, Харків",
-    Description = "Площа Свободи у Харкові — одна з найбільших площ Європи. Оточена важливими адміністративними та культурними будівлями, слугує центром громадських заходів, концертів та зібрань.",
-    Address = "Площа Свободи, Харків"
+    Title = "Харківський художній музей",
+    Description = "Харківський художній музей зберігає велику колекцію українського та європейського мистецтва, включаючи живопис, скульптуру та тимчасові виставки. Обов’язкова локація для любителів мистецтва в Харкові.",
+    Address = "Харківський художній музей, Харків"
 },
 
 // "Університет ім. Каразіна"
@@ -4442,15 +4610,15 @@ new AttractionTranslation
     Description = "Сад Шевченка — історичний громадський парк у Харкові з мальовничими доріжками, скульптурами, фонтанами та культурними подіями, названий на честь відомого українського поета Тараса Шевченка.",
     Address = "Сад Шевченка, Харків"
 },
-// "Південний вокзал"
+// "Покровський собор"
 new AttractionTranslation
 {
     id = 237,
     EntityId = 101,
     Lang = "en",
-    Title = "Kharkiv South Railway Station",
-    Description = "Kharkiv South Railway Station serves as one of the main train hubs in the city, connecting domestic and international routes, featuring modern facilities and historical architecture.",
-    Address = "Kharkiv South Railway Station, Kharkiv"
+    Title = "Pokrovsky Cathedral, Kharkiv",
+    Description = "Pokrovsky Cathedral is one of Kharkiv’s most beautiful and historic churches, known for its stunning architecture, intricate interior, and cultural significance. Visitors can admire the ornate details and peaceful surroundings.",
+    Address = "Pokrovsky Cathedral, Kharkiv"
 },
 
 new AttractionTranslation
@@ -4458,9 +4626,9 @@ new AttractionTranslation
     id = 238,
     EntityId = 101,
     Lang = "uk",
-    Title = "Південний вокзал, Харків",
-    Description = "Південний вокзал у Харкові — один із головних залізничних вузлів міста, що з'єднує внутрішні та міжнародні маршрути, з сучасними зручностями та історичною архітектурою.",
-    Address = "Південний вокзал, Харків"
+    Title = "Покровський собор, Харків",
+    Description = "Покровський собор — одна з найгарніших і найісторичніших церков Харкова, відома своєю вражаючою архітектурою, витонченим інтер’єром та культурним значенням. Відвідувачі можуть помилуватися декоративними деталями та спокійною атмосферою.",
+    Address = "Покровський собор, Харків"
 },
 
 // "Харківська Опера"
@@ -4484,15 +4652,15 @@ new AttractionTranslation
     Address = "Харківська Опера, Харків"
 },
 
-// "Парк Ювілейний"
+// "Ботанічний сад Харківського університету"
 new AttractionTranslation
 {
     id = 241,
     EntityId = 103,
     Lang = "en",
-    Title = "Jubilee Park, Kharkiv",
-    Description = "Jubilee Park is a popular recreational area in Kharkiv featuring walking paths, playgrounds, and green spaces for family outings and leisure activities.",
-    Address = "Jubilee Park, Kharkiv"
+    Title = "Botanical Garden of Kharkiv University, Kharkiv",
+    Description = "The Botanical Garden of Kharkiv University is a serene green space showcasing diverse plant collections, beautiful landscapes, and walking paths. It’s a favorite spot for relaxation, study, and photography.",
+    Address = "Botanical Garden of Kharkiv University, Kharkiv"
 },
 
 new AttractionTranslation
@@ -4500,20 +4668,20 @@ new AttractionTranslation
     id = 242,
     EntityId = 103,
     Lang = "uk",
-    Title = "Парк Ювілейний, Харків",
-    Description = "Парк Ювілейний — популярна рекреаційна зона в Харкові з пішохідними доріжками, дитячими майданчиками та зеленими зонами для сімейного відпочинку та дозвілля.",
-    Address = "Парк Ювілейний, Харків"
+    Title = "Ботанічний сад Харківського університету, Харків",
+    Description = "Ботанічний сад Харківського університету — затишна зелена зона з різноманітними колекціями рослин, красивими ландшафтами та прогулянковими доріжками. Улюблене місце для відпочинку, навчання та фотографування.",
+    Address = "Ботанічний сад Харківського університету, Харків"
 },
 
-// "Музей природи"
+// "Парк Фельдмана"
 new AttractionTranslation
 {
     id = 243,
     EntityId = 104,
     Lang = "en",
-    Title = "Nature Museum, Kharkiv",
-    Description = "The Nature Museum in Kharkiv showcases exhibits of flora, fauna, and geological collections, offering educational experiences for visitors of all ages.",
-    Address = "Nature Museum, Kharkiv"
+    Title = "Feldman Ecopark, Kharkiv",
+    Description = "Feldman Ecopark is a sprawling park and zoo in Kharkiv, featuring diverse wildlife, recreational areas, playgrounds, and scenic walking paths. It’s perfect for family outings and nature exploration.",
+    Address = "Feldman Ecopark, Kharkiv"
 },
 
 new AttractionTranslation
@@ -4521,9 +4689,9 @@ new AttractionTranslation
     id = 244,
     EntityId = 104,
     Lang = "uk",
-    Title = "Музей природи, Харків",
-    Description = "Музей природи в Харкові представляє експозиції флори, фауни та геологічних колекцій, пропонуючи освітні можливості для відвідувачів усіх вікових груп.",
-    Address = "Музей природи, Харків"
+    Title = "Парк Фельдмана, Харків",
+    Description = "Парк Фельдмана — просторий парк та зоопарк у Харкові з різноманітними тваринами, зонами відпочинку, дитячими майданчиками та мальовничими прогулянковими доріжками. Ідеальне місце для сімейного відпочинку та знайомства з природою.",
+    Address = "Парк Фельдмана, Харків"
 }
            );
 

@@ -8,7 +8,7 @@
       "welcome_new": "Welcome! Let’s create your account first.",
       "google": "Sign in with Google",
       "or": "Or",
-      "name": "Your full name",
+      "name": "Your name",
       "country": "Country",
       "email": "Email",
       "birthDate": "Date of birth",
@@ -485,6 +485,6 @@
     "location": "Location",
     "text": "Text",
     "submit": "Submit",
-    "no_reviews": "You have no reviews for this hotel"
+    "no_reviews": "No reviews for this hotel"
   }
 }

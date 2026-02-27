@@ -98,10 +98,10 @@ namespace LocationApiService.Data.Seed
               PostCode = "01001",
               IsTop = true,
               Slug= "Kyiv",
-              ImageUrl_Main = "images/cities/Kyiv.jpg",
-              ImageUrl_1 = "images/cities/Kyiv_1.jpg",
-              ImageUrl_2 = "images/cities/Kyiv_2.jpg",
-              ImageUrl_3 = "images/cities/Kyiv_3.jpg",
+              ImageUrl_Main = "images/Kyiv/cities/Kyiv.jpg",
+              ImageUrl_1 = "images/Kyiv/cities/Kyiv_1.jpg",
+              ImageUrl_2 = "images/Kyiv/cities/Kyiv_2.jpg",
+              ImageUrl_3 = "images/Kyiv/cities/Kyiv_3.jpg",
           },
             // Винниця
             new City
@@ -113,10 +113,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "21000",
                 IsTop = false,
                 Slug = "Vinnytsia",
-                ImageUrl_Main = "images/cities/Vinnytsia.jpg",
-                ImageUrl_1 = "images/cities/Vinnytsia_1.jpg",
-                ImageUrl_2 = "images/cities/Vinnytsia_2.jpg",
-                ImageUrl_3 = "images/cities/Vinnytsia_3.jpg",
+                ImageUrl_Main = "images/cities/Vinnytsia/Vinnytsia.jpg",
+                ImageUrl_1 = "images/cities/Vinnytsia/Vinnytsia_1.jpg",
+                ImageUrl_2 = "images/cities/Vinnytsia/Vinnytsia_2.jpg",
+                ImageUrl_3 = "images/cities/Vinnytsia/Vinnytsia_3.jpg",
 
             },
 
@@ -162,10 +162,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "43000",
                 IsTop = false,
                 Slug = "Lutsk",
-                ImageUrl_Main = "images/cities/Lutsk.jpg",
-                ImageUrl_1 = "images/cities/Lutsk_1.jpg",
-                ImageUrl_2 = "images/cities/Lutsk_2.jpg",
-                ImageUrl_3 = "images/cities/Lutsk_3.jpg",
+                ImageUrl_Main = "images/cities/Lutsk/Lutsk.jpg",
+                ImageUrl_1 = "images/cities/Lutsk/Lutsk_1.jpg",
+                ImageUrl_2 = "images/cities/Lutsk/Lutsk_2.jpg",
+                ImageUrl_3 = "images/cities/Lutsk/Lutsk_3.jpg",
             },
 
             // Ковель
@@ -194,10 +194,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "49000",
                 IsTop = true,
                 Slug = "Dnipro",
-                ImageUrl_Main = "images/cities/Dnipro.jpg",
-                ImageUrl_1 = "images/cities/Dnipro_1.jpg",
-                ImageUrl_2 = "images/cities/Dnipro_2.jpg",
-                ImageUrl_3 = "images/cities/Dnipro_3.jpg",
+                ImageUrl_Main = "images/cities/Dnipro/Dnipro.jpg",
+                ImageUrl_1 = "images/cities/Dnipro/Dnipro_1.jpg",
+                ImageUrl_2 = "images/cities/Dnipro/Dnipro_2.jpg",
+                ImageUrl_3 = "images/cities/Dnipro/Dnipro_3.jpg",
             },
 
                 // Кривий Ріг
@@ -370,10 +370,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "88000",
                 IsTop = true,
                 Slug = "Uzhhorod",
-                ImageUrl_Main = "images/cities/Uzhhorod.jpg",
-                ImageUrl_1 = "images/cities/Uzhhorod_1.jpg",
-                ImageUrl_2 = "images/cities/Uzhhorod_2.jpg",
-                ImageUrl_3 = "images/cities/Uzhhorod_3.jpg",
+                ImageUrl_Main = "images/cities/Uzhhorod/Uzhhorod.jpg",
+                ImageUrl_1 = "images/cities/Uzhhorod/Uzhhorod_1.jpg",
+                ImageUrl_2 = "images/cities/Uzhhorod/Uzhhorod_2.jpg",
+                ImageUrl_3 = "images/cities/Uzhhorod/Uzhhorod_3.jpg",
             },
 
             // Мукачево
@@ -433,10 +433,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "69000",
                 IsTop = false,
                 Slug = "Zaporizhzhia",
-                ImageUrl_Main = "images/cities/Zaporizhzhia.jpg",
-                ImageUrl_1 = "images/cities/Zaporizhzhia_1.jpg",
-                ImageUrl_2 = "images/cities/Zaporizhzhia_2.jpg",
-                ImageUrl_3 = "images/cities/Zaporizhzhia_3.jpg",
+                ImageUrl_Main = "images/cities/Zaporizhzhia/Zaporizhzhia.jpg",
+                ImageUrl_1 = "images/cities/Zaporizhzhia/Zaporizhzhia_1.jpg",
+                ImageUrl_2 = "images/cities/Zaporizhzhia/Zaporizhzhia_2.jpg",
+                ImageUrl_3 = "images/cities/Zaporizhzhia/Zaporizhzhia_3.jpg",
             },
 
             // Мелітополь
@@ -496,10 +496,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "76000",
                 IsTop = true,
                 Slug = "IvanoFrankivsk",
-                ImageUrl_Main = "images/cities/IvanoFrankivsk.jpg",
-                ImageUrl_1 = "images/cities/IvanoFrankivsk_1.jpg",
-                ImageUrl_2 = "images/cities/IvanoFrankivsk_2.jpg",
-                ImageUrl_3 = "images/cities/IvanoFrankivsk_3.jpg",
+                ImageUrl_Main = "images/cities/IvanoFrankivsk/IvanoFrankivsk.jpg",
+                ImageUrl_1 = "images/cities/IvanoFrankivsk/IvanoFrankivsk_1.jpg",
+                ImageUrl_2 = "images/cities/IvanoFrankivsk/IvanoFrankivsk_2.jpg",
+                ImageUrl_3 = "images/cities/IvanoFrankivsk/IvanoFrankivsk_3.jpg",
             },
 
             // Калуш
@@ -543,10 +543,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "78500",
                 IsTop = true,
                 Slug = "Yaremche",
-                ImageUrl_Main = "images/cities/Yaremche.jpg",
-                ImageUrl_1 = "images/cities/Yaremche_1.jpg",
-                ImageUrl_2 = "images/cities/Yaremche_2.jpg",
-                ImageUrl_3 = "images/cities/Yaremche_3.jpg",
+                ImageUrl_Main = "images/cities/Yaremche/Yaremche.jpg",
+                ImageUrl_1 = "images/cities/Yaremche/Yaremche_1.jpg",
+                ImageUrl_2 = "images/cities/Yaremche/Yaremche_2.jpg",
+                ImageUrl_3 = "images/cities/Yaremche/Yaremche_3.jpg",
                 },
 
             // Буковель
@@ -559,10 +559,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "78593",
                 IsTop = true,
                 Slug = "Bukovel",
-                ImageUrl_Main = "images/cities/Bukovel.jpg",
-                ImageUrl_1 = "images/cities/Bukovel_1.jpg",
-                ImageUrl_2 = "images/cities/Bukovel_2.jpg",
-                ImageUrl_3 = "images/cities/Bukovel_3.jpg",
+                ImageUrl_Main = "images/cities/Bukovel/Bukovel.jpg",
+                ImageUrl_1 = "images/cities/Bukovel/Bukovel_1.jpg",
+                ImageUrl_2 = "images/cities/Bukovel/Bukovel_2.jpg",
+                ImageUrl_3 = "images/cities/Bukovel/Bukovel_3.jpg",
             },
 
             // Біла Церква
@@ -575,10 +575,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "09100",
                 IsTop = true,
                 Slug = "BilaTserkva",
-                ImageUrl_Main = "images/cities/BilaTserkva.jpg",
-                ImageUrl_1 = "images/cities/BilaTserkva_1.jpg",
-                ImageUrl_2 = "images/cities/BilaTserkva_2.jpg",
-                ImageUrl_3 = "images/cities/BilaTserkva_3.jpg",
+                ImageUrl_Main = "images/cities/BilaTserkva/BilaTserkva.jpg",
+                ImageUrl_1 = "images/cities/BilaTserkva/BilaTserkva_1.jpg",
+                ImageUrl_2 = "images/cities/BilaTserkva/BilaTserkva_2.jpg",
+                ImageUrl_3 = "images/cities/BilaTserkva/BilaTserkva_3.jpg",
             },
 
             // Бориспіль
@@ -781,10 +781,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "79000",
                 IsTop = true,
                 Slug = "Lviv",
-                ImageUrl_Main = "images/cities/Lviv.jpg",
-                ImageUrl_1 = "images/cities/Lviv_1.jpg",
-                ImageUrl_2 = "images/cities/Lviv_2.jpg",
-                ImageUrl_3 = "images/cities/Lviv_3.jpg",
+                ImageUrl_Main = "images/cities/Lviv/Lviv.jpg",
+                ImageUrl_1 = "images/cities/Lviv/Lviv_1.jpg",
+                ImageUrl_2 = "images/cities/Lviv/Lviv_2.jpg",
+                ImageUrl_3 = "images/cities/Lviv/Lviv_3.jpg",
             },
 
             // Дрогобич
@@ -845,10 +845,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "82200",
                 IsTop = true,
                 Slug = "Truskavets",
-                ImageUrl_Main = "images/cities/Truskavets.jpg",
-                ImageUrl_1 = "images/cities/Truskavets_1.jpg",
-                ImageUrl_2 = "images/cities/Truskavets_2.jpg",
-                ImageUrl_3 = "images/cities/Truskavets_3.jpg",
+                ImageUrl_Main = "images/cities/Truskavets/Truskavets.jpg",
+                ImageUrl_1 = "images/cities/Truskavets/Truskavets_1.jpg",
+                ImageUrl_2 = "images/cities/Truskavets/Truskavets_2.jpg",
+                ImageUrl_3 = "images/cities/Truskavets/Truskavets_3.jpg",
             },
             // Миколаїв
             new City
@@ -860,10 +860,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "54000",
                 IsTop = true,
                 Slug = "Mykolaiv",
-                ImageUrl_Main = "images/cities/Mykolaiv.jpg",
-                ImageUrl_1 = "images/cities/Mykolaiv_1.jpg",
-                ImageUrl_2 = "images/cities/Mykolaiv_2.jpg",
-                ImageUrl_3 = "images/cities/Mykolaiv_3.jpg",
+                ImageUrl_Main = "images/cities/Mykolaiv/Mykolaiv.jpg",
+                ImageUrl_1 = "images/cities/Mykolaiv/Mykolaiv_1.jpg",
+                ImageUrl_2 = "images/cities/Mykolaiv/Mykolaiv_2.jpg",
+                ImageUrl_3 = "images/cities/Mykolaiv/Mykolaiv_3.jpg",
             },
 
             // Одеса
@@ -876,10 +876,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "65000",
                 IsTop = true,
                 Slug = "Odesa",
-                ImageUrl_Main = "images/cities/Odesa.jpg",
-                ImageUrl_1 = "images/cities/Odesa_1.jpg",
-                ImageUrl_2 = "images/cities/Odesa_2.jpg",
-                ImageUrl_3 = "images/cities/Odesa_3.jpg",
+                ImageUrl_Main = "images/cities/Odesa/Odesa.jpg",
+                ImageUrl_1 = "images/cities/Odesa/Odesa_1.jpg",
+                ImageUrl_2 = "images/cities/Odesa/Odesa_2.jpg",
+                ImageUrl_3 = "images/cities/Odesa/Odesa_3.jpg",
             },
 
             // Ізмаїл
@@ -1019,10 +1019,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "33000",
                 IsTop = true,
                 Slug = "Rivne",
-                ImageUrl_Main = "images/cities/Rivne.jpg",
-                ImageUrl_1 = "images/cities/Rivne_1.jpg",
-                ImageUrl_2 = "images/cities/Rivne_2.jpg",
-                ImageUrl_3 = "images/cities/Rivne_3.jpg",
+                ImageUrl_Main = "images/cities/Rivne/Rivne.jpg",
+                ImageUrl_1 = "images/cities/Rivne/Rivne_1.jpg",
+                ImageUrl_2 = "images/cities/Rivne/Rivne_2.jpg",
+                ImageUrl_3 = "images/cities/Rivne/Rivne_3.jpg",
             },
 
             // Дубно
@@ -1193,10 +1193,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "61000",
                 IsTop = true,
                 Slug = "Kharkiv",
-                ImageUrl_Main = "images/cities/Kharkiv.jpg",
-                ImageUrl_1 = "images/cities/Kharkiv_1.jpg",
-                ImageUrl_2 = "images/cities/Kharkiv_2.jpg",
-                ImageUrl_3 = "images/cities/Kharkiv_3.jpg",
+                ImageUrl_Main = "images/cities/Kharkiv/Kharkiv.jpg",
+                ImageUrl_1 = "images/cities/Kharkiv/Kharkiv_1.jpg",
+                ImageUrl_2 = "images/cities/Kharkiv/Kharkiv_2.jpg",
+                ImageUrl_3 = "images/cities/Kharkiv/Kharkiv_3.jpg",
             },
 
             // Ізюм
@@ -1257,10 +1257,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "73000",
                 IsTop = true,
                 Slug = "Kherson",
-                ImageUrl_Main = "images/cities/Kherson.jpg",
-                ImageUrl_1 = "images/cities/Kherson_1.jpg",
-                ImageUrl_2 = "images/cities/Kherson_2.jpg",
-                ImageUrl_3 = "images/cities/Kherson_3.jpg",
+                ImageUrl_Main = "images/cities/Kherson/Kherson.jpg",
+                ImageUrl_1 = "images/cities/Kherson/Kherson_1.jpg",
+                ImageUrl_2 = "images/cities/Kherson/Kherson_2.jpg",
+                ImageUrl_3 = "images/cities/Kherson/Kherson_3.jpg",
             },
 
             // Нова Каховка
@@ -1304,10 +1304,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "29000",
                 IsTop = true,
                 Slug = "Khmelnytskyi",
-                ImageUrl_Main = "images/cities/Khmelnytskyi.jpg",
-                ImageUrl_1 = "images/cities/Khmelnytskyi_1.jpg",
-                ImageUrl_2 = "images/cities/Khmelnytskyi_2.jpg",
-                ImageUrl_3 = "images/cities/Khmelnytskyi_3.jpg",
+                ImageUrl_Main = "images/cities/Khmelnytskyi/Khmelnytskyi.jpg",
+                ImageUrl_1 = "images/cities/Khmelnytskyi/Khmelnytskyi_1.jpg",
+                ImageUrl_2 = "images/cities/Khmelnytskyi/Khmelnytskyi_2.jpg",
+                ImageUrl_3 = "images/cities/Khmelnytskyi/Khmelnytskyi_3.jpg",
             },
 
             // Кам’янець-Подільський
@@ -1352,10 +1352,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "18000",
                 IsTop = true,
                 Slug = "Cherkasy",
-                ImageUrl_Main = "images/cities/Cherkasy.jpg",
-                ImageUrl_1 = "images/cities/Cherkasy_1.jpg",
-                ImageUrl_2 = "images/cities/Cherkasy_2.jpg",
-                ImageUrl_3 = "images/cities/Cherkasy_3.jpg",
+                ImageUrl_Main = "images/cities/Cherkasy/Cherkasy.jpg",
+                ImageUrl_1 = "images/cities/Cherkasy/Cherkasy_1.jpg",
+                ImageUrl_2 = "images/cities/Cherkasy/Cherkasy_2.jpg",
+                ImageUrl_3 = "images/cities/Cherkasy/Cherkasy_3.jpg",
             },
 
             // Умань
@@ -1399,10 +1399,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "58000",
                 IsTop = true,
                 Slug = "Chernivtsi",
-                ImageUrl_Main = "images/cities/Chernivtsi.jpg",
-                ImageUrl_1 = "images/cities/Chernivtsi_1.jpg",
-                ImageUrl_2 = "images/cities/Chernivtsi_2.jpg",
-                ImageUrl_3 = "images/cities/Chernivtsi_3.jpg",
+                ImageUrl_Main = "images/cities/Chernivtsi/Chernivtsi.jpg",
+                ImageUrl_1 = "images/cities/Chernivtsi/Chernivtsi_1.jpg",
+                ImageUrl_2 = "images/cities/Chernivtsi/Chernivtsi_2.jpg",
+                ImageUrl_3 = "images/cities/Chernivtsi/Chernivtsi_3.jpg",
             },
 
             // Хотин
@@ -1447,10 +1447,10 @@ namespace LocationApiService.Data.Seed
                 PostCode = "14000",
                 IsTop = true,
                 Slug = "Chernihiv",
-                ImageUrl_Main = "images/cities/Chernihiv.jpg",
-                ImageUrl_1 = "images/cities/Chernihiv_1.jpg",
-                ImageUrl_2 = "images/cities/Chernihiv_2.jpg",
-                ImageUrl_3 = "images/cities/Chernihiv_3.jpg",
+                ImageUrl_Main = "images/cities/Chernihiv/Chernihiv.jpg",
+                ImageUrl_1 = "images/cities/Chernihiv/Chernihiv_1.jpg",
+                ImageUrl_2 = "images/cities/Chernihiv/Chernihiv_2.jpg",
+                ImageUrl_3 = "images/cities/Chernihiv/Chernihiv_3.jpg",
             },
 
             // Ніжин

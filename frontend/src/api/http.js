@@ -30,6 +30,7 @@ let http = null;
 const initHttp = () => {
   if (!http) {
     const { API_BASE } = getConfig();
+    console.log("API_BASE =", API_BASE);
     http = axios.create({
       baseURL: API_BASE,
       headers: {

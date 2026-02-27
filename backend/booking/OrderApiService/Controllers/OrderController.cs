@@ -139,8 +139,8 @@ namespace OrderApiService.Controllers
             var end = request.End;
             foreach (var orderId in ordersIdList)
             {
-                var result = await _orderService.HasDateConflict(orderId, offerId, start, end);
-                if (result)
+                var isExist = await _orderService.HasDateConflict(orderId, offerId, start, end);
+                if (!isExist)
                     return false;
             }
             return true;
