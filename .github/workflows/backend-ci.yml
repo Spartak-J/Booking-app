@@ -69,7 +69,7 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
-          host: 3.74.176.134
+          host: ssh.booking-oselya.pp.ua
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
