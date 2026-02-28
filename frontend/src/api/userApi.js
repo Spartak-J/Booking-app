@@ -7,6 +7,9 @@ export const userApi = {
   
   setMyHistory: (offerId) => http.post(`/Bff/me/offer/isfavorite/add/${offerId}`), 
   getMyHistory: (lang) => http.get(`/Bff/me/history/get/offers/${lang}`), 
+
+  getMyHistoryId: (lang) => http.get(`/Bff/me/history/get/offersId/${lang}`), 
+  
   
   updateMe: (userData) => http.put("/User/me/update", userData),
     

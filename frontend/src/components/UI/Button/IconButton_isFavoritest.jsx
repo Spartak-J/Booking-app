@@ -1,29 +1,39 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { ApiContext } from "../../../contexts/ApiContext.jsx";
 
 import { ImageSvg } from "../Image/ImageSvg.jsx";
 
 export const IconButton_isFavoritest = ({
-  hotelId,            
+  hotelId,
   className = "",
   icon_src,
   sizeX = 36,
   sizeY = 36,
   onClick,
   title = null,
+  myHistoryIdList = [],
   initialActive = false,
 }) => {
   const [isActive, setIsActive] = useState(initialActive);
   const [isHover, setIsHover] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { userApi } = useContext(ApiContext);
+
+
+  useEffect(() => {
+    if (myHistoryIdList?.includes(hotelId)) {
+      setIsActive(true);
+    } else {
+      setIsActive(false);
+    }
+  }, [hotelId, myHistoryIdList]);
 
   const handleClick = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (loading) return; 
+    if (loading) return;
 
     const newState = !isActive;
     setIsActive(newState);
@@ -37,15 +47,15 @@ export const IconButton_isFavoritest = ({
         // await userApi.removeFromHistory(hotelId);
       }
 
-      if (onClick) onClick(newState); 
+      if (onClick) onClick(newState);
     } catch (err) {
       console.error("Ошибка при изменении избранного", err);
-      setIsActive(!newState); 
+      setIsActive(!newState);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const icon_name = isActive || isHover ? "isFavoritest_active" : "isFavoritest";
 
   return (

@@ -52,23 +52,21 @@ namespace ReviewApiService.Controllers
 
         [HttpPost("search/offers/rating")]
         public async Task<ActionResult<List<RatingResponse>>> GetRatingPopularOffers(
-      [FromBody] List<int> idList)
-        { 
-            var result = new List<RatingResponse>();
-            foreach (var offerId in idList)
-            {
-                var exists = await _reviewService.ExistsEntityAsync(offerId);
-                if (!exists)
-                   continue;
+    [FromBody] List<int> idList)
+        {
+            if (idList == null || !idList.Any())
+                return BadRequest("Offer id list is required");
 
-                var averageRating = await _reviewService.GetRatingByOfferId(offerId);
-                var ratingResponse = new RatingResponse
-                {
-                    OfferId = offerId,
-                    OverallRating = averageRating
-                };
-                result.Add(ratingResponse);
-            }
+            if (idList.Any(id => id <= 0))
+                return BadRequest("All offer ids must be greater than 0");
+
+            var ratings = await _reviewService.GetRatingsByOfferIds(idList);
+
+            var result = ratings.Select(r => new RatingResponse
+            {
+                OfferId = r.Key,
+                OverallRating = r.Value
+            }).ToList();
 
             return Ok(result);
         }

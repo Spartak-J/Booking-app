@@ -364,6 +364,7 @@ body {
 
 .btn_icon_isFavorite{
   position:absolute;
+   box-sizing:content-box;
   top:20px;
   right: 25px;
   background-color: transparent;

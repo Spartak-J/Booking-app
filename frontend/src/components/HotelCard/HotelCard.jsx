@@ -23,6 +23,7 @@ export const HotelCard = ({
     startDate,
     endDate,
     adults,
+    myHistoryIdList,
     showHeart = true,
     children
 }) => {
@@ -45,7 +46,7 @@ export const HotelCard = ({
             }}
         >
             {showHeart &&
-                <IconButton_isFavoritest hotelId={id} />
+                <IconButton_isFavoritest hotelId={id} myHistoryIdList={myHistoryIdList} />
             }
 
             <div className={`${styles.card__imageWrapper} btn-br-r-20 `}>
@@ -71,7 +72,7 @@ export const HotelCard = ({
                             </div>
 
                             <StarIcon className={styles.star} />
-                            <Text text={`${reviews} відгуків`} type="m_400_s_14" />
+                            {/* <Text text={`${reviews} відгуків`} type="m_400_s_14" /> */}
                         </div>
 
 

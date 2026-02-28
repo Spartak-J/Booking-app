@@ -24,6 +24,8 @@ import styles from './Header.module.css';
 export const Header_Full = ({
   showLogBtn = true,
   city = "",
+  region = "",
+  country = "",
   title = "",
   titleBtn,
   adults,
@@ -34,7 +36,7 @@ export const Header_Full = ({
   params,
   showFilterBtn = true,
   openFilterMenu = true,
-  setOpenFilterMenu=false,
+  setOpenFilterMenu = false,
   handleSearchResults,
   handleSortChange
 }) => {
@@ -50,7 +52,7 @@ export const Header_Full = ({
 
   const { t } = useTranslation();
   const { language, setLanguage } = useLanguage();
- 
+
   const handleLanguageToggle = () => {
     setIsModalLanguageOpen(true);
     setOpenSortMenu(false);
@@ -74,15 +76,17 @@ export const Header_Full = ({
           </div>
         )}
         <div className={`${styles.headerMain_Logo__container}   flex-between`} >
-          <div className={`${styles.headerMain__logo} ${styles.headerMain__logo_order}`}>
+          <div
+            className={`${styles.headerMain__logo} ${styles.headerMain__logo_order}`}
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
+          >
             <Logo_Oselya />
           </div>
           <div className={`${styles.searchBar} ${styles.searchBar_order}`}>
             <SearchBar
-              defaultCity={city}
-              defaultGuests={{ adults, children, rooms }}
-              defaultStartDate={startDate}
-              defaultEndDate={endDate}
+              city={city}
+
               params={params}
               onSearch={handleSearchResults}
             />
@@ -149,7 +153,7 @@ export const Header_Full = ({
           </div>
         </div>
         <div className={`${styles.headerMain_breadcrumbs__container} flex-left`} >
-          <Breadcrumbs city={city} hotelTitle={title} />
+          <Breadcrumbs city={city} region={region} country={country} hotelTitle={title} />
         </div>
         <div className={`${styles.headerMain_cityTitle__container} flex-center`} >
           <Text text={title} type="m_700_s_40" />

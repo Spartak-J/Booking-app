@@ -56,6 +56,8 @@ export const SearchBar_Main = () => {
 
     const params = new URLSearchParams({
       cityId: locationId,
+      countryId: null,
+      regionId: null,
       startDate: formatLocalDate(dateRange.start),
       endDate: formatLocalDate(dateRange.end),
       adults: guests.adults,

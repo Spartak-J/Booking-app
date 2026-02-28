@@ -129,6 +129,51 @@ namespace OfferApiService.Controllers
         }
 
 
+        //===========================================================================================
+        //  получение обьявлений по региону и параметрам поиска
+        //===========================================================================================
+
+        [HttpGet("search/offers/fromRegion")]
+        public async Task<ActionResult<List<OfferShortResponse>>> GetSearchOffersFromRegion(
+            [FromQuery] OfferSearchRequestByRegionAndCountGuest request,
+            [FromQuery] decimal userDiscountPercent)
+        {
+
+            if (request.StartDate >= request.EndDate)
+                throw new ArgumentException("Invalid date range");
+
+            var offers = await _offerService.SearchOffersFromRegion(request);
+
+            //var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            var result = offers.Select(o => OfferShortResponse.MapToShortResponse(o, _baseUrl)).ToList();
+           
+            return Ok(result);
+        }
+
+
+        //===========================================================================================
+        //  получение обьявлений по стране и параметрам поиска
+        //===========================================================================================
+
+        [HttpGet("search/offers/fromCountry")]
+        public async Task<ActionResult<List<OfferShortResponse>>> GetSearchOffersFromCountry(
+            [FromQuery] OfferSearchRequestByCountryAndCountGuest request,
+            [FromQuery] decimal userDiscountPercent)
+        {
+
+            if (request.StartDate >= request.EndDate)
+                throw new ArgumentException("Invalid date range");
+
+            var offers = await _offerService.SearchOffersFromCountry(request);
+
+            //var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            var result = offers.Select(o => OfferShortResponse.MapToShortResponse(o, _baseUrl)).ToList();
+
+            return Ok(result);
+        }
+
 
 
 

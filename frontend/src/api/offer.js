@@ -23,13 +23,15 @@ export const offerApi = {
     });
   },
 
-  searchOffers: ({ startDate, endDate, adults, children, rooms,  userDiscountPercent, lang, cityId, paramItemFilters }) => {
+  searchOffers: ({ startDate, endDate, adults, children, rooms,  userDiscountPercent, lang, cityId,regionId,countryId, paramItemFilters }) => {
 
     const startIso = new Date(startDate).toISOString();
     const endIso = new Date(endDate).toISOString();
 
     const params = new URLSearchParams({
-      CityId: cityId ? cityId.toString() : "",
+      CityId: cityId ? cityId.toString() : -1,
+      RegionId: regionId ? regionId.toString() : -1,
+      CountryId: countryId ? countryId.toString() : -1,
       StartDate: startIso,
       EndDate: endIso,
       Adults: adults? adults.toString() : "",
