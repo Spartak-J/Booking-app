@@ -44,6 +44,79 @@ namespace WebApiGetway.Controllers
             return Ok(result);
         }
 
+        //=============================================================================
+        //                      получаем  название города по id 
+        //=============================================================================
+
+        [HttpGet("city/country/get-translations/{cityId}/{lang}")]
+        public async Task<IActionResult> GetCity(int cityId,string lang)
+        {
+
+            var cityResult = await _gateway.ForwardRequestAsync<object>(
+               "LocationApiService",
+               $"/api/City/get/{cityId}",
+               HttpMethod.Get,
+               null
+           );
+
+            if (cityResult is not OkObjectResult okCity)
+                return cityResult;
+            var cityList = BffHelper.ConvertActionResultToDict(okCity);
+
+            var city = cityList[0];
+            var regionId = int.Parse(city["regionId"].ToString());
+
+
+
+            var regionResult = await _gateway.ForwardRequestAsync<object>(
+               "LocationApiService",
+               $"/api/Region/get/{regionId}",
+               HttpMethod.Get,
+               null
+           );
+
+            if (regionResult is not OkObjectResult okRegion)
+                return regionResult;
+            var regionList = BffHelper.ConvertActionResultToDict(okRegion);
+
+            var region = regionList[0];
+            var countryId = int.Parse(region["countryId"].ToString());
+
+
+            var translateCountry = await _gateway.ForwardRequestAsync<object>(
+                "TranslationApiService",
+                $"/api/Country/get-translations/" +
+                $"{countryId}/{lang}",
+                HttpMethod.Get, 
+                null);
+            var countryTitle = GetStringFromActionResult(translateCountry, "title");
+
+            var translateRegion = await _gateway.ForwardRequestAsync<object>(
+                "TranslationApiService",
+                $"/api/Region/get-translations/{regionId}/{lang}",
+                HttpMethod.Get,
+                null);
+            var regionTitle = GetStringFromActionResult(translateRegion, "title");
+
+            var translateCity = await _gateway.ForwardRequestAsync<object>(
+                "TranslationApiService",
+                $"/api/City/get-translations/{cityId}/{lang}",
+                HttpMethod.Get,
+                null);
+            var cityTitle = GetStringFromActionResult(translateCity, "title");
+
+
+            //----------
+
+            city["countryTitle"] = countryTitle;
+            city["regionTitle"] = regionTitle;
+            city["title"] = cityTitle;
+            city["countryId"] = countryId;
+
+            return Ok(city);
+        }
+
+
 
 
         //=============================================================================
@@ -170,14 +243,197 @@ namespace WebApiGetway.Controllers
         [HttpGet("search/offers/{lang}")]
         public async Task<IActionResult> GetSearchOffers(
             string lang,
-            [FromQuery] int cityId,
-            [FromQuery] DateTime startDate,
-            [FromQuery] DateTime endDate,
+           [FromQuery] int? cityId,
+            [FromQuery] int? regionId,
+            [FromQuery] int? countryId,
+            [FromQuery] string startDate,
+            [FromQuery] string endDate,
             [FromQuery] int adults,
             [FromQuery] int children,
             [FromQuery] int rooms,
             [FromQuery] string paramItemFilters = null)
         {
+            var start = DateTime.Parse(startDate);
+            var end = DateTime.Parse(endDate);
+
+            decimal userDiscountPercent = 0;
+            int? userId = null;
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                (userId, userDiscountPercent) = await GetUserIdAndDiscountAsync();
+            }
+
+            var totalGuests = adults + children;
+
+          var queryDict = new Dictionary<string, string?>
+            {
+                ["guests"] = totalGuests.ToString(),
+                ["adults"] = adults.ToString(),
+                ["children"] = children.ToString(),
+                ["rooms"] = rooms.ToString(),
+                ["userDiscountPercent"] = userDiscountPercent.ToString(),
+                ["startDate"] = start.ToString("O"),
+                ["endDate"] = end.ToString("O"),
+            };
+            string route = string.Empty ;
+            if (cityId != -1) {
+                queryDict["cityId"] = cityId.Value.ToString();
+                route = "/api/offer/search/offers";
+            }
+            else if (regionId != -1) {
+                queryDict["regionId"] = regionId.Value.ToString();
+                route = "/api/offer/search/offers/fromRegion";
+            }
+            else if (countryId != -1)
+            {
+                queryDict["countryId"] = countryId.Value.ToString();
+                route = "/api/offer/search/offers/fromCountry";
+            }
+
+            var offerQuery = QueryString.Create(queryDict);
+
+          
+
+           var offerObjResult = await _gateway.ForwardRequestAsync<object>(
+              "OfferApiService",
+              $"{route}{offerQuery}",
+              HttpMethod.Get,
+              null);
+
+
+
+            if (offerObjResult is not OkObjectResult okOffer)
+                return offerObjResult;
+
+            var offerDictList = BffHelper.ConvertActionResultToDict(okOffer);
+            var filterDicts = ParseParamFiltersToDict(paramItemFilters);
+            var filteredOfferList = new List<Dictionary<string, object>>();
+
+            var dateConflictCache =
+                new Dictionary<(int offerId, DateTime start, DateTime end), bool>();
+
+
+            var idList = new List<int>();
+            foreach (var offer in offerDictList)
+            {
+                if (!TryGetOfferId(offer, out var offerId))
+                    continue;
+                var id = int.Parse(offer["id"].ToString());
+                idList.Add(id);
+
+                var cacheKey = (offerId, start, end);
+
+                if (!dateConflictCache.TryGetValue(cacheKey, out var hasConflict))
+                {
+                    hasConflict = await HasDateConflictAsync(
+                        offerId, start, end);
+
+                    dateConflictCache[cacheKey] = hasConflict;
+                }
+
+                if (hasConflict)
+                    continue;
+
+                if (!filterDicts.Any())
+                {
+                    filteredOfferList.Add(offer);
+                    continue;
+                }
+
+                if (!TryGetParamValues(offer, out var paramValues))
+                    continue;
+
+                if (MatchAllFilters(paramValues, filterDicts))
+                    filteredOfferList.Add(offer);
+
+                var entityStatOfferEventRequest = new EntityStatEventRequest
+                {
+                    EntityId = offerId,
+                    EntityType = "Offer",
+                    ActionType = "Search",
+                    UserId = userId
+                };
+                await SendStatEvent(entityStatOfferEventRequest, "Offer");
+
+
+                //var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService",
+                //    $"/api/review/search/offers/rating/{offerId}",
+                //    HttpMethod.Get,
+                //    null);
+                //if (ratingObjResult is not OkObjectResult okRating)
+                //    return Ok(offerDictList);
+                //var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
+
+                //BffHelper.UpdateOfferListWithRating(offerDictList, ratingDictList);
+            }
+
+            int entityId;
+            string entityType;
+
+            if (cityId.HasValue)
+            {
+                entityId = cityId.Value;
+                entityType = "City";
+            }
+            else if (regionId.HasValue)
+            {
+                entityId = regionId.Value;
+                entityType = "Region";
+            }
+            else
+            {
+                entityId = countryId.Value;
+                entityType = "Country";
+            }
+
+            var entityStatEventRequest = new EntityStatEventRequest
+            {
+                EntityId = entityId,
+                EntityType = entityType,
+                ActionType = "Search",
+                UserId = userId
+            };
+
+            await SendStatEvent(entityStatEventRequest, entityType);
+
+            var offerTranslations = await GetTranslationsAsync(lang, "Offer");
+            var updateOfferDictList = BffHelper.UpdateListWithTranslations(filteredOfferList, offerTranslations);
+
+
+            //получаем рейтинг
+            var ratingObjResult = await _gateway.ForwardRequestAsync<object>(
+                "ReviewApiService",
+                $"/api/review/search/offers/rating", 
+                HttpMethod.Post,
+                idList);
+            if (ratingObjResult is OkObjectResult okRating)
+            {
+                var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
+                BffHelper.UpdateOfferListWithRating(updateOfferDictList, ratingDictList);
+            }
+            return Ok(updateOfferDictList);
+        }
+
+
+
+        //=====================================================================================
+        //      получаем список обьявлений по региону
+        //=====================================================================================
+
+        [HttpGet("search/offers/regions/{lang}")]
+        public async Task<IActionResult> GetSearchOffersFromRegion(
+            string lang,
+            [FromQuery] int regionId,
+            [FromQuery] string startDate,
+            [FromQuery] string endDate,
+            [FromQuery] int adults,
+            [FromQuery] int children,
+            [FromQuery] int rooms,
+            [FromQuery] string paramItemFilters = null)
+        {
+            var start = DateTime.Parse(startDate);
+            var end = DateTime.Parse(endDate);
 
             decimal userDiscountPercent = 0;
             int? userId = null;
@@ -191,19 +447,19 @@ namespace WebApiGetway.Controllers
 
             var offerQuery = QueryString.Create(new Dictionary<string, string?>
             {
-                ["cityId"] = cityId.ToString(),
+                ["regionId"] = regionId.ToString(),
                 ["guests"] = totalGuests.ToString(),
                 ["adults"] = adults.ToString(),
                 ["children"] = children.ToString(),
                 ["rooms"] = rooms.ToString(),
                 ["userDiscountPercent"] = userDiscountPercent.ToString(),
-                ["startDate"] = startDate.ToString("O"),
-                ["endDate"] = endDate.ToString("O"),
+                ["startDate"] = start.ToString("O"),
+                ["endDate"] = end.ToString("O"),
             });
 
             var offerObjResult = await _gateway.ForwardRequestAsync<object>(
                 "OfferApiService",
-                $"/api/offer/search/offers{offerQuery}",
+                $"/api/offer/search/offers/fromRegion{offerQuery}",
                 HttpMethod.Get,
                 null);
 
@@ -226,12 +482,12 @@ namespace WebApiGetway.Controllers
                 var id = int.Parse(offer["id"].ToString());
                 idList.Add(id);
 
-                var cacheKey = (offerId, startDate, endDate);
+                var cacheKey = (offerId, start, end);
 
                 if (!dateConflictCache.TryGetValue(cacheKey, out var hasConflict))
                 {
                     hasConflict = await HasDateConflictAsync(
-                        offerId, startDate, endDate);
+                        offerId, start, end);
 
                     dateConflictCache[cacheKey] = hasConflict;
                 }
@@ -259,12 +515,23 @@ namespace WebApiGetway.Controllers
                     UserId = userId
                 };
                 await SendStatEvent(entityStatEventRequest, "Offer");
+
+
+                //var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService",
+                //    $"/api/review/search/offers/rating/{offerId}",
+                //    HttpMethod.Get,
+                //    null);
+                //if (ratingObjResult is not OkObjectResult okRating)
+                //    return Ok(offerDictList);
+                //var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
+
+                //BffHelper.UpdateOfferListWithRating(offerDictList, ratingDictList);
             }
 
             var entityStatCityEventRequest = new EntityStatEventRequest
             {
-                EntityId = cityId,
-                EntityType = "City",
+                EntityId = regionId,
+                EntityType = "Region",
                 ActionType = "Search",
                 UserId = userId
             };
@@ -275,7 +542,11 @@ namespace WebApiGetway.Controllers
 
 
             //получаем рейтинг
-            var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating", HttpMethod.Get, idList);
+            var ratingObjResult = await _gateway.ForwardRequestAsync<object>(
+                "ReviewApiService",
+                $"/api/review/search/offers/rating",
+                HttpMethod.Post,
+                idList);
             if (ratingObjResult is OkObjectResult okRating)
             {
                 var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
@@ -283,6 +554,146 @@ namespace WebApiGetway.Controllers
             }
             return Ok(updateOfferDictList);
         }
+
+
+        //=====================================================================================
+        //      получаем список обьявлений по стране
+        //=====================================================================================
+
+        [HttpGet("search/offers/regions/{lang}")]
+        public async Task<IActionResult> GetSearchOffersFromCountry(
+            string lang,
+            [FromQuery] int countryId,
+            [FromQuery] string startDate,
+            [FromQuery] string endDate,
+            [FromQuery] int adults,
+            [FromQuery] int children,
+            [FromQuery] int rooms,
+            [FromQuery] string paramItemFilters = null)
+        {
+            var start = DateTime.Parse(startDate);
+            var end = DateTime.Parse(endDate);
+
+            decimal userDiscountPercent = 0;
+            int? userId = null;
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                (userId, userDiscountPercent) = await GetUserIdAndDiscountAsync();
+            }
+
+            var totalGuests = adults + children;
+
+            var offerQuery = QueryString.Create(new Dictionary<string, string?>
+            {
+                ["countryId"] = countryId.ToString(),
+                ["guests"] = totalGuests.ToString(),
+                ["adults"] = adults.ToString(),
+                ["children"] = children.ToString(),
+                ["rooms"] = rooms.ToString(),
+                ["userDiscountPercent"] = userDiscountPercent.ToString(),
+                ["startDate"] = start.ToString("O"),
+                ["endDate"] = end.ToString("O"),
+            });
+
+            var offerObjResult = await _gateway.ForwardRequestAsync<object>(
+                "OfferApiService",
+                $"/api/offer/search/offers/fromCountry{offerQuery}",
+                HttpMethod.Get,
+                null);
+
+            if (offerObjResult is not OkObjectResult okOffer)
+                return offerObjResult;
+
+            var offerDictList = BffHelper.ConvertActionResultToDict(okOffer);
+            var filterDicts = ParseParamFiltersToDict(paramItemFilters);
+            var filteredOfferList = new List<Dictionary<string, object>>();
+
+            var dateConflictCache =
+                new Dictionary<(int offerId, DateTime start, DateTime end), bool>();
+
+
+            var idList = new List<int>();
+            foreach (var offer in offerDictList)
+            {
+                if (!TryGetOfferId(offer, out var offerId))
+                    continue;
+                var id = int.Parse(offer["id"].ToString());
+                idList.Add(id);
+
+                var cacheKey = (offerId, start, end);
+
+                if (!dateConflictCache.TryGetValue(cacheKey, out var hasConflict))
+                {
+                    hasConflict = await HasDateConflictAsync(
+                        offerId, start, end);
+
+                    dateConflictCache[cacheKey] = hasConflict;
+                }
+
+                if (hasConflict)
+                    continue;
+
+                if (!filterDicts.Any())
+                {
+                    filteredOfferList.Add(offer);
+                    continue;
+                }
+
+                if (!TryGetParamValues(offer, out var paramValues))
+                    continue;
+
+                if (MatchAllFilters(paramValues, filterDicts))
+                    filteredOfferList.Add(offer);
+
+                var entityStatEventRequest = new EntityStatEventRequest
+                {
+                    EntityId = offerId,
+                    EntityType = "Offer",
+                    ActionType = "Search",
+                    UserId = userId
+                };
+                await SendStatEvent(entityStatEventRequest, "Offer");
+
+
+                //var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService",
+                //    $"/api/review/search/offers/rating/{offerId}",
+                //    HttpMethod.Get,
+                //    null);
+                //if (ratingObjResult is not OkObjectResult okRating)
+                //    return Ok(offerDictList);
+                //var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
+
+                //BffHelper.UpdateOfferListWithRating(offerDictList, ratingDictList);
+            }
+
+            var entityStatCityEventRequest = new EntityStatEventRequest
+            {
+                EntityId = countryId,
+                EntityType = "Country",
+                ActionType = "Search",
+                UserId = userId
+            };
+            await SendStatEvent(entityStatCityEventRequest, "City");
+
+            var offerTranslations = await GetTranslationsAsync(lang, "Offer");
+            var updateOfferDictList = BffHelper.UpdateListWithTranslations(filteredOfferList, offerTranslations);
+
+
+            //получаем рейтинг
+            var ratingObjResult = await _gateway.ForwardRequestAsync<object>(
+                "ReviewApiService",
+                $"/api/review/search/offers/rating",
+                HttpMethod.Post,
+                idList);
+            if (ratingObjResult is OkObjectResult okRating)
+            {
+                var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
+                BffHelper.UpdateOfferListWithRating(updateOfferDictList, ratingDictList);
+            }
+            return Ok(updateOfferDictList);
+        }
+
 
 
 
@@ -403,7 +814,13 @@ namespace WebApiGetway.Controllers
 
 
             //получаем рейтинг
-            var ratingObjResult = await _gateway.ForwardRequestAsync<object>("ReviewApiService", $"/api/review/search/offers/rating/{id}", HttpMethod.Get, null);
+            var ratingObjResult = await _gateway.ForwardRequestAsync<object>(
+                 "ReviewApiService",
+                 $"/api/review/get-by-offerId/{id}",
+                 HttpMethod.Get,
+                 null
+             );
+
             if (ratingObjResult is not OkObjectResult okRating)
                 return Ok(offerDictList);
             var ratingDictList = BffHelper.ConvertActionResultToDict(okRating);
@@ -713,6 +1130,50 @@ namespace WebApiGetway.Controllers
             }
 
             return Ok(historyResponseList);
+        }
+
+
+         // =======================================================================================
+        //                          CLIENT:  получить все id  заказов из истории и из избранное
+        // =======================================================================================
+
+        [Authorize]
+        [HttpGet("me/history/get/offersId/{lang}")]
+        public async Task<IActionResult> GetOffersIdToClientHistory(string lang)
+        {
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            var historyResult = await _gateway.ForwardRequestAsync<object>(
+                "UserApiService",
+                $"/api/User/me/history/get/offers",
+                HttpMethod.Get,
+                null
+            );
+
+            if (historyResult is not OkObjectResult okHistory)
+                return historyResult;
+
+            var historyDictList = BffHelper.ConvertActionResultToDict(okHistory);
+            if (historyDictList == null || !historyDictList.Any())
+                return Ok(new List<HistoryOfferLinkResponse>());
+
+
+            var historyIdResponseList = new List<int>();
+
+            foreach (var historyOf in historyDictList)
+            {
+                if (!historyOf.TryGetValue("offerId", out var offerIdRaw) ||
+                     !int.TryParse(offerIdRaw?.ToString(), out var idOffer))
+                {
+                    continue; 
+                }
+                historyIdResponseList.Add(idOffer);
+
+            }
+
+            return Ok(historyIdResponseList);
         }
 
         //============================================================================================

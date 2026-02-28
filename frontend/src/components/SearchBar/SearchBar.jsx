@@ -14,64 +14,69 @@ import styles from "./SearchBar.module.css";
 
 export const SearchBar = ({
   onSearch,
-  params,
+   params = {},
   classNameWidth = "btn-w-960",
   classNameHeight = "btn-h-50",
   className
 }) => {
   const { t } = useTranslation();
   const { offerApi } = useContext(ApiContext);
+
   const { language } = useLanguage();
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const cityId = searchParams.get("cityId") || localStorage.getItem("locationId") || null;
-  const cityName = localStorage.getItem("city") || "";
- const adults = Number(searchParams.get("adults") || localStorage.getItem("adults") || 1);
+  const cityName =  "";
+  const adults = Number(searchParams.get("adults") || localStorage.getItem("adults") || 1);
   const children = Number(searchParams.get("children") || localStorage.getItem("children") || 0);
   const rooms = Number(searchParams.get("rooms") || localStorage.getItem("rooms") || 1);
 
-const parseLocalDate = (str) => {
-  if (!str) return null;
-  const parts = str.split("-");
-  if (parts.length !== 3) return null;
-  const [year, month, day] = parts.map(Number);
-  if (!year || !month || !day) return null;
-  return new Date(year, month - 1, day); // локальная дата 00:00
-};
+  const parseLocalDate = (str) => {
+    if (!str) return null;
+    const parts = str.split("-");
+    if (parts.length !== 3) return null;
+    const [year, month, day] = parts.map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day); 
+  };
 
-const today = new Date();
+  const today = new Date();
 
-const startDateStr =
-  searchParams.get("startDate") ||
-  localStorage.getItem("startDate") ||
-  `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const startDateStr =
+    searchParams.get("startDate") ||
+    localStorage.getItem("startDate") ||
+    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-const endDateStr =
-  searchParams.get("endDate") ||
-  localStorage.getItem("endDate") ||
-  `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()+1).padStart(2,'0')}`;
+  const endDateStr =
+    searchParams.get("endDate") ||
+    localStorage.getItem("endDate") ||
+    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate() + 1).padStart(2, '0')}`;
 
-const [dateRange, setDateRange] = useState({
-  start: parseLocalDate(startDateStr),
-  end: parseLocalDate(endDateStr),
-});
-console.log( "Time-"); 
-console.log({ startDateStr, endDateStr, dateRange });
-console.log({ dateRange });
-  const [location, setLocation] = useState(cityName);
+  const [dateRange, setDateRange] = useState({
+    start: parseLocalDate(startDateStr),
+    end: parseLocalDate(endDateStr),
+  });
+
+
+  console.log("Time-");
+  console.log({ startDateStr, endDateStr, dateRange });
+  console.log({ dateRange });
+  const [location, setLocation] = useState("");
   const [locationId, setLocationId] = useState(null);
-   const [slug, setSlug] = useState("");
+  const [slug, setSlug] = useState("");
   const [hotels, setHotels] = useState([]);
 
+console.log({locationT: location, locationId, slug});
 
-  useEffect(() => {
-    if (cityId) {
-      setLocationId(cityId); 
-      const storedCityName = localStorage.getItem("city");
-      if (storedCityName) setLocation(storedCityName);
-    }
-  }, [cityId]);
+
+  // useEffect(() => {
+  //   if (cityId) {
+  //     setLocationId(cityId);
+  //     const storedCityName = localStorage.getItem("city");
+  //     if (storedCityName) setLocation(storedCityName);
+  //   }
+  // }, [cityId]);
 
 
 
@@ -83,13 +88,13 @@ console.log({ dateRange });
 
   const [isGuestOpen, setIsGuestOpen] = useState(false);
 
-const formatLocalDate = (date) => {
-  if (!date) return "";
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-};
+  const formatLocalDate = (date) => {
+    if (!date) return "";
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
 
   const handleSearch = () => {
     if (!locationId) {
@@ -104,6 +109,8 @@ const formatLocalDate = (date) => {
 
     const combinedParams = {
       cityId: locationId,
+        countryId: null,
+      regionId: null,
       startDate: formatLocalDate(dateRange.start),
       endDate: formatLocalDate(dateRange.end),
       adults: guests.adults,
@@ -125,6 +132,8 @@ const formatLocalDate = (date) => {
     setLocationId(cityId);
     setSlug(slug);
   };
+
+ 
 
 
   return (

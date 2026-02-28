@@ -10,6 +10,7 @@ export const HotelCardList = ({
   endDate = "2026-01-24",
   onCardClick,
   onCheckAvailability,
+  myHistoryIdList,
   cardWidth = 424,
   gap = 20,
   openFilterMenu = false, 
@@ -40,7 +41,7 @@ useEffect(()=>{
   useEffect(() => {
     updateColumns();
   }, [openFilterMenu]);
-
+console.log({ hotels });
   return (
     <div
       ref={containerRef}
@@ -61,13 +62,18 @@ useEffect(()=>{
           cityId={hotel.rentObj?.[0]?.cityId}
           country={hotel.country}
           distance={hotel.distanceToCenter}
-          rating={hotel.rating}
+          rating={
+                      hotel.overallRating != null
+                        ? hotel.overallRating.toFixed(2)
+                        : "7.10"
+                    }
           reviews={hotel.reviews}
           price={hotel.pricePerDay ?? hotel.totalPrice}
            adults ={adults}
               children={children}
           startDate={startDate}
           endDate={endDate}
+          myHistoryIdList={myHistoryIdList}
           showHeart = {showHeart}
           onClick={() => {
             console.log ({id: hotel.id})

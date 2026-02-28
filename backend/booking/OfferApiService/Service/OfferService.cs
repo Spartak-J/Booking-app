@@ -28,6 +28,8 @@ namespace OfferApiService.Services
             var offers = await GetEntitiesAsync();
             return offers.FirstOrDefault(o => o.id == id);
         }
+
+
         public override async Task<Offer> GetEntityAsync(int id, params string[] includeProperties)
         {
             using var db = new OfferContext();
@@ -220,6 +222,65 @@ namespace OfferApiService.Services
         }
 
 
+        //==================================================================================================================
+        public async Task<List<Offer>> SearchOffersFromRegion([FromQuery] OfferSearchRequestByRegionAndCountGuest request)
+        {
+            var fitOffers = new List<Offer>();
+            var totalGuests = request.Adults + request.Children;
+            try
+            {
+                using var db = new OfferContext();
+
+                fitOffers = await db.Offers
+                   .Include(o => o.RentObj)
+                       .ThenInclude(ro => ro.Images)
+                   .Include(o => o.RentObj)
+                       .ThenInclude(ro => ro.ParamValues)
+                   .Where(o => o.RentObj != null &&
+                               o.RentObj.RegionId == request.RegionId &&
+                               o.MaxGuests >= totalGuests)
+                   .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                //throw new Exception("An error occurred while retrieving offers", ex);
+                Console.WriteLine("Exception message: " + ex.Message);
+                Console.WriteLine("Stack trace: " + ex.StackTrace);
+                throw;
+            }
+            return fitOffers;
+        }
+
+        //==================================================================================================================
+        public async Task<List<Offer>> SearchOffersFromCountry([FromQuery] OfferSearchRequestByCountryAndCountGuest request)
+        {
+            var fitOffers = new List<Offer>();
+            var totalGuests = request.Adults + request.Children;
+            try
+            {
+                using var db = new OfferContext();
+
+                fitOffers = await db.Offers
+                   .Include(o => o.RentObj)
+                       .ThenInclude(ro => ro.Images)
+                   .Include(o => o.RentObj)
+                       .ThenInclude(ro => ro.ParamValues)
+                   .Where(o => o.RentObj != null &&
+                               o.RentObj.CountryId == request.CountryId &&
+                               o.MaxGuests >= totalGuests)
+                   .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                //throw new Exception("An error occurred while retrieving offers", ex);
+                Console.WriteLine("Exception message: " + ex.Message);
+                Console.WriteLine("Stack trace: " + ex.StackTrace);
+                throw;
+            }
+            return fitOffers;
+        }
         //==================================================================================================================
         public async Task<List<Offer>> SearchOffersAsync([FromQuery] OfferSearchRequestByCityAndCountGuest request)
         {

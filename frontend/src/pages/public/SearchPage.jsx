@@ -17,12 +17,14 @@ import styles from "./SearchPage.module.css";
 
 
 export const SearchPage = ({ defaultCityId }) => {
-  const { offerApi, paramsCategoryApi } = useContext(ApiContext);
+  const { offerApi, paramsCategoryApi,userApi,locationApi } = useContext(ApiContext);
   const { language } = useLanguage();
   const [searchParams] = useSearchParams();
 
   const cityId = searchParams.get("cityId") || localStorage.getItem("locationId") || null;
-  const cityName = localStorage.getItem("city") || "";
+  const regionId = searchParams.get("regionId")  || null;
+  const countryId = searchParams.get("countryId")  || null;
+
 
   const startDateStr = searchParams.get("startDate") || localStorage.getItem("startDate") || new Date().toISOString();
   const endDateStr = searchParams.get("endDate") || localStorage.getItem("endDate") || new Date(Date.now() + 86400000).toISOString(); // завтра
@@ -67,18 +69,46 @@ export const SearchPage = ({ defaultCityId }) => {
   const [sortType, setSortType] = useState("recommended");
 
 
+  const [country, setCountry] = useState("");
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
+  
+  
+  
+    useEffect(() => {
+      const loadCity = async () => {
+        try {
+          const res = await locationApi.getCityAndCountryById(cityId, language);
+          setCity(res.data.title);
+          setRegion(res.data.regionTitle);
+          setCountry(res.data.countryTitle);
+          console.log("Ответ getCity:", res.data, res.data.title);
+        } catch (error) {
+          console.warn("API getCity недоступен, используется mock");
+          setCity("");
+        }
+      };
+  
+      loadCity();
+    }, [cityId, language]);
+
+
   useEffect(() => {
-    if (!cityId || !startDate || !endDate) return;
+    
 
     const fetchHotels = async () => {
       setLoading(true);
       document.body.style.cursor = "wait";
-
+const safeCityId = cityId && cityId !== "null" ? Number(cityId) : null;
+const safeRegionId = regionId && regionId !== "null" ? Number(regionId) : null;
+const safeCountryId = countryId && countryId !== "null" ? Number(countryId) : null;
       try {
         const response = await offerApi.searchOffers({
-          cityId,
+          cityId: safeCityId,
+          regionId: safeRegionId,
+  countryId: safeCountryId, 
           startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
+          endDate: endDate.toISOString(),   
           adults,
           children,
           rooms,
@@ -153,10 +183,32 @@ export const SearchPage = ({ defaultCityId }) => {
   }, [hotels, sortType]);
 
 
+
+   const [myHistoryIdList, setMyHistoryIdList] = useState([]);
+
+
+  useEffect(() => {
+
+    userApi
+      .getMyHistoryId(language)
+      .then((res) => {
+        setMyHistoryIdList(res.data || []);
+      })
+      .catch(() => {
+        setMyHistoryIdList([]);
+      })
+      .finally(() => {
+       
+      });
+  }, [language]);
+
+
   return (
     <div className={styles.searchPage}>
       <Header_Full
-        city={cityName}
+        city={city}
+        region={region}
+        country={country}
         adults={adults}
         rooms={rooms}
         children={children}
@@ -187,6 +239,7 @@ export const SearchPage = ({ defaultCityId }) => {
               >
                 <HotelCardList
                   hotels={sortedHotels}
+                  myHistoryIdList={myHistoryIdList}
                   adults={adults}
                   children={children}
                   startDate={startDate}
@@ -196,7 +249,7 @@ export const SearchPage = ({ defaultCityId }) => {
               {openFilterMenu && (
                 <aside className={styles.searchPage__filters}>
                   <FilterSidebar
-                    city={cityName}
+                    city={city}
                     setParamsString={setParamsString}
                     params={params}
                     setParams={setParams}

@@ -18,5 +18,8 @@ namespace OfferApiService.Service.Interface
         Task<List<Offer>> GetOffersByOwnerIdAndCityAsync(int ownerId, int cityId);
         Task<List<Offer>> GetOffersByOwnerIdAndCountryAsync(int ownerId, int countryId);
         Task<List<Offer>> SearchOffersAsync([FromQuery] OfferSearchRequestByCityAndCountGuest request);
+        Task<List<Offer>> SearchOffersFromRegion([FromQuery] OfferSearchRequestByRegionAndCountGuest request);
+
+        Task<List<Offer>> SearchOffersFromCountry([FromQuery] OfferSearchRequestByCountryAndCountGuest request);
     }
 }

@@ -14,6 +14,7 @@ export const locationApi = {
  getPopularCities: (period, limit, lang) => http.get(`/Bff/statistic/top/${period}/get/city/${limit}/${lang}`), 
  getCityById: (id, lang) => http.get(`/Bff/location/get/city/${id}/${lang}`), 
 
+ getCityAndCountryById: (id, lang) => http.get(`/Bff/city/country/get-translations/${id}/${lang}`), 
 
 
   getCountryTitle: (id) => http.get(`/Location/get-country-title/${id}`),
